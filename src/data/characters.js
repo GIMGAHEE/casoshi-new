@@ -147,12 +147,12 @@ export const DEFAULT_PRESET_ID = 'preset_basic';
 // 머리스타일 목록 — basic.png 위에 레이어로 겹쳐지는 오버레이 PNG
 // defaultTransform: 사용자가 직접 맞춘 basic body 기준 0포인트 (이후 조정은 이 값에 +/- 오프셋)
 export const HAIRSTYLES = [
-  { id: 'hair_bob_short',     label: 'ショート',   overlay: '/sprites/hair_bob_short.png',     defaultTransform: { x: 0, y: -18, scale: 1.74 } },
-  { id: 'hair_medium',        label: 'ミディアム', overlay: '/sprites/hair_medium.png',        defaultTransform: { x: 0, y: -10, scale: 1.80 } },
-  { id: 'hair_long_straight', label: 'ロング',     overlay: '/sprites/hair_long_straight.png', defaultTransform: { x: 0, y:  -7, scale: 1.84 } },
-  { id: 'hair_long_wavy',     label: 'ウェーブ',   overlay: '/sprites/hair_long_wavy.png',     defaultTransform: { x: 0, y:  -2, scale: 1.90 } },
-  { id: 'hair_twintails',     label: 'ツインテ',   overlay: '/sprites/hair_twintails.png',     defaultTransform: { x: 0, y: -11, scale: 1.81 } },
-  { id: 'hair_bun',           label: 'お団子',     overlay: '/sprites/hair_bun.png',           defaultTransform: { x: 0, y: -13, scale: 1.81 } },
+  { id: 'hair_bob_short',     label: 'ショート',   overlay: '/sprites/hair_bob_short.png',     defaultTransform: { x: 0, y: -18, scale: 0.74 } },
+  { id: 'hair_medium',        label: 'ミディアム', overlay: '/sprites/hair_medium.png',        defaultTransform: { x: 0, y: -10, scale: 0.80 } },
+  { id: 'hair_long_straight', label: 'ロング',     overlay: '/sprites/hair_long_straight.png', defaultTransform: { x: 0, y:  -7, scale: 0.84 } },
+  { id: 'hair_long_wavy',     label: 'ウェーブ',   overlay: '/sprites/hair_long_wavy.png',     defaultTransform: { x: 0, y:  -2, scale: 0.90 } },
+  { id: 'hair_twintails',     label: 'ツインテ',   overlay: '/sprites/hair_twintails.png',     defaultTransform: { x: 0, y: -11, scale: 0.81 } },
+  { id: 'hair_bun',           label: 'お団子',     overlay: '/sprites/hair_bun.png',           defaultTransform: { x: 0, y: -13, scale: 0.81 } },
 ];
 
 export const DEFAULT_HAIRSTYLE_ID = 'hair_bob_short';
