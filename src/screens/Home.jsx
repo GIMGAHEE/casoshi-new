@@ -58,7 +58,12 @@ export default function Home({
             onClick={onOpenTapGame}
             className="card flex flex-col items-center justify-center py-5 bg-gradient-to-br from-oshi-sub to-oshi-bg hover:scale-[1.02] transition-transform"
           >
-            <div className="text-3xl mb-1">💥</div>
+            <img
+              src="/icons/tap.png"
+              alt=""
+              className="w-12 h-12 mb-1"
+              style={{ imageRendering: 'pixelated' }}
+            />
             <div className="text-sm font-bold text-oshi-dark">タップゲーム</div>
             <div className="text-[10px] text-oshi-dark/60">タップで +1 ポイント</div>
           </button>
