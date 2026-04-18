@@ -1,8 +1,7 @@
-import { SEED_CHARACTERS, asCharacter, MY_OSHI_ID } from '../data/characters';
+import { SEED_CHARACTERS, asCharacter, MY_OSHI_ID, MY_OSHI_PRESETS } from '../data/characters';
 import { todayKey, DAILY_BONUS } from '../data/gameRules';
 import CharacterCard from '../components/CharacterCard';
 import PixelAvatar from '../components/PixelAvatar';
-import { DEFAULT_PIXEL_SELECTIONS } from '../data/pixelParts';
 
 export default function Home({
   points, setPoints,
@@ -93,7 +92,7 @@ export default function Home({
           >
             {/* 미니 프리뷰 */}
             <div className="flex-shrink-0 w-16 h-16 rounded-xl bg-white flex items-center justify-center overflow-hidden shadow-inner border border-oshi-sub">
-              <PixelAvatar selections={DEFAULT_PIXEL_SELECTIONS} size={48} />
+              <PixelAvatar sprite={MY_OSHI_PRESETS[0].sprite} size={56} />
             </div>
             <div className="flex-1 text-left">
               <div className="text-sm font-black text-oshi-main">✨ マイ推しを作る</div>

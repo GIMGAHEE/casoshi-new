@@ -130,6 +130,18 @@ export const getDialogueForLevel = (character, level) => {
 
 export const MY_OSHI_ID = 'my_oshi';
 
+// 5명 시드 캐릭터의 스프라이트를 프리셋으로 재활용
+// 이름/대사는 유저가 커스텀, 외모만 이 중에서 선택
+export const MY_OSHI_PRESETS = [
+  { id: 'preset_himari', sprite: '/sprites/himari.png', label: 'タイプA',  themeColor: '#FFD166', bgColor: '#FFF4D6' },
+  { id: 'preset_yuki',   sprite: '/sprites/yuki.png',   label: 'タイプB',  themeColor: '#A5D8FF', bgColor: '#E7F5FF' },
+  { id: 'preset_rei',    sprite: '/sprites/rei.png',    label: 'タイプC',  themeColor: '#9B8AFB', bgColor: '#EDE9FE' },
+  { id: 'preset_akane',  sprite: '/sprites/akane.png',  label: 'タイプD',  themeColor: '#FF8A65', bgColor: '#FFE3D6' },
+  { id: 'preset_mio',    sprite: '/sprites/mio.png',    label: 'タイプE',  themeColor: '#B47AEA', bgColor: '#F3E8FF' },
+];
+
+export const DEFAULT_PRESET_ID = 'preset_himari';
+
 // 제네릭 대사 (유저 캐릭터용 - 이름 자리표시자 {name} 치환)
 const GENERIC_DIALOGUES = [
   { unlockLevel: 1,  text: 'よろしくね！私は{name}だよ♪' },
@@ -140,8 +152,14 @@ const GENERIC_DIALOGUES = [
 ];
 
 // myOshi(로컬스토리지 저장 데이터)를 표준 캐릭터 객체로 변환
+// 신형: { name, presetId }
+// 구형(마이그레이션): { name, parts, colors } — presetId 없으면 기본 프리셋 사용
 export const asCharacter = (myOshi) => {
   if (!myOshi) return null;
+  const preset =
+    MY_OSHI_PRESETS.find(p => p.id === myOshi.presetId) ||
+    MY_OSHI_PRESETS.find(p => p.id === DEFAULT_PRESET_ID);
+
   return {
     id: MY_OSHI_ID,
     creatorId: 'user_self',
@@ -149,18 +167,17 @@ export const asCharacter = (myOshi) => {
     nameRomaji: '',
     type: 'マイ推し',
     typeLabel: '나의 추시',
-    themeColor: myOshi.colors.hair,     // 테마 컬러는 머리색 기준
-    bgColor: myOshi.colors.outfit + '33', // 옷 컬러 + 투명도
+    themeColor: preset.themeColor,
+    bgColor: preset.bgColor,
+    sprite: preset.sprite,
     catchphrase: 'あなたが作った、あなただけの推し。',
     bio: `${myOshi.name}は、あなただけのために生まれた推しです。一緒に育てていこう！`,
     dialogues: GENERIC_DIALOGUES.map(d => ({
       ...d,
       text: d.text.replace('{name}', myOshi.name),
     })),
-    // MyOshi 전용 필드 (렌더 시 AvatarSVG 사용 여부 판별용)
     isMyOshi: true,
-    parts: myOshi.parts,
-    colors: myOshi.colors,
+    presetId: preset.id,
   };
 };
 
