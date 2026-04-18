@@ -77,7 +77,9 @@ export default function LevelUpModal({ character, newLevel, onClose }) {
           className="mx-auto w-24 h-24 rounded-full flex items-center justify-center mb-3 shadow-inner overflow-hidden animate-float"
           style={{ backgroundColor: character.themeColor + '55' }}
         >
-          {character.isMyOshi ? (
+          {character.sprite ? (
+            <PixelAvatar sprite={character.sprite} size={96} />
+          ) : character.isMyOshi ? (
             <PixelAvatar
               selections={{ parts: character.parts, colors: character.colors }}
               size={80}

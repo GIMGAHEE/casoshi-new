@@ -8,8 +8,11 @@ const MEDAL_BG = [
   'linear-gradient(135deg, #CD7F32, #8B4513)',
 ];
 
-// 아바타 표시 (이모지 or 픽셀 분기)
+// 아바타 표시 (PNG sprite > 픽셀 빌더 > 이모지 폴백)
 function Avatar({ character, size }) {
+  if (character.sprite) {
+    return <PixelAvatar sprite={character.sprite} size={size} />;
+  }
   if (character.isMyOshi) {
     return (
       <PixelAvatar

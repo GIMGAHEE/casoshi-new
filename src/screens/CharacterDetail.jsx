@@ -96,7 +96,9 @@ export default function CharacterDetail({
             className="mx-auto w-32 h-32 rounded-full flex items-center justify-center shadow-inner mb-3 overflow-hidden"
             style={{ backgroundColor: character.themeColor + '40' }}
           >
-            {character.isMyOshi ? (
+            {character.sprite ? (
+              <PixelAvatar sprite={character.sprite} size={128} />
+            ) : character.isMyOshi ? (
               <PixelAvatar
                 selections={{ parts: character.parts, colors: character.colors }}
                 size={110}

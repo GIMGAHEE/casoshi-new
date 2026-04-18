@@ -12,6 +12,7 @@ export const SEED_CHARACTERS = [
     emoji: '🌻',
     themeColor: '#FFD166',
     bgColor: '#FFF4D6',
+    sprite: '/sprites/himari.png',
     catchphrase: 'みんなの元気、ぜんぶ吸収しちゃう！',
     bio: 'いつも笑顔を絶やさない太陽みたいな子。推されると光ります。',
     dialogues: [
@@ -32,6 +33,7 @@ export const SEED_CHARACTERS = [
     emoji: '❄️',
     themeColor: '#A5D8FF',
     bgColor: '#E7F5FF',
+    sprite: '/sprites/yuki.png',
     catchphrase: 'そっと、側にいさせてください。',
     bio: '物静かで優しい雪の妖精。声をかけると少しだけ微笑みます。',
     dialogues: [
@@ -52,6 +54,7 @@ export const SEED_CHARACTERS = [
     emoji: '🌙',
     themeColor: '#9B8AFB',
     bgColor: '#EDE9FE',
+    sprite: '/sprites/rei.png',
     catchphrase: '…別に、嬉しくなんかないけど。',
     bio: 'ツンとした態度の裏に、実はファン想いの一面が。',
     dialogues: [
@@ -72,6 +75,7 @@ export const SEED_CHARACTERS = [
     emoji: '🔥',
     themeColor: '#FF8A65',
     bgColor: '#FFE3D6',
+    sprite: '/sprites/akane.png',
     catchphrase: 'よっしゃ、今日も全力で行くぞ！',
     bio: '元気100倍、勝負ごとが大好き。推しカツも真剣勝負です。',
     dialogues: [
@@ -92,6 +96,7 @@ export const SEED_CHARACTERS = [
     emoji: '🔮',
     themeColor: '#B47AEA',
     bgColor: '#F3E8FF',
+    sprite: '/sprites/mio.png',
     catchphrase: 'あなたの運命、視えてしまった。',
     bio: '不思議な雰囲気の占い好き。推しの数値で占いの精度が上がるとか。',
     dialogues: [

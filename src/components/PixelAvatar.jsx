@@ -13,7 +13,26 @@ import {
  * }
  * size: target rendered width in px (height auto-computed by aspect ratio)
  */
-export default function PixelAvatar({ selections, size = 96 }) {
+export default function PixelAvatar({ selections, sprite, size = 96 }) {
+  // PNG sprite path wins over parts-based rendering.
+  if (sprite) {
+    return (
+      <img
+        src={sprite}
+        alt=""
+        width={size}
+        style={{
+          display: 'block',
+          imageRendering: 'pixelated',
+          width: size,
+          height: 'auto',
+          userSelect: 'none',
+        }}
+        draggable={false}
+      />
+    );
+  }
+
   const palette = buildPalette(selections.colors);
   const merged = composeLayers(selections);
 

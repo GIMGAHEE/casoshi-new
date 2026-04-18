@@ -24,7 +24,9 @@ export default function CharacterCard({ character, supportPoints, onClick, highl
           className="flex-shrink-0 w-20 h-20 rounded-full flex items-center justify-center shadow-inner overflow-hidden"
           style={{ backgroundColor: character.themeColor + '30' }}
         >
-          {character.isMyOshi ? (
+          {character.sprite ? (
+            <PixelAvatar sprite={character.sprite} size={72} />
+          ) : character.isMyOshi ? (
             <div style={{ imageRendering: 'pixelated' }}>
               <PixelAvatar
                 selections={{ parts: character.parts, colors: character.colors }}

@@ -59,7 +59,9 @@ export default function MiniHome({
                 }}
               >
                 <div style={{ width: 100, height: 132, overflow: 'visible' }}>
-                  {character.isMyOshi ? (
+                  {character.sprite ? (
+                    <PixelAvatar sprite={character.sprite} size={100} />
+                  ) : character.isMyOshi ? (
                     <PixelAvatar
                       selections={{ parts: character.parts, colors: character.colors }}
                       size={100}
@@ -116,7 +118,9 @@ export default function MiniHome({
             className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0"
             style={{ backgroundColor: character.themeColor + '40' }}
           >
-            {character.isMyOshi ? (
+            {character.sprite ? (
+              <PixelAvatar sprite={character.sprite} size={48} />
+            ) : character.isMyOshi ? (
               <PixelAvatar
                 selections={{ parts: character.parts, colors: character.colors }}
                 size={44}
