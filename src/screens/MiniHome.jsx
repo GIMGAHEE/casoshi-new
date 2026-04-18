@@ -1,6 +1,6 @@
 import { findCharacter, calcLevel } from '../data/characters';
 import IsometricRoom from '../components/IsometricRoom';
-import AvatarSVG from '../components/AvatarSVG';
+import PixelAvatar from '../components/PixelAvatar';
 
 export default function MiniHome({
   characterId, myOshi, supports,
@@ -58,9 +58,9 @@ export default function MiniHome({
                   alignItems: 'flex-end',
                 }}
               >
-                <div style={{ width: 100, height: 120, overflow: 'visible' }}>
+                <div style={{ width: 100, height: 132, overflow: 'visible' }}>
                   {character.isMyOshi ? (
-                    <AvatarSVG
+                    <PixelAvatar
                       selections={{ parts: character.parts, colors: character.colors }}
                       size={100}
                     />
@@ -117,12 +117,10 @@ export default function MiniHome({
             style={{ backgroundColor: character.themeColor + '40' }}
           >
             {character.isMyOshi ? (
-              <div style={{ transform: 'translateY(8%)' }}>
-                <AvatarSVG
-                  selections={{ parts: character.parts, colors: character.colors }}
-                  size={48}
-                />
-              </div>
+              <PixelAvatar
+                selections={{ parts: character.parts, colors: character.colors }}
+                size={44}
+              />
             ) : (
               <span className="text-2xl">{character.emoji}</span>
             )}

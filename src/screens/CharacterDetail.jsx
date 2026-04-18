@@ -5,7 +5,7 @@ import {
 } from '../data/characters';
 import { SUPPORT_COST } from '../data/gameRules';
 import LevelUpModal from '../components/LevelUpModal';
-import AvatarSVG from '../components/AvatarSVG';
+import PixelAvatar from '../components/PixelAvatar';
 
 export default function CharacterDetail({
   characterId,
@@ -97,12 +97,10 @@ export default function CharacterDetail({
             style={{ backgroundColor: character.themeColor + '40' }}
           >
             {character.isMyOshi ? (
-              <div style={{ transform: 'translateY(6%) scale(1.05)' }}>
-                <AvatarSVG
-                  selections={{ parts: character.parts, colors: character.colors }}
-                  size={130}
-                />
-              </div>
+              <PixelAvatar
+                selections={{ parts: character.parts, colors: character.colors }}
+                size={110}
+              />
             ) : (
               <div className="text-7xl animate-float">{character.emoji}</div>
             )}

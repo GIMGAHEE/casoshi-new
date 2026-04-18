@@ -1,5 +1,5 @@
 import { calcLevel, calcExp } from '../data/characters';
-import AvatarSVG from './AvatarSVG';
+import PixelAvatar from './PixelAvatar';
 
 export default function CharacterCard({ character, supportPoints, onClick, highlight = false }) {
   const level = calcLevel(supportPoints);
@@ -25,10 +25,10 @@ export default function CharacterCard({ character, supportPoints, onClick, highl
           style={{ backgroundColor: character.themeColor + '30' }}
         >
           {character.isMyOshi ? (
-            <div style={{ transform: 'translateY(8%)' }}>
-              <AvatarSVG
+            <div style={{ imageRendering: 'pixelated' }}>
+              <PixelAvatar
                 selections={{ parts: character.parts, colors: character.colors }}
-                size={64}
+                size={56}
               />
             </div>
           ) : (

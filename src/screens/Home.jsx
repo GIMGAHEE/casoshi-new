@@ -1,7 +1,8 @@
 import { SEED_CHARACTERS, asCharacter, MY_OSHI_ID } from '../data/characters';
 import { todayKey, DAILY_BONUS } from '../data/gameRules';
 import CharacterCard from '../components/CharacterCard';
-import AvatarSVG from '../components/AvatarSVG';
+import PixelAvatar from '../components/PixelAvatar';
+import { DEFAULT_PIXEL_SELECTIONS } from '../data/pixelParts';
 
 export default function Home({
   points, setPoints,
@@ -91,27 +92,8 @@ export default function Home({
             className="w-full card flex items-center gap-4 py-5 px-5 bg-gradient-to-br from-oshi-sub/50 via-white to-oshi-bg active:scale-[0.98] transition-transform border-dashed border-2 border-oshi-main/40"
           >
             {/* 미니 프리뷰 */}
-            <div className="flex-shrink-0 w-16 h-16 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-inner">
-              <div style={{ transform: 'translateY(10%) scale(0.85)' }}>
-                <AvatarSVG
-                  selections={{
-                    parts: {
-                      hair: 'hair_twintails',
-                      eyes: 'eyes_round',
-                      mouth: 'mouth_smile',
-                      outfit: 'outfit_dress',
-                      accessory: 'acc_ribbon',
-                    },
-                    colors: {
-                      skin: '#FFE0C2',
-                      hair: '#FF6B9D',
-                      outfit: '#A5D8FF',
-                      accent: '#FF4785',
-                    },
-                  }}
-                  size={52}
-                />
-              </div>
+            <div className="flex-shrink-0 w-16 h-16 rounded-xl bg-white flex items-center justify-center overflow-hidden shadow-inner border border-oshi-sub">
+              <PixelAvatar selections={DEFAULT_PIXEL_SELECTIONS} size={48} />
             </div>
             <div className="flex-1 text-left">
               <div className="text-sm font-black text-oshi-main">✨ マイ推しを作る</div>

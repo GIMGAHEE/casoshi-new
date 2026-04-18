@@ -2,9 +2,9 @@ import { useState } from 'react';
 import {
   HAIR_PARTS, EYE_PARTS, MOUTH_PARTS, OUTFIT_PARTS, ACCESSORY_PARTS,
   SKIN_COLORS, HAIR_COLORS, OUTFIT_COLORS, ACCENT_COLORS,
-  DEFAULT_SELECTIONS,
-} from '../data/avatarParts';
-import AvatarSVG from '../components/AvatarSVG';
+  DEFAULT_PIXEL_SELECTIONS,
+} from '../data/pixelParts';
+import PixelAvatar from '../components/PixelAvatar';
 
 const TABS = [
   { id: 'hair', label: 'ヘア', emoji: '💇‍♀️' },
@@ -16,9 +16,9 @@ const TABS = [
 
 export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
   const [selections, setSelections] = useState(
-    initialOshi
+    initialOshi && initialOshi.style === 'pixel'
       ? { parts: initialOshi.parts, colors: initialOshi.colors }
-      : DEFAULT_SELECTIONS
+      : DEFAULT_PIXEL_SELECTIONS
   );
   const [name, setName] = useState(initialOshi?.name || '');
   const [activeTab, setActiveTab] = useState('hair');
@@ -56,6 +56,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
       return;
     }
     onSave({
+      style: 'pixel',
       name: trimmed,
       parts: selections.parts,
       colors: selections.colors,
@@ -64,7 +65,6 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
 
   return (
     <div className="max-w-md mx-auto pb-32">
-      {/* 상단바 */}
       <div className="flex items-center justify-between px-4 py-3">
         <button onClick={onCancel} className="text-sm text-oshi-dark/70">
           ← キャンセル
@@ -80,13 +80,17 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
         </button>
       </div>
 
-      {/* 프리뷰 */}
+      {/* プレビュー */}
       <div className="px-4">
         <div
           className="rounded-3xl py-6 flex flex-col items-center shadow-md border-2 border-oshi-sub"
-          style={{ background: `linear-gradient(135deg, ${selections.colors.skin}30, ${selections.colors.hair}20)` }}
+          style={{
+            background: `linear-gradient(135deg, ${selections.colors.skin}30, ${selections.colors.hair}20)`,
+            imageRendering: 'pixelated',
+          }}
         >
-          <AvatarSVG selections={selections} size={180} />
+          {/* 픽셀 아바타 - 24x32 스프라이트를 176x234로 스케일 (약 7.3배) */}
+          <PixelAvatar selections={selections} size={176} />
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -114,7 +118,6 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
         ))}
       </div>
 
-      {/* 탭 컨텐츠 */}
       <div className="px-4 mt-3 space-y-4">
         {activeTab === 'hair' && (
           <>
@@ -204,7 +207,6 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
         )}
       </div>
 
-      {/* 저장 버튼 고정 */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-oshi-bg via-oshi-bg to-transparent">
         <div className="max-w-md mx-auto">
           <button
@@ -219,10 +221,6 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
   );
 }
 
-// =====================================================
-// 서브 컴포넌트
-// =====================================================
-
 function PartGrid({ label, parts, activeId, onPick, selections, previewSlot }) {
   return (
     <div>
@@ -230,7 +228,6 @@ function PartGrid({ label, parts, activeId, onPick, selections, previewSlot }) {
       <div className="grid grid-cols-3 gap-2">
         {parts.map(p => {
           const active = p.id === activeId;
-          // 이 파츠만 바꾼 프리뷰를 미니로 렌더
           const previewSelections = {
             ...selections,
             parts: { ...selections.parts, [previewSlot]: p.id },
@@ -245,10 +242,8 @@ function PartGrid({ label, parts, activeId, onPick, selections, previewSlot }) {
                   : 'border-oshi-sub bg-white'
               }`}
             >
-              <div className="flex items-center justify-center h-16 overflow-hidden">
-                <div style={{ transform: 'scale(0.55)', transformOrigin: 'center' }}>
-                  <AvatarSVG selections={previewSelections} size={100} />
-                </div>
+              <div className="flex items-center justify-center h-20 overflow-hidden">
+                <PixelAvatar selections={previewSelections} size={60} />
               </div>
               <div className="text-[10px] text-center text-oshi-dark/70 mt-1 truncate">
                 {p.name}

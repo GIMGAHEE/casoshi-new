@@ -1,5 +1,5 @@
 import { allCharacters, calcLevel } from '../data/characters';
-import AvatarSVG from '../components/AvatarSVG';
+import PixelAvatar from '../components/PixelAvatar';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
 const MEDAL_BG = [
@@ -8,16 +8,14 @@ const MEDAL_BG = [
   'linear-gradient(135deg, #CD7F32, #8B4513)',
 ];
 
-// 아바타 표시 (이모지 or SVG 분기)
+// 아바타 표시 (이모지 or 픽셀 분기)
 function Avatar({ character, size }) {
   if (character.isMyOshi) {
     return (
-      <div style={{ transform: 'translateY(8%)' }}>
-        <AvatarSVG
-          selections={{ parts: character.parts, colors: character.colors }}
-          size={size * 1.1}
-        />
-      </div>
+      <PixelAvatar
+        selections={{ parts: character.parts, colors: character.colors }}
+        size={size}
+      />
     );
   }
   return <div style={{ fontSize: size * 0.55 }}>{character.emoji}</div>;
