@@ -132,25 +132,15 @@ export const MY_OSHI_ID = 'my_oshi';
 
 // 5명 시드 캐릭터의 스프라이트를 프리셋으로 재활용
 // 이름/대사는 유저가 커스텀, 외모만 이 중에서 선택
-// baseHairColor: 각 프리셋 원본 머리색 (canvas 치환 기준값)
 export const MY_OSHI_PRESETS = [
-  { id: 'preset_himari', sprite: '/sprites/himari.png', label: 'タイプA', themeColor: '#FFD166', bgColor: '#FFF4D6', baseHairColor: '#000000' },
-  { id: 'preset_yuki',   sprite: '/sprites/yuki.png',   label: 'タイプB', themeColor: '#A5D8FF', bgColor: '#E7F5FF', baseHairColor: '#101010' },
-  { id: 'preset_rei',    sprite: '/sprites/rei.png',    label: 'タイプC', themeColor: '#9B8AFB', bgColor: '#EDE9FE', baseHairColor: '#A07060' },
-  { id: 'preset_akane',  sprite: '/sprites/akane.png',  label: 'タイプD', themeColor: '#FF8A65', bgColor: '#FFE3D6', baseHairColor: '#000000' },
-  { id: 'preset_mio',    sprite: '/sprites/mio.png',    label: 'タイプE', themeColor: '#B47AEA', bgColor: '#F3E8FF', baseHairColor: '#000000' },
+  { id: 'preset_himari', sprite: '/sprites/himari.png', label: 'タイプA',  themeColor: '#FFD166', bgColor: '#FFF4D6' },
+  { id: 'preset_yuki',   sprite: '/sprites/yuki.png',   label: 'タイプB',  themeColor: '#A5D8FF', bgColor: '#E7F5FF' },
+  { id: 'preset_rei',    sprite: '/sprites/rei.png',    label: 'タイプC',  themeColor: '#9B8AFB', bgColor: '#EDE9FE' },
+  { id: 'preset_akane',  sprite: '/sprites/akane.png',  label: 'タイプD',  themeColor: '#FF8A65', bgColor: '#FFE3D6' },
+  { id: 'preset_mio',    sprite: '/sprites/mio.png',    label: 'タイプE',  themeColor: '#B47AEA', bgColor: '#F3E8FF' },
 ];
 
 export const DEFAULT_PRESET_ID = 'preset_himari';
-
-// 유저가 선택 가능한 머리색 (null = 원본 유지)
-export const HAIR_COLOR_OPTIONS = [
-  { id: 'original', label: 'そのまま', hex: null,      previewBg: '#e5e7eb' },
-  { id: 'blonde',   label: 'ブロンド',  hex: '#FFD166', previewBg: '#FFD166' },
-  { id: 'pink',     label: 'ピンク',    hex: '#FF6B9D', previewBg: '#FF6B9D' },
-  { id: 'blue',     label: 'ブルー',    hex: '#5B9BD5', previewBg: '#5B9BD5' },
-  { id: 'red',      label: 'レッド',    hex: '#E24B4A', previewBg: '#E24B4A' },
-];
 
 // 제네릭 대사 (유저 캐릭터용 - 이름 자리표시자 {name} 치환)
 const GENERIC_DIALOGUES = [
@@ -180,8 +170,6 @@ export const asCharacter = (myOshi) => {
     themeColor: preset.themeColor,
     bgColor: preset.bgColor,
     sprite: preset.sprite,
-    baseHairColor: preset.baseHairColor,
-    hairColor: myOshi.hairColor || null,
     catchphrase: 'あなたが作った、あなただけの推し。',
     bio: `${myOshi.name}は、あなただけのために生まれた推しです。一緒に育てていこう！`,
     dialogues: GENERIC_DIALOGUES.map(d => ({

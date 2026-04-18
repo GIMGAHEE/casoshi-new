@@ -11,7 +11,7 @@ const MEDAL_BG = [
 // 아바타 표시 (PNG sprite > 픽셀 빌더 > 이모지 폴백)
 function Avatar({ character, size }) {
   if (character.sprite) {
-    return <PixelAvatar sprite={character.sprite} size={size} hairColor={character.hairColor} baseHairColor={character.baseHairColor} />;
+    return <PixelAvatar sprite={character.sprite} size={size} />;
   }
   if (character.isMyOshi) {
     return (
