@@ -39,54 +39,48 @@ export default function MiniHome({
         </div>
 
         {/* 방 뷰 */}
-        <div
-          className="relative overflow-hidden"
-          style={{
-            background: `linear-gradient(180deg, ${character.bgColor} 0%, #FFFFFF 100%)`,
-            aspectRatio: '1 / 1',
-          }}
-        >
+        <div className="relative">
           <IsometricRoom character={character}>
-            {/* 캐릭터를 바닥 중앙(뒤벽 앞)에 배치, 발 y≈330 */}
-            <foreignObject x="140" y="170" width="120" height="160">
-              <div
-                xmlns="http://www.w3.org/1999/xhtml"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'flex-end',
-                }}
-              >
-                <div style={{ width: 100, height: 132, overflow: 'visible' }}>
-                  {character.sprite ? (
-                    <PixelAvatar sprite={character.sprite} size={100} hairOverlay={character.hairOverlay} hairTransform={character.hairTransform} />
-                  ) : character.isMyOshi ? (
-                    <PixelAvatar
-                      selections={{ parts: character.parts, colors: character.colors }}
-                      size={100}
-                    />
-                  ) : (
-                    <div
-                      style={{
-                        width: 100,
-                        height: 120,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: 72,
-                      }}
-                    >
-                      {character.emoji}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </foreignObject>
-
-            {/* 캐릭터 그림자 */}
-            <ellipse cx="200" cy="330" rx="32" ry="7" fill="rgba(0,0,0,0.22)" />
+            {/* 캐릭터 그림자 (바닥 타원) */}
+            <div
+              style={{
+                position: 'absolute',
+                left: '50%',
+                bottom: '12%',
+                transform: 'translateX(-50%)',
+                width: '22%',
+                height: '3%',
+                background: 'rgba(0,0,0,0.22)',
+                borderRadius: '50%',
+                filter: 'blur(1px)',
+              }}
+            />
+            {/* 캐릭터 — 바닥 중앙에 서있음 */}
+            <div
+              style={{
+                position: 'absolute',
+                left: '50%',
+                bottom: '13%',
+                transform: 'translateX(-50%)',
+                pointerEvents: 'none',
+              }}
+            >
+              {character.sprite ? (
+                <PixelAvatar
+                  sprite={character.sprite}
+                  size={120}
+                  hairOverlay={character.hairOverlay}
+                  hairTransform={character.hairTransform}
+                />
+              ) : character.isMyOshi ? (
+                <PixelAvatar
+                  selections={{ parts: character.parts, colors: character.colors }}
+                  size={120}
+                />
+              ) : (
+                <div style={{ fontSize: 88 }}>{character.emoji}</div>
+              )}
+            </div>
           </IsometricRoom>
 
           {/* 오른쪽 상단: BGM 인디케이터 */}
