@@ -1,0 +1,80 @@
+// キャスオシ 시드 캐릭터 5명
+// Phase 1: 내가 (GH) 세팅. Phase 2에 크리에이터 온보딩 대비해서
+// 구조는 "creator 단위"로 설계 (creatorId 필드 포함)
+
+export const SEED_CHARACTERS = [
+  {
+    id: 'himari',
+    creatorId: 'seed_gh',
+    name: 'ひまり',
+    nameRomaji: 'Himari',
+    type: '太陽系',
+    typeLabel: '밝은',
+    emoji: '🌻',
+    themeColor: '#FFD166',
+    bgColor: '#FFF4D6',
+    catchphrase: 'みんなの元気、ぜんぶ吸収しちゃう！',
+    bio: 'いつも笑顔を絶やさない太陽みたいな子。推されると光ります。',
+    startLevel: 1,
+  },
+  {
+    id: 'yuki',
+    creatorId: 'seed_gh',
+    name: 'ゆき',
+    nameRomaji: 'Yuki',
+    type: '清楚系',
+    typeLabel: '청순',
+    emoji: '❄️',
+    themeColor: '#A5D8FF',
+    bgColor: '#E7F5FF',
+    catchphrase: 'そっと、側にいさせてください。',
+    bio: '物静かで優しい雪の妖精。声をかけると少しだけ微笑みます。',
+    startLevel: 1,
+  },
+  {
+    id: 'rei',
+    creatorId: 'seed_gh',
+    name: 'れい',
+    nameRomaji: 'Rei',
+    type: 'クール系',
+    typeLabel: '쿨',
+    emoji: '🌙',
+    themeColor: '#9B8AFB',
+    bgColor: '#EDE9FE',
+    catchphrase: '…別に、嬉しくなんかないけど。',
+    bio: 'ツンとした態度の裏に、実はファン想いの一面が。',
+    startLevel: 1,
+  },
+  {
+    id: 'akane',
+    creatorId: 'seed_gh',
+    name: 'あかね',
+    nameRomaji: 'Akane',
+    type: 'ボーイッシュ系',
+    typeLabel: '보이시',
+    emoji: '🔥',
+    themeColor: '#FF8A65',
+    bgColor: '#FFE3D6',
+    catchphrase: 'よっしゃ、今日も全力で行くぞ！',
+    bio: '元気100倍、勝負ごとが大好き。推しカツも真剣勝負です。',
+    startLevel: 1,
+  },
+  {
+    id: 'mio',
+    creatorId: 'seed_gh',
+    name: 'みお',
+    nameRomaji: 'Mio',
+    type: 'ミステリアス系',
+    typeLabel: '미스테리어스',
+    emoji: '🔮',
+    themeColor: '#B47AEA',
+    bgColor: '#F3E8FF',
+    catchphrase: 'あなたの運命、視えてしまった。',
+    bio: '不思議な雰囲気の占い好き。推しの数値で占いの精度が上がるとか。',
+    startLevel: 1,
+  },
+];
+
+// 레벨 계산: 응원 포인트 100당 1레벨
+export const calcLevel = (supportPoints) => Math.floor(supportPoints / 100) + 1;
+export const calcExp = (supportPoints) => supportPoints % 100;

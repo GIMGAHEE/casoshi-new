@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    font-family: 'Noto Sans JP', system-ui, sans-serif;
+    background-color: #FFE5EC;
+    color: #2D1B2E;
+  }
+  body {
+    min-height: 100vh;
+  }
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-oshi-main text-white font-bold py-3 px-6 rounded-full shadow-lg
+           active:scale-95 transition-transform hover:bg-pink-500;
+  }
+  .card {
+    @apply bg-white rounded-3xl shadow-md p-4 border-2 border-oshi-sub;
+  }
+}
