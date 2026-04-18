@@ -23,7 +23,8 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
     MY_OSHI_PRESETS.find(p => p.id === presetId) || MY_OSHI_PRESETS[0];
   const hairstyle =
     HAIRSTYLES.find(h => h.id === hairstyleId) || HAIRSTYLES[0];
-  const hasHair = !!hairstyle.overlay;
+  // preset.hairBaked: 스프라이트에 이미 헤어가 그려져 있으면 overlay 스킵
+  const hasHair = !preset.hairBaked && !!hairstyle.overlay;
 
   // 프리뷰에 쓸 실제 transform = 기본값 + 오프셋
   const effectiveTransform = computeHairTransform(hairstyleId, hairOffset);
@@ -77,7 +78,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
           <PixelAvatar
             sprite={preset.sprite}
             size={180}
-            hairOverlay={hairstyle.overlay}
+            hairOverlay={hasHair ? hairstyle.overlay : null}
             hairTransform={hasHair ? effectiveTransform : null}
           />
           <input
@@ -157,48 +158,50 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
         </div>
       )}
 
-      {/* 헤어스타일 선택 */}
-      <div className="px-4 mt-5">
-        <div className="text-xs font-bold text-oshi-dark/60 mb-2">
-          ヘアスタイル
-        </div>
-        <div className="grid grid-cols-3 gap-2">
-          {HAIRSTYLES.map(h => {
-            const active = h.id === hairstyleId;
-            return (
-              <button
-                key={h.id}
-                onClick={() => pickHair(h.id)}
-                className={`rounded-2xl p-2 border-2 transition active:scale-95 ${
-                  active
-                    ? 'border-oshi-main shadow-md scale-[1.02] bg-oshi-bg'
-                    : 'border-oshi-sub bg-white'
-                }`}
-              >
-                <div className="flex items-start justify-center h-24 overflow-hidden">
-                  <img
-                    src={h.overlay}
-                    alt=""
-                    style={{
-                      width: 88,
-                      height: 'auto',
-                      imageRendering: 'pixelated',
-                      marginTop: -8,
-                    }}
-                    draggable={false}
-                  />
-                </div>
-                <div
-                  className="text-[10px] text-center font-bold mt-1 truncate"
-                  style={{ color: active ? '#FF4785' : '#666' }}
+      {/* 헤어스타일 선택 — hairBaked 프리셋에서는 숨김 */}
+      {!preset.hairBaked && (
+        <div className="px-4 mt-5">
+          <div className="text-xs font-bold text-oshi-dark/60 mb-2">
+            ヘアスタイル
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {HAIRSTYLES.map(h => {
+              const active = h.id === hairstyleId;
+              return (
+                <button
+                  key={h.id}
+                  onClick={() => pickHair(h.id)}
+                  className={`rounded-2xl p-2 border-2 transition active:scale-95 ${
+                    active
+                      ? 'border-oshi-main shadow-md scale-[1.02] bg-oshi-bg'
+                      : 'border-oshi-sub bg-white'
+                  }`}
                 >
-                  {h.label}
-                </div>
-              </button>
-            );
-          })}
+                  <div className="flex items-start justify-center h-24 overflow-hidden">
+                    <img
+                      src={h.overlay}
+                      alt=""
+                      style={{
+                        width: 88,
+                        height: 'auto',
+                        imageRendering: 'pixelated',
+                        marginTop: -8,
+                      }}
+                      draggable={false}
+                    />
+                  </div>
+                  <div
+                    className="text-[10px] text-center font-bold mt-1 truncate"
+                    style={{ color: active ? '#FF4785' : '#666' }}
+                  >
+                    {h.label}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 안내 문구 */}
       <div className="px-4 mt-4 text-center">

@@ -132,7 +132,16 @@ export const MY_OSHI_ID = 'my_oshi';
 
 // MyOshi 프리셋 — 기본 캐릭터 1개로 시작, 머리스타일/옷 variant 추가될 때마다 이 배열에 추가
 // body는 대머리 상태, 헤어는 반드시 HAIRSTYLES에서 선택해서 overlay로 표시
+// hairBaked: true면 sprite에 헤어가 이미 그려져 있어서 overlay를 스킵함
 export const MY_OSHI_PRESETS = [
+  {
+    id: 'preset_bob',
+    sprite: '/sprites/basic_bob.png',
+    label: 'ショート',
+    themeColor: '#FF6B9D',
+    bgColor: '#FFE5EC',
+    hairBaked: true,
+  },
   {
     id: 'preset_basic',
     sprite: '/sprites/basic.png',
@@ -142,7 +151,7 @@ export const MY_OSHI_PRESETS = [
   },
 ];
 
-export const DEFAULT_PRESET_ID = 'preset_basic';
+export const DEFAULT_PRESET_ID = 'preset_bob';
 
 // 머리스타일 목록 — basic.png 위에 레이어로 겹쳐지는 오버레이 PNG
 // defaultTransform: 사용자가 직접 맞춘 basic body 기준 0포인트 (이후 조정은 이 값에 +/- 오프셋)
@@ -205,8 +214,8 @@ export const asCharacter = (myOshi) => {
     themeColor: preset.themeColor,
     bgColor: preset.bgColor,
     sprite: preset.sprite,
-    hairOverlay: hairstyle.overlay,
-    hairTransform: computeHairTransform(myOshi.hairstyleId, myOshi.hairOffset),
+    hairOverlay: preset.hairBaked ? null : hairstyle.overlay,
+    hairTransform: preset.hairBaked ? null : computeHairTransform(myOshi.hairstyleId, myOshi.hairOffset),
     catchphrase: 'あなたが作った、あなただけの推し。',
     bio: `${myOshi.name}は、あなただけのために生まれた推しです。一緒に育てていこう！`,
     dialogues: GENERIC_DIALOGUES.map(d => ({
