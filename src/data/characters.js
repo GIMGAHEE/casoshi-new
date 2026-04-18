@@ -131,12 +131,11 @@ export const getDialogueForLevel = (character, level) => {
 export const MY_OSHI_ID = 'my_oshi';
 
 // MyOshi 프리셋 — 기본 캐릭터 1개로 시작, 머리스타일/옷 variant 추가될 때마다 이 배열에 추가
-// bareSprite: 헤어 오버레이를 얹을 때 사용하는 '대머리' 버전 (원본 머리 제거)
+// body는 대머리 상태, 헤어는 반드시 HAIRSTYLES에서 선택해서 overlay로 표시
 export const MY_OSHI_PRESETS = [
   {
     id: 'preset_basic',
-    sprite:     '/sprites/basic.png',
-    bareSprite: '/sprites/basic_bald.png',
+    sprite: '/sprites/basic.png',
     label: 'きほん',
     themeColor: '#FF6B9D',
     bgColor: '#FFE5EC',
@@ -146,9 +145,8 @@ export const MY_OSHI_PRESETS = [
 export const DEFAULT_PRESET_ID = 'preset_basic';
 
 // 머리스타일 목록 — basic.png 위에 레이어로 겹쳐지는 오버레이 PNG
-// 'original' (null) = basic.png 원본 머리 그대로 사용
+// body가 대머리 상태라서 반드시 하나 선택해야 함
 export const HAIRSTYLES = [
-  { id: 'hair_original', label: 'きほん',    overlay: null },
   { id: 'hair_bob_short',     label: 'ショート',  overlay: '/sprites/hair_bob_short.png' },
   { id: 'hair_medium',        label: 'ミディアム', overlay: '/sprites/hair_medium.png' },
   { id: 'hair_long_straight', label: 'ロング',    overlay: '/sprites/hair_long_straight.png' },
@@ -157,7 +155,7 @@ export const HAIRSTYLES = [
   { id: 'hair_bun',           label: 'お団子',    overlay: '/sprites/hair_bun.png' },
 ];
 
-export const DEFAULT_HAIRSTYLE_ID = 'hair_original';
+export const DEFAULT_HAIRSTYLE_ID = 'hair_bob_short';
 
 // 제네릭 대사 (유저 캐릭터용 - 이름 자리표시자 {name} 치환)
 const GENERIC_DIALOGUES = [
@@ -190,7 +188,7 @@ export const asCharacter = (myOshi) => {
     typeLabel: '나의 추시',
     themeColor: preset.themeColor,
     bgColor: preset.bgColor,
-    sprite: hairstyle.overlay ? preset.bareSprite : preset.sprite,
+    sprite: preset.sprite,
     hairOverlay: hairstyle.overlay,
     hairTransform: myOshi.hairTransform || { x: 0, y: 0, scale: 1 },
     catchphrase: 'あなたが作った、あなただけの推し。',

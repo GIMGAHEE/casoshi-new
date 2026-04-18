@@ -72,7 +72,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
           }}
         >
           <PixelAvatar
-            sprite={hasHair ? preset.bareSprite : preset.sprite}
+            sprite={preset.sprite}
             size={180}
             hairOverlay={hairstyle.overlay}
             hairTransform={hasHair ? hairTransform : null}
@@ -103,21 +103,21 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
             <SliderRow
               label="よこ"
               value={hairTransform.x}
-              min={-30} max={30} step={1}
+              min={-50} max={50} step={1}
               suffix="%"
               onChange={(v) => updateTransform('x', v)}
             />
             <SliderRow
               label="たて"
               value={hairTransform.y}
-              min={-30} max={30} step={1}
+              min={-50} max={50} step={1}
               suffix="%"
               onChange={(v) => updateTransform('y', v)}
             />
             <SliderRow
               label="サイズ"
               value={Math.round(hairTransform.scale * 100)}
-              min={50} max={150} step={1}
+              min={40} max={180} step={1}
               suffix="%"
               onChange={(v) => updateTransform('scale', v / 100)}
             />
@@ -181,7 +181,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
               >
                 <div className="flex items-center justify-center h-24 overflow-hidden">
                   <PixelAvatar
-                    sprite={h.overlay ? preset.bareSprite : preset.sprite}
+                    sprite={preset.sprite}
                     size={80}
                     hairOverlay={h.overlay}
                   />
