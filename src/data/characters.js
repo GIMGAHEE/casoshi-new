@@ -1,6 +1,5 @@
 // キャスオシ 시드 캐릭터 5명
-// Phase 1: 내가 (GH) 세팅. Phase 2에 크리에이터 온보딩 대비해서
-// 구조는 "creator 단위"로 설계 (creatorId 필드 포함)
+// Phase 1: GH(제작자) 세팅. Phase 2 대비해서 creatorId 구조 유지
 
 export const SEED_CHARACTERS = [
   {
@@ -15,7 +14,13 @@ export const SEED_CHARACTERS = [
     bgColor: '#FFF4D6',
     catchphrase: 'みんなの元気、ぜんぶ吸収しちゃう！',
     bio: 'いつも笑顔を絶やさない太陽みたいな子。推されると光ります。',
-    startLevel: 1,
+    dialogues: [
+      { unlockLevel: 1, text: 'はじめまして！応援ありがとっ！♪' },
+      { unlockLevel: 2, text: 'えへへ、キミのこと覚えちゃった！' },
+      { unlockLevel: 3, text: '今日もキミに会えて、ひまりは幸せだよー！' },
+      { unlockLevel: 5, text: 'キミの応援が、ひまりの太陽みたいなんだ☀️' },
+      { unlockLevel: 10, text: 'ずっと、ずっと、キミのひまり先輩でいさせてね！' },
+    ],
   },
   {
     id: 'yuki',
@@ -29,7 +34,13 @@ export const SEED_CHARACTERS = [
     bgColor: '#E7F5FF',
     catchphrase: 'そっと、側にいさせてください。',
     bio: '物静かで優しい雪の妖精。声をかけると少しだけ微笑みます。',
-    startLevel: 1,
+    dialogues: [
+      { unlockLevel: 1, text: '…こんにちは。見つけてくれて、ありがとう。' },
+      { unlockLevel: 2, text: '…あの、もう少しだけ、居てもいい？' },
+      { unlockLevel: 3, text: '雪が降る音、聞こえますか…？ふふっ。' },
+      { unlockLevel: 5, text: 'あなたの応援、全部、心に積もっていきます。' },
+      { unlockLevel: 10, text: '……もう、離れないでね？ずっと、一緒に。' },
+    ],
   },
   {
     id: 'rei',
@@ -43,7 +54,13 @@ export const SEED_CHARACTERS = [
     bgColor: '#EDE9FE',
     catchphrase: '…別に、嬉しくなんかないけど。',
     bio: 'ツンとした態度の裏に、実はファン想いの一面が。',
-    startLevel: 1,
+    dialogues: [
+      { unlockLevel: 1, text: '……。( じっと見てる )' },
+      { unlockLevel: 2, text: 'ふーん、まだいるんだ。…別に嬉しくないし。' },
+      { unlockLevel: 3, text: 'ま、まあ、応援してくれるなら、勝手にしたら？' },
+      { unlockLevel: 5, text: '…今日の応援、ちゃんと数えてたからね。バカ。' },
+      { unlockLevel: 10, text: 'これ以上は…言わないけど。…ありがと。本当に。' },
+    ],
   },
   {
     id: 'akane',
@@ -57,7 +74,13 @@ export const SEED_CHARACTERS = [
     bgColor: '#FFE3D6',
     catchphrase: 'よっしゃ、今日も全力で行くぞ！',
     bio: '元気100倍、勝負ごとが大好き。推しカツも真剣勝負です。',
-    startLevel: 1,
+    dialogues: [
+      { unlockLevel: 1, text: 'おーっす！相棒になるか？！' },
+      { unlockLevel: 2, text: 'お前、ガッツあるじゃん！気に入ったぜ！' },
+      { unlockLevel: 3, text: 'よっしゃ、今日はもっと燃えるぞ！ついてこい！' },
+      { unlockLevel: 5, text: 'お前の応援、マジで効くわ。エネルギー補給ありがとな！' },
+      { unlockLevel: 10, text: '一生、一緒に走ろうぜ！約束だ！' },
+    ],
   },
   {
     id: 'mio',
@@ -71,10 +94,27 @@ export const SEED_CHARACTERS = [
     bgColor: '#F3E8FF',
     catchphrase: 'あなたの運命、視えてしまった。',
     bio: '不思議な雰囲気の占い好き。推しの数値で占いの精度が上がるとか。',
-    startLevel: 1,
+    dialogues: [
+      { unlockLevel: 1, text: 'あら…貴方、面白い星の下に生まれたのね。' },
+      { unlockLevel: 2, text: '水晶に…貴方の顔が映っているわ。ふふ。' },
+      { unlockLevel: 3, text: '今夜の占い、貴方にだけ教えてあげましょうか？' },
+      { unlockLevel: 5, text: '運命の糸が、私と貴方を結んでいるのが視えたの。' },
+      { unlockLevel: 10, text: 'ねえ…この先の未来、一緒に視に行かない？' },
+    ],
   },
 ];
 
 // 레벨 계산: 응원 포인트 100당 1레벨
 export const calcLevel = (supportPoints) => Math.floor(supportPoints / 100) + 1;
 export const calcExp = (supportPoints) => supportPoints % 100;
+
+// 현재 해금된 대사들 (현재 레벨 이하 전부)
+export const getUnlockedDialogues = (character, supportPoints) => {
+  const level = calcLevel(supportPoints);
+  return character.dialogues.filter(d => d.unlockLevel <= level);
+};
+
+// 특정 레벨에서 "새로" 해금되는 대사 (레벨업 직후 연출용)
+export const getDialogueForLevel = (character, level) => {
+  return character.dialogues.find(d => d.unlockLevel === level) || null;
+};

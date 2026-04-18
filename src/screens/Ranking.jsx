@@ -1,0 +1,139 @@
+import { SEED_CHARACTERS, calcLevel } from '../data/characters';
+
+const MEDALS = ['🥇', '🥈', '🥉'];
+const MEDAL_BG = [
+  'linear-gradient(135deg, #FFD700, #FFA500)',
+  'linear-gradient(135deg, #E8E8E8, #B0B0B0)',
+  'linear-gradient(135deg, #CD7F32, #8B4513)',
+];
+
+export default function Ranking({ supports, onBack, onSelectCharacter }) {
+  // 응원값 내림차순 정렬
+  const ranked = [...SEED_CHARACTERS]
+    .map(c => ({ ...c, supportPoints: supports[c.id] || 0 }))
+    .sort((a, b) => b.supportPoints - a.supportPoints);
+
+  const top = ranked[0];
+  const hasAnySupport = top.supportPoints > 0;
+
+  return (
+    <div className="max-w-md mx-auto px-4 py-4 space-y-5">
+      <button
+        onClick={onBack}
+        className="text-sm text-oshi-dark/70 hover:text-oshi-dark"
+      >
+        ← 戻る
+      </button>
+
+      {/* 헤더 */}
+      <section className="text-center py-2">
+        <div className="text-3xl font-black text-oshi-main">
+          🏆 推しランキング
+        </div>
+        <div className="text-xs text-oshi-dark/60 mt-1">
+          一番推されているのは誰？
+        </div>
+      </section>
+
+      {/* 1등 크게 */}
+      {hasAnySupport && (
+        <section
+          className="rounded-3xl p-6 text-center shadow-lg relative overflow-hidden"
+          style={{ backgroundColor: top.bgColor }}
+        >
+          <div className="absolute top-3 right-3 text-4xl animate-float">👑</div>
+
+          <div className="text-[10px] font-black tracking-[0.3em] text-oshi-dark/60 mb-2">
+            ✦ #1 推し ✦
+          </div>
+
+          <div
+            className="mx-auto w-24 h-24 rounded-full flex items-center justify-center text-6xl shadow-inner mb-2"
+            style={{ backgroundColor: top.themeColor + '55' }}
+          >
+            {top.emoji}
+          </div>
+
+          <div className="text-2xl font-black text-oshi-dark mb-1">
+            {top.name}
+          </div>
+          <div className="text-xs text-oshi-dark/60 mb-3">
+            Lv.{calcLevel(top.supportPoints)} · 応援 {top.supportPoints} pt
+          </div>
+
+          <button
+            onClick={() => onSelectCharacter(top.id)}
+            className="btn-primary inline-block"
+            style={{ backgroundColor: top.themeColor }}
+          >
+            もっと応援する
+          </button>
+        </section>
+      )}
+
+      {/* 순위 리스트 */}
+      <section className="space-y-2">
+        {ranked.map((c, idx) => {
+          const level = calcLevel(c.supportPoints);
+          const maxSupport = Math.max(top.supportPoints, 1);
+          const barWidth = Math.max(4, (c.supportPoints / maxSupport) * 100);
+
+          return (
+            <button
+              key={c.id}
+              onClick={() => onSelectCharacter(c.id)}
+              className="w-full card text-left flex items-center gap-3 active:scale-[0.98] transition-transform"
+              style={{ padding: '12px' }}
+            >
+              {/* 순위 */}
+              <div
+                className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-xl font-black"
+                style={{
+                  background: idx < 3 ? MEDAL_BG[idx] : '#F3F4F6',
+                  color: idx < 3 ? 'white' : '#9CA3AF',
+                }}
+              >
+                {idx < 3 ? MEDALS[idx] : idx + 1}
+              </div>
+
+              {/* 캐릭터 */}
+              <div
+                className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-2xl"
+                style={{ backgroundColor: c.themeColor + '40' }}
+              >
+                {c.emoji}
+              </div>
+
+              {/* 정보 */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-black text-oshi-dark">{c.name}</span>
+                  <span className="text-[10px] font-bold text-oshi-dark/50">Lv.{level}</span>
+                </div>
+                <div className="h-2 bg-oshi-bg rounded-full overflow-hidden mt-1">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${barWidth}%`,
+                      backgroundColor: c.themeColor,
+                    }}
+                  />
+                </div>
+                <div className="text-[10px] text-oshi-dark/60 mt-1">
+                  応援 {c.supportPoints} pt
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </section>
+
+      {!hasAnySupport && (
+        <div className="text-center text-xs text-oshi-dark/50 py-6">
+          まだ誰も応援されていません。<br />
+          推しに応援してランキングを作ろう！
+        </div>
+      )}
+    </div>
+  );
+}
