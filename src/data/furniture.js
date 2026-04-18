@@ -7,15 +7,43 @@ export const FURNITURE_CATALOG = [
     id: 'bed',
     label: 'ベッド',
     image: '/furniture/bed.png',
-    aspectRatio: 1.5,       // 1536 / 1024
+    aspectRatio: 1.5,
     defaultWidthPercent: 42,
   },
   {
     id: 'chair',
     label: 'いす',
     image: '/furniture/chair.png',
-    aspectRatio: 1.0,       // 1024 / 1024
+    aspectRatio: 1.0,
     defaultWidthPercent: 20,
+  },
+  {
+    id: 'vanity',
+    label: 'ドレッサー',
+    image: '/furniture/vanity.png',
+    aspectRatio: 1.0,
+    defaultWidthPercent: 30,
+  },
+  {
+    id: 'drawer',
+    label: 'チェスト',
+    image: '/furniture/drawer.png',
+    aspectRatio: 1.0,
+    defaultWidthPercent: 25,
+  },
+  {
+    id: 'carpet1',
+    label: 'カーペット',
+    image: '/furniture/carpet1.png',
+    aspectRatio: 1.79,
+    defaultWidthPercent: 55,
+  },
+  {
+    id: 'carpet2',
+    label: 'ハートマット',
+    image: '/furniture/carpet2.png',
+    aspectRatio: 1.53,
+    defaultWidthPercent: 48,
   },
 ];
 
