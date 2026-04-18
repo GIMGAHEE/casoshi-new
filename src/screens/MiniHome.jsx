@@ -43,11 +43,12 @@ export default function MiniHome({
           className="relative overflow-hidden"
           style={{
             background: `linear-gradient(180deg, ${character.bgColor} 0%, #FFFFFF 100%)`,
+            aspectRatio: '1 / 1',
           }}
         >
-          <IsometricRoom character={character} size={340}>
-            {/* 캐릭터를 바닥 중앙에 배치 (발 y≈335) */}
-            <foreignObject x="140" y="170" width="120" height="165">
+          <IsometricRoom character={character}>
+            {/* 캐릭터를 바닥 중앙(뒤벽 앞)에 배치, 발 y≈330 */}
+            <foreignObject x="140" y="170" width="120" height="160">
               <div
                 xmlns="http://www.w3.org/1999/xhtml"
                 style={{
@@ -85,7 +86,7 @@ export default function MiniHome({
             </foreignObject>
 
             {/* 캐릭터 그림자 */}
-            <ellipse cx="200" cy="335" rx="34" ry="8" fill="rgba(0,0,0,0.2)" />
+            <ellipse cx="200" cy="330" rx="32" ry="7" fill="rgba(0,0,0,0.22)" />
           </IsometricRoom>
 
           {/* 오른쪽 상단: BGM 인디케이터 */}

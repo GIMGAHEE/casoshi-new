@@ -1,91 +1,106 @@
 import { shade } from '../utils/color';
 
 /**
- * 1-point perspective mini-room
- * - 뒤쪽 코너가 중앙 소실점, 벽이 좌우로 퍼짐
- * - 바닥은 앞쪽이 넓은 삼각형/사다리꼴
- * - 캐릭터는 바닥 중앙에 서있음
+ * 1-point perspective mini-room with visible back wall
+ * 방의 5면을 모두 렌더: 뒤벽(직사각) + 좌/우 벽(사다리꼴) + 바닥 + 천장
+ *
+ * 좌표:
+ *   뒤벽 (rectangle): 120,90 → 280,90 → 280,240 → 120,240
+ *   천장:   0,0   → 120,90   → 280,90   → 400,0
+ *   바닥:   0,400 → 120,240  → 280,240  → 400,400
+ *   왼쪽벽: 0,0   → 120,90   → 120,240  → 0,400
+ *   오른쪽벽: 400,0 → 280,90 → 280,240  → 400,400
  */
-export default function IsometricRoom({
-  character,
-  children,
-  size = 340,
-}) {
+export default function IsometricRoom({ character, children }) {
   const themeColor = character?.themeColor || '#FF6B9D';
   const accent = themeColor;
   const accentDark = shade(accent, -0.3);
 
-  // 벽/바닥 팔레트
-  const wallLeft  = '#F5E6D3';
-  const wallRight = shade(wallLeft, -0.08);
+  // 팔레트
+  const wallBack  = '#F5E6D3';          // 뒤벽 (가장 밝음)
+  const wallSide  = shade(wallBack, -0.08); // 측벽 (살짝 어두움)
+  const ceiling   = shade(wallBack, 0.05);
   const floorColor = '#C9A878';
   const floorDark  = '#8B6B45';
 
   return (
     <svg
       viewBox="0 0 400 400"
-      width={size}
-      height={size}
+      width="100%"
+      height="100%"
+      preserveAspectRatio="xMidYMid slice"
       xmlns="http://www.w3.org/2000/svg"
       shapeRendering="crispEdges"
-      style={{ display: 'block' }}
+      style={{ display: 'block', aspectRatio: '1 / 1' }}
     >
-      {/* 방 좌표 체계:
-          소실점(뒤 코너 위): (200, 120)
-          뒤 코너 아래(바닥과 벽 만남): (200, 220)
-          앞 모서리: 화면 네 귀퉁이 (0,0)(400,0)(0,400)(400,400)
-          바닥 앞 모서리: (0,400)-(400,400)
-          바닥 뒤: (200,220) 한 점(수렴) */}
+      {/* ===== 천장 ===== */}
+      <polygon
+        points="0,0 120,90 280,90 400,0"
+        fill={ceiling}
+        stroke={floorDark}
+        strokeWidth="1"
+      />
 
       {/* ===== 왼쪽 벽 ===== */}
       <polygon
-        points="0,0 200,120 200,220 0,400"
-        fill={wallLeft}
+        points="0,0 120,90 120,240 0,400"
+        fill={wallSide}
         stroke={floorDark}
         strokeWidth="1"
       />
 
       {/* ===== 오른쪽 벽 ===== */}
       <polygon
-        points="400,0 200,120 200,220 400,400"
-        fill={wallRight}
+        points="400,0 280,90 280,240 400,400"
+        fill={wallSide}
         stroke={floorDark}
         strokeWidth="1"
       />
 
-      {/* ===== 바닥 (삼각형) ===== */}
+      {/* ===== 뒤 벽 (rectangle) ===== */}
+      <rect
+        x="120" y="90" width="160" height="150"
+        fill={wallBack}
+        stroke={floorDark}
+        strokeWidth="1"
+      />
+
+      {/* ===== 바닥 ===== */}
       <polygon
-        points="200,220 0,400 400,400"
+        points="0,400 120,240 280,240 400,400"
         fill={floorColor}
         stroke={floorDark}
         strokeWidth="1.5"
       />
-      {/* 바닥 depth 라인 (뒤→앞 방향 깊이감) */}
-      <g stroke={floorDark} strokeWidth="1" opacity="0.35">
-        <line x1="150" y1="265" x2="250" y2="265" />
-        <line x1="100" y1="310" x2="300" y2="310" />
-        <line x1="50"  y1="355" x2="350" y2="355" />
+      {/* 바닥 depth 라인 (원근 수렴) */}
+      <g stroke={floorDark} strokeWidth="1" opacity="0.3">
+        <line x1="0"   y1="400" x2="120" y2="240" />
+        <line x1="400" y1="400" x2="280" y2="240" />
+      </g>
+      {/* 바닥 가로선 (깊이감) */}
+      <g stroke={floorDark} strokeWidth="1" opacity="0.25">
+        <line x1="60"  y1="320" x2="340" y2="320" />
+        <line x1="30"  y1="360" x2="370" y2="360" />
       </g>
 
-      {/* ===== 창문 (오른쪽 벽, 원근 적용) ===== */}
+      {/* ===== 창문 (뒤 벽 중앙에) ===== */}
       <g>
-        <polygon
-          points="260,80 330,50 330,220 260,190"
+        <rect
+          x="155" y="120" width="90" height="95"
           fill="#FFF8F0"
           stroke={accentDark}
           strokeWidth="2"
         />
-        {/* 하늘 */}
-        <polygon
-          points="264,84 326,56 326,216 264,186"
+        <rect
+          x="159" y="124" width="82" height="87"
           fill="#B5E0FA"
         />
         {/* 구름 */}
-        <ellipse cx="285" cy="95" rx="8" ry="3" fill="white" opacity="0.9" />
-        <ellipse cx="305" cy="130" rx="10" ry="3" fill="white" opacity="0.8" />
+        <ellipse cx="180" cy="148" rx="10" ry="3" fill="white" opacity="0.9" />
+        <ellipse cx="215" cy="170" rx="12" ry="3" fill="white" opacity="0.8" />
         {/* 창틀 십자 */}
-        <line x1="264" y1="135" x2="326" y2="105" stroke={accentDark} strokeWidth="1.5" />
-        <line x1="295" y1="67"  x2="295" y2="205" stroke={accentDark} strokeWidth="1.5" />
+        <line x1="159" y1="167" x2="241" y2="167" stroke={accentDark} strokeWidth="1.5" />
+        <line x1="200" y1="124" x2="200" y2="211" stroke={accentDark} strokeWidth="1.5" />
       </g>
 
       {/* ===== 오버레이 (캐릭터 등) ===== */}
