@@ -54,47 +54,50 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
         </div>
       </div>
 
-      {/* 프리셋 선택 그리드 */}
-      <div className="px-4 mt-5">
-        <div className="text-xs font-bold text-oshi-dark/60 mb-2">
-          キャラクターを選ぶ
-        </div>
-        <div className="grid grid-cols-3 gap-2">
-          {MY_OSHI_PRESETS.map(p => {
-            const active = p.id === presetId;
-            return (
-              <button
-                key={p.id}
-                onClick={() => setPresetId(p.id)}
-                className={`rounded-2xl p-2 border-2 transition active:scale-95 ${
-                  active
-                    ? 'border-oshi-main shadow-md scale-[1.02]'
-                    : 'border-oshi-sub bg-white'
-                }`}
-                style={{
-                  backgroundColor: active ? p.bgColor : '#fff',
-                }}
-              >
-                <div className="flex items-center justify-center h-24 overflow-hidden">
-                  <PixelAvatar sprite={p.sprite} size={80} />
-                </div>
-                <div
-                  className="text-[10px] text-center font-bold mt-1 truncate"
-                  style={{ color: active ? p.themeColor : '#666' }}
+      {/* 프리셋 선택 그리드 — 2개 이상일 때만 표시 */}
+      {MY_OSHI_PRESETS.length > 1 && (
+        <div className="px-4 mt-5">
+          <div className="text-xs font-bold text-oshi-dark/60 mb-2">
+            キャラクターを選ぶ
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {MY_OSHI_PRESETS.map(p => {
+              const active = p.id === presetId;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setPresetId(p.id)}
+                  className={`rounded-2xl p-2 border-2 transition active:scale-95 ${
+                    active
+                      ? 'border-oshi-main shadow-md scale-[1.02]'
+                      : 'border-oshi-sub bg-white'
+                  }`}
+                  style={{
+                    backgroundColor: active ? p.bgColor : '#fff',
+                  }}
                 >
-                  {p.label}
-                </div>
-              </button>
-            );
-          })}
+                  <div className="flex items-center justify-center h-24 overflow-hidden">
+                    <PixelAvatar sprite={p.sprite} size={80} />
+                  </div>
+                  <div
+                    className="text-[10px] text-center font-bold mt-1 truncate"
+                    style={{ color: active ? p.themeColor : '#666' }}
+                  >
+                    {p.label}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 안내 문구 */}
       <div className="px-4 mt-4 text-center">
         <div className="text-[11px] text-oshi-dark/50 leading-relaxed">
-          お気に入りの見た目を選んで、<br />
-          あなただけの推しの名前をつけよう！
+          {MY_OSHI_PRESETS.length > 1
+            ? 'お気に入りの見た目を選んで、あなただけの推しの名前をつけよう！'
+            : 'あなただけの推しに名前をつけよう！ヘアスタイルなど、バリエーションは今後追加予定 🔜'}
         </div>
       </div>
 

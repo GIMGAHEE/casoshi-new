@@ -130,17 +130,12 @@ export const getDialogueForLevel = (character, level) => {
 
 export const MY_OSHI_ID = 'my_oshi';
 
-// 5명 시드 캐릭터의 스프라이트를 프리셋으로 재활용
-// 이름/대사는 유저가 커스텀, 외모만 이 중에서 선택
+// MyOshi 프리셋 — 기본 캐릭터 1개로 시작, 머리스타일/옷 variant 추가될 때마다 이 배열에 추가
 export const MY_OSHI_PRESETS = [
-  { id: 'preset_himari', sprite: '/sprites/himari.png', label: 'タイプA',  themeColor: '#FFD166', bgColor: '#FFF4D6' },
-  { id: 'preset_yuki',   sprite: '/sprites/yuki.png',   label: 'タイプB',  themeColor: '#A5D8FF', bgColor: '#E7F5FF' },
-  { id: 'preset_rei',    sprite: '/sprites/rei.png',    label: 'タイプC',  themeColor: '#9B8AFB', bgColor: '#EDE9FE' },
-  { id: 'preset_akane',  sprite: '/sprites/akane.png',  label: 'タイプD',  themeColor: '#FF8A65', bgColor: '#FFE3D6' },
-  { id: 'preset_mio',    sprite: '/sprites/mio.png',    label: 'タイプE',  themeColor: '#B47AEA', bgColor: '#F3E8FF' },
+  { id: 'preset_basic', sprite: '/sprites/basic.png', label: 'きほん', themeColor: '#FF6B9D', bgColor: '#FFE5EC' },
 ];
 
-export const DEFAULT_PRESET_ID = 'preset_himari';
+export const DEFAULT_PRESET_ID = 'preset_basic';
 
 // 제네릭 대사 (유저 캐릭터용 - 이름 자리표시자 {name} 치환)
 const GENERIC_DIALOGUES = [
