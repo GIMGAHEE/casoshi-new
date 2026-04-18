@@ -1,6 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { FURNITURE_CATALOG, findFurniture, createRoomItem } from '../data/furniture';
 import IsometricRoom from '../components/IsometricRoom';
+import PixelAvatar from '../components/PixelAvatar';
+
+const CHAR_ID = '__character__';
+const DEFAULT_CHAR_POS = { x: 50, y: 80 }; // 바닥 중앙, 발 기준
 
 /**
  * 방 꾸미기 편집기
@@ -13,16 +17,33 @@ export default function RoomEditor({
   character, initialRoom, onSave, onCancel,
 }) {
   const [items, setItems] = useState(initialRoom?.items || []);
+  const [characterPos, setCharacterPos] = useState(
+    initialRoom?.characterPos || DEFAULT_CHAR_POS
+  );
   const [selectedId, setSelectedId] = useState(null);
   const [showCatalog, setShowCatalog] = useState(false);
 
   const roomRef = useRef(null);
-  const dragStateRef = useRef(null); // { itemId, startX, startY, itemStartX, itemStartY }
+  const dragStateRef = useRef(null);
 
-  const selectedItem = items.find(i => i.id === selectedId);
+  const selectedItem = selectedId && selectedId !== CHAR_ID
+    ? items.find(i => i.id === selectedId)
+    : null;
+  const isCharSelected = selectedId === CHAR_ID;
 
   const updateItem = (id, patch) => {
     setItems(items => items.map(i => i.id === id ? { ...i, ...patch } : i));
+  };
+
+  // 드래그 대상(가구 or 캐릭터)의 현재 position 읽기/쓰기 공통 헬퍼
+  const getPos = (id) => {
+    if (id === CHAR_ID) return { x: characterPos.x, y: characterPos.y };
+    const it = items.find(i => i.id === id);
+    return it ? { x: it.x, y: it.y } : null;
+  };
+  const setPos = (id, patch) => {
+    if (id === CHAR_ID) setCharacterPos(p => ({ ...p, ...patch }));
+    else updateItem(id, patch);
   };
 
   const addFurniture = (furnitureId) => {
@@ -37,19 +58,19 @@ export default function RoomEditor({
     if (selectedId === id) setSelectedId(null);
   };
 
-  // ===== 드래그 처리 =====
+  // ===== 드래그 처리 (가구 & 캐릭터 공통) =====
   const handlePointerDown = (e, itemId) => {
     e.stopPropagation();
     setSelectedId(itemId);
-    const item = items.find(i => i.id === itemId);
-    if (!item) return;
+    const pos = getPos(itemId);
+    if (!pos) return;
     const rect = roomRef.current.getBoundingClientRect();
     dragStateRef.current = {
       itemId,
       startClientX: e.clientX,
       startClientY: e.clientY,
-      itemStartX: item.x,
-      itemStartY: item.y,
+      itemStartX: pos.x,
+      itemStartY: pos.y,
       roomW: rect.width,
       roomH: rect.height,
     };
@@ -65,7 +86,7 @@ export default function RoomEditor({
     const dyPercent = (dyPx / d.roomH) * 100;
     const newX = Math.max(0, Math.min(100, d.itemStartX + dxPercent));
     const newY = Math.max(0, Math.min(100, d.itemStartY + dyPercent));
-    updateItem(d.itemId, { x: newX, y: newY });
+    setPos(d.itemId, { x: newX, y: newY });
   };
 
   const handlePointerUp = () => {
@@ -78,7 +99,7 @@ export default function RoomEditor({
   };
 
   const handleSave = () => {
-    onSave({ items });
+    onSave({ items, characterPos });
   };
 
   return (
@@ -148,6 +169,44 @@ export default function RoomEditor({
               </div>
             );
           })}
+
+          {/* 캐릭터 (드래그 가능 / 발 기준 anchor) */}
+          <div
+            onPointerDown={(e) => handlePointerDown(e, CHAR_ID)}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'absolute',
+              left: `${characterPos.x}%`,
+              top: `${characterPos.y}%`,
+              transform: 'translate(-50%, -100%)',
+              cursor: 'grab',
+              touchAction: 'none',
+              outline: isCharSelected ? '2px dashed #FF6B9D' : 'none',
+              outlineOffset: '4px',
+              borderRadius: '4px',
+              // 발 아래 PNG 여백을 잘라냄 (MiniHome과 동일)
+              height: 104,
+              overflow: 'hidden',
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            {character?.sprite ? (
+              <PixelAvatar
+                sprite={character.sprite}
+                size={90}
+                hairOverlay={character.hairOverlay}
+                hairTransform={character.hairTransform}
+              />
+            ) : character?.isMyOshi ? (
+              <PixelAvatar
+                selections={{ parts: character.parts, colors: character.colors }}
+                size={90}
+              />
+            ) : (
+              <div style={{ fontSize: 72 }}>{character?.emoji}</div>
+            )}
+          </div>
 
           {/* 상단: 가구 추가 버튼 */}
           <button
@@ -234,15 +293,35 @@ export default function RoomEditor({
         </div>
       )}
 
-      {!selectedItem && items.length > 0 && (
-        <div className="mt-3 text-center text-[11px] text-oshi-dark/50">
-          家具をタップして編集 / ドラッグで移動
+      {/* 캐릭터 선택 시: 위치 리셋 */}
+      {isCharSelected && (
+        <div className="mt-3 bg-white rounded-2xl border-2 border-oshi-main p-3">
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-bold text-oshi-main">
+              {character?.name || 'キャラクター'} を移動
+            </div>
+            <button
+              onClick={() => setCharacterPos(DEFAULT_CHAR_POS)}
+              className="text-[10px] text-oshi-dark/60 font-bold underline active:scale-95"
+            >
+              位置リセット
+            </button>
+          </div>
+          <div className="text-[10px] text-oshi-dark/40 mt-2 text-center">
+            ドラッグで位置変更
+          </div>
         </div>
       )}
 
-      {items.length === 0 && (
+      {!selectedItem && !isCharSelected && items.length > 0 && (
         <div className="mt-3 text-center text-[11px] text-oshi-dark/50">
-          右上の「+ 家具」から家具を追加してね 🛋️
+          家具やキャラをタップして編集 / ドラッグで移動
+        </div>
+      )}
+
+      {items.length === 0 && !isCharSelected && (
+        <div className="mt-3 text-center text-[11px] text-oshi-dark/50">
+          右上の「+ 家具」から家具を追加 🛋️ / キャラをドラッグして移動
         </div>
       )}
     </div>

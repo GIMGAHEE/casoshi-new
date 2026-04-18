@@ -20,6 +20,7 @@ export default function MiniHome({
   const supportPoints = supports[character.id] || 0;
   const level = calcLevel(supportPoints);
   const roomItems = room?.items || [];
+  const characterPos = room?.characterPos || { x: 50, y: 80 };
 
   return (
     <div className="max-w-md mx-auto px-4 py-4 pb-24">
@@ -80,9 +81,9 @@ export default function MiniHome({
             <div
               style={{
                 position: 'absolute',
-                left: '50%',
-                bottom: '20%',
-                transform: 'translateX(-50%)',
+                left: `${characterPos.x}%`,
+                top: `${characterPos.y}%`,
+                transform: 'translate(-50%, -100%)',
                 pointerEvents: 'none',
                 display: 'flex',
                 flexDirection: 'column',
