@@ -13,7 +13,7 @@ import {
  * }
  * size: target rendered width in px (height auto-computed by aspect ratio)
  */
-export default function PixelAvatar({ selections, sprite, size = 96 }) {
+export default function PixelAvatar({ selections, sprite, size = 96, hue = 0 }) {
   // PNG sprite path wins over parts-based rendering.
   if (sprite) {
     return (
@@ -27,6 +27,7 @@ export default function PixelAvatar({ selections, sprite, size = 96 }) {
           width: size,
           height: 'auto',
           userSelect: 'none',
+          filter: hue ? `hue-rotate(${hue}deg)` : undefined,
         }}
         draggable={false}
       />

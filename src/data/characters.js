@@ -170,6 +170,7 @@ export const asCharacter = (myOshi) => {
     themeColor: preset.themeColor,
     bgColor: preset.bgColor,
     sprite: preset.sprite,
+    hue: myOshi.hue || 0,
     catchphrase: 'あなたが作った、あなただけの推し。',
     bio: `${myOshi.name}は、あなただけのために生まれた推しです。一緒に育てていこう！`,
     dialogues: GENERIC_DIALOGUES.map(d => ({

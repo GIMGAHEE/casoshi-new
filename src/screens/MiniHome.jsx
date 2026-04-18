@@ -60,7 +60,7 @@ export default function MiniHome({
               >
                 <div style={{ width: 100, height: 132, overflow: 'visible' }}>
                   {character.sprite ? (
-                    <PixelAvatar sprite={character.sprite} size={100} />
+                    <PixelAvatar sprite={character.sprite} size={100} hue={character.hue} />
                   ) : character.isMyOshi ? (
                     <PixelAvatar
                       selections={{ parts: character.parts, colors: character.colors }}
@@ -119,7 +119,7 @@ export default function MiniHome({
             style={{ backgroundColor: character.themeColor + '40' }}
           >
             {character.sprite ? (
-              <PixelAvatar sprite={character.sprite} size={48} />
+              <PixelAvatar sprite={character.sprite} size={48} hue={character.hue} />
             ) : character.isMyOshi ? (
               <PixelAvatar
                 selections={{ parts: character.parts, colors: character.colors }}

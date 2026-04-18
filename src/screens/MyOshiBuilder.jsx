@@ -7,6 +7,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
     initialOshi?.presetId || DEFAULT_PRESET_ID
   );
   const [name, setName] = useState(initialOshi?.name || '');
+  const [hue, setHue] = useState(initialOshi?.hue || 0);
 
   const preset =
     MY_OSHI_PRESETS.find(p => p.id === presetId) || MY_OSHI_PRESETS[0];
@@ -20,6 +21,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
     onSave({
       name: trimmed,
       presetId,
+      hue,
     });
   };
 
@@ -43,7 +45,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
             background: `linear-gradient(135deg, ${preset.themeColor}33, ${preset.bgColor})`,
           }}
         >
-          <PixelAvatar sprite={preset.sprite} size={180} />
+          <PixelAvatar sprite={preset.sprite} size={180} hue={hue} />
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -87,6 +89,41 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
               </button>
             );
           })}
+        </div>
+      </div>
+
+      {/* HUE 슬라이더 */}
+      <div className="px-4 mt-5">
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-xs font-bold text-oshi-dark/60">いろあい</div>
+          <div className="flex items-center gap-2">
+            <div className="text-[10px] text-oshi-dark/40 tabular-nums">
+              {hue}°
+            </div>
+            {hue !== 0 && (
+              <button
+                onClick={() => setHue(0)}
+                className="text-[10px] text-oshi-main font-bold underline active:scale-95"
+              >
+                リセット
+              </button>
+            )}
+          </div>
+        </div>
+        <input
+          type="range"
+          min={0}
+          max={360}
+          step={5}
+          value={hue}
+          onChange={(e) => setHue(parseInt(e.target.value))}
+          className="w-full h-3 rounded-full appearance-none cursor-pointer outline-none"
+          style={{
+            background: 'linear-gradient(to right, #ff6b6b, #ffd166, #06d6a0, #118ab2, #9b8afb, #ff6b9d, #ff6b6b)',
+          }}
+        />
+        <div className="text-[10px] text-oshi-dark/40 mt-1.5 text-center">
+          スライダーで全体の色合いを変えられます
         </div>
       </div>
 
