@@ -179,11 +179,17 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
                     : 'border-oshi-sub bg-white'
                 }`}
               >
-                <div className="flex items-center justify-center h-24 overflow-hidden">
-                  <PixelAvatar
-                    sprite={preset.sprite}
-                    size={80}
-                    hairOverlay={h.overlay}
+                <div className="flex items-start justify-center h-24 overflow-hidden">
+                  <img
+                    src={h.overlay}
+                    alt=""
+                    style={{
+                      width: 88,
+                      height: 'auto',
+                      imageRendering: 'pixelated',
+                      marginTop: -8,
+                    }}
+                    draggable={false}
                   />
                 </div>
                 <div
