@@ -182,13 +182,15 @@ export default function RoomEditor({
               cursor: 'grab',
               touchAction: 'none',
               outline: isCharSelected ? '2px dashed #FF6B9D' : 'none',
-              outlineOffset: '4px',
+              outlineOffset: '1px',
               borderRadius: '4px',
-              // 발 아래 PNG 여백을 잘라냄 (MiniHome과 동일)
+              // 캐릭터 실제 크기에 맞춘 hitbox (90x104)
+              width: 90,
               height: 104,
               overflow: 'hidden',
               display: 'flex',
               justifyContent: 'center',
+              alignItems: 'flex-start',
             }}
           >
             {character?.sprite ? (
