@@ -73,7 +73,12 @@ export default function Home({
           onClick={onOpenRanking}
           className="card w-full flex items-center gap-4 px-5 py-4 bg-gradient-to-r from-yellow-50 via-orange-50 to-pink-50 hover:scale-[1.01] transition-transform"
         >
-          <div className="text-4xl">🏆</div>
+          <img
+            src="/icons/trophy.png"
+            alt=""
+            className="w-14 h-14"
+            style={{ imageRendering: 'pixelated' }}
+          />
           <div className="flex-1 text-left">
             <div className="text-sm font-bold text-oshi-dark">推しランキング</div>
             <div className="text-[10px] text-oshi-dark/60">一番推されている推しをチェック！</div>

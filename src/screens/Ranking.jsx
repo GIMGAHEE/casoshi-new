@@ -44,8 +44,14 @@ export default function Ranking({ myOshi, supports, onBack, onSelectCharacter })
 
       {/* 헤더 */}
       <section className="text-center py-2">
-        <div className="text-3xl font-black text-oshi-main">
-          🏆 推しランキング
+        <div className="text-3xl font-black text-oshi-main flex items-center justify-center gap-2">
+          <img
+            src="/icons/trophy.png"
+            alt=""
+            className="w-10 h-10"
+            style={{ imageRendering: 'pixelated' }}
+          />
+          推しランキング
         </div>
         <div className="text-xs text-oshi-dark/60 mt-1">
           一番推されているのは誰？
