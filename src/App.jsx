@@ -7,14 +7,17 @@ import TapGame from './screens/TapGame';
 import Ranking from './screens/Ranking';
 import MyOshiBuilder from './screens/MyOshiBuilder';
 import MiniHome from './screens/MiniHome';
+import RoomEditor from './screens/RoomEditor';
 
 export default function App() {
   const [points, setPoints] = useLocalStorage('casoshi:points', 0);
   const [supports, setSupports] = useLocalStorage('casoshi:supports', {});
   const [lastCheckin, setLastCheckin] = useLocalStorage('casoshi:lastCheckin', null);
   const [myOshi, setMyOshi] = useLocalStorage('casoshi:myOshi', null);
+  // rooms: { [characterId]: { items: [...] } }
+  const [rooms, setRooms] = useLocalStorage('casoshi:rooms', {});
 
-  // screen: home | character | tap | ranking | builder | minihome
+  // screen: home | character | tap | ranking | builder | minihome | roomEditor
   const [screen, setScreen] = useState({ name: 'home' });
 
   const handleReset = () => {
@@ -23,12 +26,18 @@ export default function App() {
     setSupports({});
     setLastCheckin(null);
     setMyOshi(null);
+    setRooms({});
     setScreen({ name: 'home' });
   };
 
   const handleSaveMyOshi = (data) => {
     setMyOshi(data);
     setScreen({ name: 'minihome', params: { id: 'my_oshi' } });
+  };
+
+  const handleSaveRoom = (characterId, roomData) => {
+    setRooms({ ...rooms, [characterId]: roomData });
+    setScreen({ name: 'minihome', params: { id: characterId } });
   };
 
   return (
@@ -53,8 +62,10 @@ export default function App() {
           characterId={screen.params.id}
           myOshi={myOshi}
           supports={supports}
+          room={rooms[screen.params.id]}
           onBack={() => setScreen({ name: 'home' })}
           onOpenDetail={(id) => setScreen({ name: 'character', params: { id } })}
+          onEditRoom={() => setScreen({ name: 'roomEditor', params: screen.params })}
         />
       )}
 
@@ -93,6 +104,21 @@ export default function App() {
           onCancel={() => setScreen({ name: myOshi ? 'minihome' : 'home', params: myOshi ? { id: 'my_oshi' } : undefined })}
         />
       )}
+
+      {screen.name === 'roomEditor' && (
+        <RoomEditor
+          character={findCharacterForRoom(screen.params.id, myOshi)}
+          initialRoom={rooms[screen.params.id]}
+          onSave={(roomData) => handleSaveRoom(screen.params.id, roomData)}
+          onCancel={() => setScreen({ name: 'minihome', params: screen.params })}
+        />
+      )}
     </div>
   );
+}
+
+// RoomEditor에 character 정보 넘기는 헬퍼 (배경 결정용)
+import { findCharacter } from './data/characters';
+function findCharacterForRoom(id, myOshi) {
+  return findCharacter(myOshi, id);
 }

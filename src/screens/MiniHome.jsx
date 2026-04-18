@@ -1,10 +1,11 @@
 import { findCharacter, calcLevel } from '../data/characters';
+import { findFurniture } from '../data/furniture';
 import IsometricRoom from '../components/IsometricRoom';
 import PixelAvatar from '../components/PixelAvatar';
 
 export default function MiniHome({
-  characterId, myOshi, supports,
-  onBack, onOpenDetail,
+  characterId, myOshi, supports, room,
+  onBack, onOpenDetail, onEditRoom,
 }) {
   const character = findCharacter(myOshi, characterId);
   if (!character) {
@@ -18,6 +19,7 @@ export default function MiniHome({
 
   const supportPoints = supports[character.id] || 0;
   const level = calcLevel(supportPoints);
+  const roomItems = room?.items || [];
 
   return (
     <div className="max-w-md mx-auto px-4 py-4 pb-24">
@@ -41,6 +43,38 @@ export default function MiniHome({
         {/* 방 뷰 */}
         <div className="relative">
           <IsometricRoom character={character}>
+            {/* 배치된 가구 렌더링 (캐릭터보다 뒤) */}
+            {roomItems.map(item => {
+              const f = findFurniture(item.furnitureId);
+              if (!f) return null;
+              return (
+                <div
+                  key={item.id}
+                  style={{
+                    position: 'absolute',
+                    left: `${item.x}%`,
+                    top: `${item.y}%`,
+                    width: `${f.defaultWidthPercent * item.scaleX}%`,
+                    aspectRatio: f.aspectRatio,
+                    transform: `translate(-50%, -50%) rotate(${item.rotation}deg) scaleY(${item.scaleY / item.scaleX})`,
+                    transformOrigin: 'center center',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <img
+                    src={f.image}
+                    alt=""
+                    draggable={false}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      imageRendering: 'pixelated',
+                    }}
+                  />
+                </div>
+              );
+            })}
+
             {/* 캐릭터 + 그림자 (한 그룹으로 바닥 중앙에 배치) */}
             <div
               style={{
@@ -103,7 +137,7 @@ export default function MiniHome({
         {/* 하단 액션 메뉴 (Cyworld 느낌) */}
         <div className="grid grid-cols-4 divide-x divide-oshi-sub border-t-2 border-oshi-sub bg-oshi-bg/40">
           <MenuButton emoji="💬" label="방명록" onClick={() => alert('방명록は Phase 2 で実装予定！')} />
-          <MenuButton emoji="🛋️" label="家具追加" onClick={() => alert('家具の追加機能は次のアップデートで！')} />
+          <MenuButton emoji="🛋️" label="家具追加" onClick={onEditRoom} />
           <MenuButton emoji="💖" label="응원" onClick={() => onOpenDetail(characterId)} />
           <MenuButton emoji="📷" label="앨범" onClick={() => alert('アルバム機能は Phase 2 で！')} />
         </div>
