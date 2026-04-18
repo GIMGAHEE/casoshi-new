@@ -41,45 +41,48 @@ export default function MiniHome({
         {/* 방 뷰 */}
         <div className="relative">
           <IsometricRoom character={character}>
-            {/* 캐릭터 그림자 (바닥 타원) */}
+            {/* 캐릭터 + 그림자 (한 그룹으로 바닥 중앙에 배치) */}
             <div
               style={{
                 position: 'absolute',
                 left: '50%',
-                bottom: '12%',
-                transform: 'translateX(-50%)',
-                width: '22%',
-                height: '3%',
-                background: 'rgba(0,0,0,0.22)',
-                borderRadius: '50%',
-                filter: 'blur(1px)',
-              }}
-            />
-            {/* 캐릭터 — 바닥 중앙에 서있음 */}
-            <div
-              style={{
-                position: 'absolute',
-                left: '50%',
-                bottom: '13%',
+                bottom: '20%',
                 transform: 'translateX(-50%)',
                 pointerEvents: 'none',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
               }}
             >
-              {character.sprite ? (
-                <PixelAvatar
-                  sprite={character.sprite}
-                  size={120}
-                  hairOverlay={character.hairOverlay}
-                  hairTransform={character.hairTransform}
-                />
-              ) : character.isMyOshi ? (
-                <PixelAvatar
-                  selections={{ parts: character.parts, colors: character.colors }}
-                  size={120}
-                />
-              ) : (
-                <div style={{ fontSize: 88 }}>{character.emoji}</div>
-              )}
+              {/* 캐릭터 본체 — 발 아래 PNG 여백을 잘라냄 */}
+              <div style={{ height: 104, overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
+                {character.sprite ? (
+                  <PixelAvatar
+                    sprite={character.sprite}
+                    size={90}
+                    hairOverlay={character.hairOverlay}
+                    hairTransform={character.hairTransform}
+                  />
+                ) : character.isMyOshi ? (
+                  <PixelAvatar
+                    selections={{ parts: character.parts, colors: character.colors }}
+                    size={90}
+                  />
+                ) : (
+                  <div style={{ fontSize: 72 }}>{character.emoji}</div>
+                )}
+              </div>
+              {/* 그림자 — 발 바로 아래 */}
+              <div
+                style={{
+                  marginTop: 2,
+                  width: 54,
+                  height: 7,
+                  background: 'rgba(0,0,0,0.22)',
+                  borderRadius: '50%',
+                  filter: 'blur(1px)',
+                }}
+              />
             </div>
           </IsometricRoom>
 
