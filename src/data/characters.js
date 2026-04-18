@@ -131,8 +131,16 @@ export const getDialogueForLevel = (character, level) => {
 export const MY_OSHI_ID = 'my_oshi';
 
 // MyOshi 프리셋 — 기본 캐릭터 1개로 시작, 머리스타일/옷 variant 추가될 때마다 이 배열에 추가
+// bareSprite: 헤어 오버레이를 얹을 때 사용하는 '대머리' 버전 (원본 머리 제거)
 export const MY_OSHI_PRESETS = [
-  { id: 'preset_basic', sprite: '/sprites/basic.png', label: 'きほん', themeColor: '#FF6B9D', bgColor: '#FFE5EC' },
+  {
+    id: 'preset_basic',
+    sprite:     '/sprites/basic.png',
+    bareSprite: '/sprites/basic_bald.png',
+    label: 'きほん',
+    themeColor: '#FF6B9D',
+    bgColor: '#FFE5EC',
+  },
 ];
 
 export const DEFAULT_PRESET_ID = 'preset_basic';
@@ -182,7 +190,7 @@ export const asCharacter = (myOshi) => {
     typeLabel: '나의 추시',
     themeColor: preset.themeColor,
     bgColor: preset.bgColor,
-    sprite: preset.sprite,
+    sprite: hairstyle.overlay ? preset.bareSprite : preset.sprite,
     hairOverlay: hairstyle.overlay,
     hairTransform: myOshi.hairTransform || { x: 0, y: 0, scale: 1 },
     catchphrase: 'あなたが作った、あなただけの推し。',

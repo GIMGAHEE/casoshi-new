@@ -72,7 +72,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
           }}
         >
           <PixelAvatar
-            sprite={preset.sprite}
+            sprite={hasHair ? preset.bareSprite : preset.sprite}
             size={180}
             hairOverlay={hairstyle.overlay}
             hairTransform={hasHair ? hairTransform : null}
@@ -86,6 +86,44 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
           />
         </div>
       </div>
+
+      {/* 헤어 위치/크기 미세조정 — 프리뷰 바로 아래 (헤어 선택 시에만) */}
+      {hasHair && (
+        <div className="px-4 mt-3">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-xs font-bold text-oshi-dark/60">ヘアの微調整</div>
+            <button
+              onClick={resetTransform}
+              className="text-[10px] text-oshi-main font-bold underline active:scale-95"
+            >
+              リセット
+            </button>
+          </div>
+          <div className="bg-white rounded-2xl border border-oshi-sub p-3 space-y-2.5">
+            <SliderRow
+              label="よこ"
+              value={hairTransform.x}
+              min={-30} max={30} step={1}
+              suffix="%"
+              onChange={(v) => updateTransform('x', v)}
+            />
+            <SliderRow
+              label="たて"
+              value={hairTransform.y}
+              min={-30} max={30} step={1}
+              suffix="%"
+              onChange={(v) => updateTransform('y', v)}
+            />
+            <SliderRow
+              label="サイズ"
+              value={Math.round(hairTransform.scale * 100)}
+              min={50} max={150} step={1}
+              suffix="%"
+              onChange={(v) => updateTransform('scale', v / 100)}
+            />
+          </div>
+        </div>
+      )}
 
       {/* 프리셋 선택 그리드 — 2개 이상일 때만 표시 */}
       {MY_OSHI_PRESETS.length > 1 && (
@@ -142,7 +180,11 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
                 }`}
               >
                 <div className="flex items-center justify-center h-24 overflow-hidden">
-                  <PixelAvatar sprite={preset.sprite} size={80} hairOverlay={h.overlay} />
+                  <PixelAvatar
+                    sprite={h.overlay ? preset.bareSprite : preset.sprite}
+                    size={80}
+                    hairOverlay={h.overlay}
+                  />
                 </div>
                 <div
                   className="text-[10px] text-center font-bold mt-1 truncate"
@@ -155,44 +197,6 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
           })}
         </div>
       </div>
-
-      {/* 헤어 위치/크기 미세조정 — 헤어 선택 시에만 */}
-      {hasHair && (
-        <div className="px-4 mt-5">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-xs font-bold text-oshi-dark/60">ヘアの微調整</div>
-            <button
-              onClick={resetTransform}
-              className="text-[10px] text-oshi-main font-bold underline active:scale-95"
-            >
-              リセット
-            </button>
-          </div>
-          <div className="bg-white rounded-2xl border border-oshi-sub p-3 space-y-3">
-            <SliderRow
-              label="よこ"
-              value={hairTransform.x}
-              min={-30} max={30} step={1}
-              suffix="%"
-              onChange={(v) => updateTransform('x', v)}
-            />
-            <SliderRow
-              label="たて"
-              value={hairTransform.y}
-              min={-30} max={30} step={1}
-              suffix="%"
-              onChange={(v) => updateTransform('y', v)}
-            />
-            <SliderRow
-              label="サイズ"
-              value={Math.round(hairTransform.scale * 100)}
-              min={50} max={150} step={1}
-              suffix="%"
-              onChange={(v) => updateTransform('scale', v / 100)}
-            />
-          </div>
-        </div>
-      )}
 
       {/* 안내 문구 */}
       <div className="px-4 mt-4 text-center">
