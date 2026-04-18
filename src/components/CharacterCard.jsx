@@ -25,7 +25,7 @@ export default function CharacterCard({ character, supportPoints, onClick, highl
           style={{ backgroundColor: character.themeColor + '30' }}
         >
           {character.sprite ? (
-            <PixelAvatar sprite={character.sprite} size={72} />
+            <PixelAvatar sprite={character.sprite} size={72} hairOverlay={character.hairOverlay} />
           ) : character.isMyOshi ? (
             <div style={{ imageRendering: 'pixelated' }}>
               <PixelAvatar

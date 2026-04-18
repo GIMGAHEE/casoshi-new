@@ -137,6 +137,20 @@ export const MY_OSHI_PRESETS = [
 
 export const DEFAULT_PRESET_ID = 'preset_basic';
 
+// 머리스타일 목록 — basic.png 위에 레이어로 겹쳐지는 오버레이 PNG
+// 'original' (null) = basic.png 원본 머리 그대로 사용
+export const HAIRSTYLES = [
+  { id: 'hair_original', label: 'きほん',    overlay: null },
+  { id: 'hair_bob_short',     label: 'ショート',  overlay: '/sprites/hair_bob_short.png' },
+  { id: 'hair_medium',        label: 'ミディアム', overlay: '/sprites/hair_medium.png' },
+  { id: 'hair_long_straight', label: 'ロング',    overlay: '/sprites/hair_long_straight.png' },
+  { id: 'hair_long_wavy',     label: 'ウェーブ',  overlay: '/sprites/hair_long_wavy.png' },
+  { id: 'hair_twintails',     label: 'ツインテ',  overlay: '/sprites/hair_twintails.png' },
+  { id: 'hair_bun',           label: 'お団子',    overlay: '/sprites/hair_bun.png' },
+];
+
+export const DEFAULT_HAIRSTYLE_ID = 'hair_original';
+
 // 제네릭 대사 (유저 캐릭터용 - 이름 자리표시자 {name} 치환)
 const GENERIC_DIALOGUES = [
   { unlockLevel: 1,  text: 'よろしくね！私は{name}だよ♪' },
@@ -155,6 +169,10 @@ export const asCharacter = (myOshi) => {
     MY_OSHI_PRESETS.find(p => p.id === myOshi.presetId) ||
     MY_OSHI_PRESETS.find(p => p.id === DEFAULT_PRESET_ID);
 
+  const hairstyle =
+    HAIRSTYLES.find(h => h.id === myOshi.hairstyleId) ||
+    HAIRSTYLES.find(h => h.id === DEFAULT_HAIRSTYLE_ID);
+
   return {
     id: MY_OSHI_ID,
     creatorId: 'user_self',
@@ -165,6 +183,7 @@ export const asCharacter = (myOshi) => {
     themeColor: preset.themeColor,
     bgColor: preset.bgColor,
     sprite: preset.sprite,
+    hairOverlay: hairstyle.overlay,
     catchphrase: 'あなたが作った、あなただけの推し。',
     bio: `${myOshi.name}は、あなただけのために生まれた推しです。一緒に育てていこう！`,
     dialogues: GENERIC_DIALOGUES.map(d => ({

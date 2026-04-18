@@ -78,7 +78,7 @@ export default function LevelUpModal({ character, newLevel, onClose }) {
           style={{ backgroundColor: character.themeColor + '55' }}
         >
           {character.sprite ? (
-            <PixelAvatar sprite={character.sprite} size={96} />
+            <PixelAvatar sprite={character.sprite} size={96} hairOverlay={character.hairOverlay} />
           ) : character.isMyOshi ? (
             <PixelAvatar
               selections={{ parts: character.parts, colors: character.colors }}

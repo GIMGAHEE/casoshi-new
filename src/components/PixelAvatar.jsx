@@ -13,24 +13,35 @@ import {
  * }
  * size: target rendered width in px (height auto-computed by aspect ratio)
  */
-export default function PixelAvatar({ selections, sprite, size = 96 }) {
+export default function PixelAvatar({ selections, sprite, size = 96, hairOverlay }) {
   // PNG sprite path wins over parts-based rendering.
   if (sprite) {
-    return (
-      <img
-        src={sprite}
-        alt=""
-        width={size}
-        style={{
-          display: 'block',
-          imageRendering: 'pixelated',
-          width: size,
-          height: 'auto',
-          userSelect: 'none',
-        }}
-        draggable={false}
-      />
+    const imgStyle = {
+      display: 'block',
+      imageRendering: 'pixelated',
+      width: size,
+      height: 'auto',
+      userSelect: 'none',
+    };
+    const baseImg = (
+      <img src={sprite} alt="" width={size} style={imgStyle} draggable={false} />
     );
+    // Hair overlay stacks on top via absolute positioning (same canvas size).
+    if (hairOverlay) {
+      return (
+        <div style={{ position: 'relative', width: size, display: 'inline-block' }}>
+          {baseImg}
+          <img
+            src={hairOverlay}
+            alt=""
+            width={size}
+            style={{ ...imgStyle, position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
+            draggable={false}
+          />
+        </div>
+      );
+    }
+    return baseImg;
   }
 
   const palette = buildPalette(selections.colors);
