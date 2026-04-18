@@ -123,9 +123,9 @@ export default function RoomEditor({
                   position: 'absolute',
                   left: `${item.x}%`,
                   top: `${item.y}%`,
-                  width: `${f.defaultWidthPercent * item.scaleX}%`,
+                  width: `${f.defaultWidthPercent * (item.scale ?? item.scaleX ?? 1)}%`,
                   aspectRatio: f.aspectRatio,
-                  transform: `translate(-50%, -50%) rotate(${item.rotation}deg) scaleY(${item.scaleY / item.scaleX})`,
+                  transform: `translate(-50%, -50%) rotate(${item.rotation}deg)`,
                   transformOrigin: 'center center',
                   cursor: 'grab',
                   touchAction: 'none',
@@ -208,16 +208,10 @@ export default function RoomEditor({
           </div>
 
           <EditSlider
-            label="よこ"
-            value={Math.round(selectedItem.scaleX * 100)}
+            label="サイズ"
+            value={Math.round((selectedItem.scale ?? selectedItem.scaleX ?? 1) * 100)}
             min={30} max={250} step={1} suffix="%"
-            onChange={(v) => updateItem(selectedItem.id, { scaleX: v / 100 })}
-          />
-          <EditSlider
-            label="たて"
-            value={Math.round(selectedItem.scaleY * 100)}
-            min={30} max={250} step={1} suffix="%"
-            onChange={(v) => updateItem(selectedItem.id, { scaleY: v / 100 })}
+            onChange={(v) => updateItem(selectedItem.id, { scale: v / 100 })}
           />
           <EditSlider
             label="かいてん"
@@ -228,7 +222,7 @@ export default function RoomEditor({
 
           <div className="flex items-center justify-between pt-1">
             <button
-              onClick={() => updateItem(selectedItem.id, { scaleX: 1, scaleY: 1, rotation: 0 })}
+              onClick={() => updateItem(selectedItem.id, { scale: 1, rotation: 0 })}
               className="text-[10px] text-oshi-dark/60 font-bold underline active:scale-95"
             >
               リセット

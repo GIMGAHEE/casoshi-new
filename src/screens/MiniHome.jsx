@@ -47,6 +47,7 @@ export default function MiniHome({
             {roomItems.map(item => {
               const f = findFurniture(item.furnitureId);
               if (!f) return null;
+              const scale = item.scale ?? item.scaleX ?? 1;
               return (
                 <div
                   key={item.id}
@@ -54,9 +55,9 @@ export default function MiniHome({
                     position: 'absolute',
                     left: `${item.x}%`,
                     top: `${item.y}%`,
-                    width: `${f.defaultWidthPercent * item.scaleX}%`,
+                    width: `${f.defaultWidthPercent * scale}%`,
                     aspectRatio: f.aspectRatio,
-                    transform: `translate(-50%, -50%) rotate(${item.rotation}deg) scaleY(${item.scaleY / item.scaleX})`,
+                    transform: `translate(-50%, -50%) rotate(${item.rotation}deg)`,
                     transformOrigin: 'center center',
                     pointerEvents: 'none',
                   }}

@@ -58,8 +58,7 @@ export const createRoomItem = (furnitureId) => {
     furnitureId,
     x: 50,        // 방 중앙 (%)
     y: 70,        // 바닥 쪽
-    scaleX: 1.0,
-    scaleY: 1.0,
+    scale: 1.0,   // 균일 배율
     rotation: 0,
   };
 };
