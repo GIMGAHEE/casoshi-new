@@ -12,7 +12,7 @@ export default function CharacterDetail({
   myOshi,
   points, setPoints,
   supports, setSupports,
-  onBack, onEditMyOshi,
+  onBack, onEditMyOshi, onOpenMiniHome,
 }) {
   const character = findCharacter(myOshi, characterId);
   const [feedback, setFeedback] = useState(null);
@@ -80,6 +80,15 @@ export default function CharacterDetail({
               className="absolute top-3 right-3 bg-white/80 rounded-full px-3 py-1 text-xs font-bold text-oshi-dark border border-oshi-sub active:scale-95"
             >
               ✏️ 編集
+            </button>
+          )}
+
+          {onOpenMiniHome && (
+            <button
+              onClick={onOpenMiniHome}
+              className="absolute top-3 left-3 bg-white/80 rounded-full px-3 py-1 text-xs font-bold text-oshi-dark border border-oshi-sub active:scale-95"
+            >
+              🏠 おへや
             </button>
           )}
 

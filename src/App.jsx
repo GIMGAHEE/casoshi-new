@@ -6,6 +6,7 @@ import CharacterDetail from './screens/CharacterDetail';
 import TapGame from './screens/TapGame';
 import Ranking from './screens/Ranking';
 import MyOshiBuilder from './screens/MyOshiBuilder';
+import MiniHome from './screens/MiniHome';
 
 export default function App() {
   const [points, setPoints] = useLocalStorage('casoshi:points', 0);
@@ -13,7 +14,7 @@ export default function App() {
   const [lastCheckin, setLastCheckin] = useLocalStorage('casoshi:lastCheckin', null);
   const [myOshi, setMyOshi] = useLocalStorage('casoshi:myOshi', null);
 
-  // screen: { name: 'home' | 'character' | 'tap' | 'ranking' | 'builder', params?: { id } }
+  // screen: home | character | tap | ranking | builder | minihome
   const [screen, setScreen] = useState({ name: 'home' });
 
   const handleReset = () => {
@@ -27,7 +28,7 @@ export default function App() {
 
   const handleSaveMyOshi = (data) => {
     setMyOshi(data);
-    setScreen({ name: 'character', params: { id: 'my_oshi' } });
+    setScreen({ name: 'minihome', params: { id: 'my_oshi' } });
   };
 
   return (
@@ -40,10 +41,20 @@ export default function App() {
           supports={supports}
           myOshi={myOshi}
           lastCheckin={lastCheckin} setLastCheckin={setLastCheckin}
-          onSelectCharacter={(id) => setScreen({ name: 'character', params: { id } })}
+          onSelectCharacter={(id) => setScreen({ name: 'minihome', params: { id } })}
           onOpenTapGame={() => setScreen({ name: 'tap' })}
           onOpenRanking={() => setScreen({ name: 'ranking' })}
           onOpenBuilder={() => setScreen({ name: 'builder' })}
+        />
+      )}
+
+      {screen.name === 'minihome' && (
+        <MiniHome
+          characterId={screen.params.id}
+          myOshi={myOshi}
+          supports={supports}
+          onBack={() => setScreen({ name: 'home' })}
+          onOpenDetail={(id) => setScreen({ name: 'character', params: { id } })}
         />
       )}
 
@@ -53,8 +64,9 @@ export default function App() {
           myOshi={myOshi}
           points={points} setPoints={setPoints}
           supports={supports} setSupports={setSupports}
-          onBack={() => setScreen({ name: 'home' })}
+          onBack={() => setScreen({ name: 'minihome', params: screen.params })}
           onEditMyOshi={() => setScreen({ name: 'builder' })}
+          onOpenMiniHome={() => setScreen({ name: 'minihome', params: screen.params })}
         />
       )}
 
@@ -70,7 +82,7 @@ export default function App() {
           myOshi={myOshi}
           supports={supports}
           onBack={() => setScreen({ name: 'home' })}
-          onSelectCharacter={(id) => setScreen({ name: 'character', params: { id } })}
+          onSelectCharacter={(id) => setScreen({ name: 'minihome', params: { id } })}
         />
       )}
 
@@ -78,7 +90,7 @@ export default function App() {
         <MyOshiBuilder
           initialOshi={myOshi}
           onSave={handleSaveMyOshi}
-          onCancel={() => setScreen({ name: myOshi ? 'character' : 'home', params: myOshi ? { id: 'my_oshi' } : undefined })}
+          onCancel={() => setScreen({ name: myOshi ? 'minihome' : 'home', params: myOshi ? { id: 'my_oshi' } : undefined })}
         />
       )}
     </div>
