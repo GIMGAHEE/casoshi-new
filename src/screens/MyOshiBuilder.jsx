@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MY_OSHI_PRESETS, DEFAULT_PRESET_ID } from '../data/characters';
+import { MY_OSHI_PRESETS, DEFAULT_PRESET_ID, HAIR_COLOR_OPTIONS } from '../data/characters';
 import PixelAvatar from '../components/PixelAvatar';
 
 export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
@@ -7,7 +7,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
     initialOshi?.presetId || DEFAULT_PRESET_ID
   );
   const [name, setName] = useState(initialOshi?.name || '');
-  const [hue, setHue] = useState(initialOshi?.hue || 0);
+  const [hairColor, setHairColor] = useState(initialOshi?.hairColor || null);
 
   const preset =
     MY_OSHI_PRESETS.find(p => p.id === presetId) || MY_OSHI_PRESETS[0];
@@ -21,7 +21,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
     onSave({
       name: trimmed,
       presetId,
-      hue,
+      hairColor,
     });
   };
 
@@ -45,7 +45,12 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
             background: `linear-gradient(135deg, ${preset.themeColor}33, ${preset.bgColor})`,
           }}
         >
-          <PixelAvatar sprite={preset.sprite} size={180} hue={hue} />
+          <PixelAvatar
+            sprite={preset.sprite}
+            size={180}
+            hairColor={hairColor}
+            baseHairColor={preset.baseHairColor}
+          />
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -92,46 +97,42 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
         </div>
       </div>
 
-      {/* HUE 슬라이더 */}
+      {/* 머리색 선택 버튼 */}
       <div className="px-4 mt-5">
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-xs font-bold text-oshi-dark/60">いろあい</div>
-          <div className="flex items-center gap-2">
-            <div className="text-[10px] text-oshi-dark/40 tabular-nums">
-              {hue}°
-            </div>
-            {hue !== 0 && (
+        <div className="text-xs font-bold text-oshi-dark/60 mb-2">
+          髪の色
+        </div>
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {HAIR_COLOR_OPTIONS.map(opt => {
+            const active = (opt.hex || null) === hairColor;
+            return (
               <button
-                onClick={() => setHue(0)}
-                className="text-[10px] text-oshi-main font-bold underline active:scale-95"
+                key={opt.id}
+                onClick={() => setHairColor(opt.hex)}
+                className={`flex-shrink-0 flex flex-col items-center gap-1 rounded-2xl p-2 border-2 transition active:scale-95 ${
+                  active
+                    ? 'border-oshi-main shadow-md'
+                    : 'border-oshi-sub bg-white'
+                }`}
+                style={{ minWidth: 64 }}
               >
-                リセット
+                <div
+                  className="w-10 h-10 rounded-full border-2 border-white shadow-inner"
+                  style={{
+                    background: opt.hex
+                      ? opt.previewBg
+                      : 'repeating-linear-gradient(45deg, #e5e7eb 0 4px, #f9fafb 4px 8px)',
+                  }}
+                />
+                <div className="text-[10px] font-bold text-oshi-dark/70 truncate max-w-[60px]">
+                  {opt.label}
+                </div>
               </button>
-            )}
-          </div>
+            );
+          })}
         </div>
-        <input
-          type="range"
-          min={0}
-          max={360}
-          step={5}
-          value={hue}
-          onChange={(e) => setHue(parseInt(e.target.value))}
-          className="w-full h-3 rounded-full appearance-none cursor-pointer outline-none"
-          style={{
-            background: 'linear-gradient(to right, #ff6b6b, #ffd166, #06d6a0, #118ab2, #9b8afb, #ff6b9d, #ff6b6b)',
-          }}
-        />
-        <div className="text-[10px] text-oshi-dark/40 mt-1.5 text-center">
-          スライダーで全体の色合いを変えられます
-        </div>
-      </div>
-
-      {/* 안내 문구 */}
-      <div className="px-4 mt-4 text-center">
-        <div className="text-[11px] text-oshi-dark/50 leading-relaxed">
-          お気に入りの見た目を選んで、<br />
-          あなただけの推しの名前をつけよう！
+        <div className="text-[10px] text-oshi-dark/40 mt-2 text-center leading-relaxed">
+          ※ 黒髪キャラは輪郭も少し色が変わります
         </div>
       </div>
 

@@ -1,24 +1,41 @@
+import { useState, useEffect } from 'react';
 import {
   SPRITE_W, SPRITE_H,
   buildPalette, composeLayers,
 } from '../data/pixelParts';
+import { recolorHair } from '../utils/colorSwap';
 
 /**
- * Renders a pixel-art chibi avatar using composed sprite layers.
- * Each "pixel" is an SVG <rect> to preserve crisp edges at any scale.
+ * Renders a pixel-art chibi avatar.
  *
- * selections: {
- *   parts:  { hair, eyes, mouth, outfit, accessory },
- *   colors: { skin, hair, outfit, accent },
- * }
- * size: target rendered width in px (height auto-computed by aspect ratio)
+ * If `sprite` (PNG path) is given, renders as <img>.
+ *   - When `hairColor` + `baseHairColor` provided, canvas-recolors pixels
+ *     matching baseHairColor → hairColor (preserving shading).
+ *
+ * Otherwise falls back to SVG pixel-parts composition using `selections`.
  */
-export default function PixelAvatar({ selections, sprite, size = 96, hue = 0 }) {
-  // PNG sprite path wins over parts-based rendering.
+export default function PixelAvatar({
+  selections, sprite, size = 96,
+  hairColor, baseHairColor,
+}) {
+  const [recoloredUrl, setRecoloredUrl] = useState(null);
+
+  useEffect(() => {
+    if (!sprite || !hairColor || !baseHairColor) {
+      setRecoloredUrl(null);
+      return;
+    }
+    let cancelled = false;
+    recolorHair(sprite, baseHairColor, hairColor)
+      .then(url => { if (!cancelled) setRecoloredUrl(url); })
+      .catch(() => { if (!cancelled) setRecoloredUrl(null); });
+    return () => { cancelled = true; };
+  }, [sprite, hairColor, baseHairColor]);
+
   if (sprite) {
     return (
       <img
-        src={sprite}
+        src={recoloredUrl || sprite}
         alt=""
         width={size}
         style={{
@@ -27,7 +44,6 @@ export default function PixelAvatar({ selections, sprite, size = 96, hue = 0 }) 
           width: size,
           height: 'auto',
           userSelect: 'none',
-          filter: hue ? `hue-rotate(${hue}deg)` : undefined,
         }}
         draggable={false}
       />
