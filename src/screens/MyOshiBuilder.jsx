@@ -2,6 +2,7 @@ import { useState } from 'react';
 import {
   MY_OSHI_PRESETS, DEFAULT_PRESET_ID,
   HAIRSTYLES, DEFAULT_HAIRSTYLE_ID,
+  getDefaultHairTransform,
 } from '../data/characters';
 import PixelAvatar from '../components/PixelAvatar';
 
@@ -15,7 +16,8 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
     initialOshi?.hairstyleId || DEFAULT_HAIRSTYLE_ID
   );
   const [hairTransform, setHairTransform] = useState(
-    initialOshi?.hairTransform || DEFAULT_TRANSFORM
+    initialOshi?.hairTransform ||
+    getDefaultHairTransform(initialOshi?.hairstyleId || DEFAULT_HAIRSTYLE_ID)
   );
   const [name, setName] = useState(initialOshi?.name || '');
 
@@ -43,12 +45,12 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
     setHairTransform(t => ({ ...t, [key]: value }));
   };
 
-  const resetTransform = () => setHairTransform(DEFAULT_TRANSFORM);
+  const resetTransform = () => setHairTransform(getDefaultHairTransform(hairstyleId));
 
-  // 헤어 바꾸면 위치 초기화 (이전 조정값이 다른 헤어에 맞지 않음)
+  // 헤어 바꾸면 해당 헤어의 기본 위치/크기로 초기화
   const pickHair = (id) => {
     setHairstyleId(id);
-    setHairTransform(DEFAULT_TRANSFORM);
+    setHairTransform(getDefaultHairTransform(id));
   };
 
   return (
