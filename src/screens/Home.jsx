@@ -42,7 +42,12 @@ export default function Home({
               canCheckin ? 'hover:bg-oshi-bg cursor-pointer' : 'opacity-50 cursor-not-allowed'
             }`}
           >
-            <div className="text-3xl mb-1">📅</div>
+            <img
+              src="/icons/calendar.png"
+              alt=""
+              className="w-12 h-12 mb-1"
+              style={{ imageRendering: 'pixelated' }}
+            />
             <div className="text-sm font-bold text-oshi-dark">
               {canCheckin ? '出席チェック' : '出席済み'}
             </div>
