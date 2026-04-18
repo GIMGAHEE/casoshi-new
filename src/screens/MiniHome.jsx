@@ -106,17 +106,6 @@ export default function MiniHome({
                   <div style={{ fontSize: 72 }}>{character.emoji}</div>
                 )}
               </div>
-              {/* 그림자 — 발 바로 아래 */}
-              <div
-                style={{
-                  marginTop: 2,
-                  width: 54,
-                  height: 7,
-                  background: 'rgba(0,0,0,0.22)',
-                  borderRadius: '50%',
-                  filter: 'blur(1px)',
-                }}
-              />
             </div>
           </IsometricRoom>
 
