@@ -118,3 +118,53 @@ export const getUnlockedDialogues = (character, supportPoints) => {
 export const getDialogueForLevel = (character, level) => {
   return character.dialogues.find(d => d.unlockLevel === level) || null;
 };
+
+// ============================================================
+// MyOshi (유저가 만든 캐릭터)
+// ============================================================
+
+export const MY_OSHI_ID = 'my_oshi';
+
+// 제네릭 대사 (유저 캐릭터용 - 이름 자리표시자 {name} 치환)
+const GENERIC_DIALOGUES = [
+  { unlockLevel: 1,  text: 'よろしくね！私は{name}だよ♪' },
+  { unlockLevel: 2,  text: 'えへへ、また会えたね！' },
+  { unlockLevel: 3,  text: 'あなたのおかげで、元気が出るよ！' },
+  { unlockLevel: 5,  text: 'ずっと応援してくれて、本当にありがとう。' },
+  { unlockLevel: 10, text: '私の一番の推し活仲間、それはあなただよ！' },
+];
+
+// myOshi(로컬스토리지 저장 데이터)를 표준 캐릭터 객체로 변환
+export const asCharacter = (myOshi) => {
+  if (!myOshi) return null;
+  return {
+    id: MY_OSHI_ID,
+    creatorId: 'user_self',
+    name: myOshi.name,
+    nameRomaji: '',
+    type: 'マイ推し',
+    typeLabel: '나의 추시',
+    themeColor: myOshi.colors.hair,     // 테마 컬러는 머리색 기준
+    bgColor: myOshi.colors.outfit + '33', // 옷 컬러 + 투명도
+    catchphrase: 'あなたが作った、あなただけの推し。',
+    bio: `${myOshi.name}は、あなただけのために生まれた推しです。一緒に育てていこう！`,
+    dialogues: GENERIC_DIALOGUES.map(d => ({
+      ...d,
+      text: d.text.replace('{name}', myOshi.name),
+    })),
+    // MyOshi 전용 필드 (렌더 시 AvatarSVG 사용 여부 판별용)
+    isMyOshi: true,
+    parts: myOshi.parts,
+    colors: myOshi.colors,
+  };
+};
+
+// 전체 캐릭터 목록 (시드 + 있으면 마이 추시)
+export const allCharacters = (myOshi) => {
+  const my = asCharacter(myOshi);
+  return my ? [my, ...SEED_CHARACTERS] : SEED_CHARACTERS;
+};
+
+export const findCharacter = (myOshi, id) => {
+  return allCharacters(myOshi).find(c => c.id === id) || null;
+};

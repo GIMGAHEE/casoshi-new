@@ -1,4 +1,5 @@
-import { SEED_CHARACTERS, calcLevel } from '../data/characters';
+import { allCharacters, calcLevel } from '../data/characters';
+import AvatarSVG from '../components/AvatarSVG';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
 const MEDAL_BG = [
@@ -7,9 +8,24 @@ const MEDAL_BG = [
   'linear-gradient(135deg, #CD7F32, #8B4513)',
 ];
 
-export default function Ranking({ supports, onBack, onSelectCharacter }) {
-  // 응원값 내림차순 정렬
-  const ranked = [...SEED_CHARACTERS]
+// 아바타 표시 (이모지 or SVG 분기)
+function Avatar({ character, size }) {
+  if (character.isMyOshi) {
+    return (
+      <div style={{ transform: 'translateY(8%)' }}>
+        <AvatarSVG
+          selections={{ parts: character.parts, colors: character.colors }}
+          size={size * 1.1}
+        />
+      </div>
+    );
+  }
+  return <div style={{ fontSize: size * 0.55 }}>{character.emoji}</div>;
+}
+
+export default function Ranking({ myOshi, supports, onBack, onSelectCharacter }) {
+  const characters = allCharacters(myOshi);
+  const ranked = [...characters]
     .map(c => ({ ...c, supportPoints: supports[c.id] || 0 }))
     .sort((a, b) => b.supportPoints - a.supportPoints);
 
@@ -48,10 +64,10 @@ export default function Ranking({ supports, onBack, onSelectCharacter }) {
           </div>
 
           <div
-            className="mx-auto w-24 h-24 rounded-full flex items-center justify-center text-6xl shadow-inner mb-2"
+            className="mx-auto w-24 h-24 rounded-full flex items-center justify-center shadow-inner mb-2 overflow-hidden"
             style={{ backgroundColor: top.themeColor + '55' }}
           >
-            {top.emoji}
+            <Avatar character={top} size={96} />
           </div>
 
           <div className="text-2xl font-black text-oshi-dark mb-1">
@@ -98,10 +114,10 @@ export default function Ranking({ supports, onBack, onSelectCharacter }) {
 
               {/* 캐릭터 */}
               <div
-                className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-2xl"
+                className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center overflow-hidden"
                 style={{ backgroundColor: c.themeColor + '40' }}
               >
-                {c.emoji}
+                <Avatar character={c} size={48} />
               </div>
 
               {/* 정보 */}

@@ -1,20 +1,22 @@
 import { useState } from 'react';
 import {
-  SEED_CHARACTERS, calcLevel, calcExp,
-  getUnlockedDialogues,
+  calcLevel, calcExp,
+  getUnlockedDialogues, findCharacter,
 } from '../data/characters';
 import { SUPPORT_COST } from '../data/gameRules';
 import LevelUpModal from '../components/LevelUpModal';
+import AvatarSVG from '../components/AvatarSVG';
 
 export default function CharacterDetail({
   characterId,
+  myOshi,
   points, setPoints,
   supports, setSupports,
-  onBack,
+  onBack, onEditMyOshi,
 }) {
-  const character = SEED_CHARACTERS.find(c => c.id === characterId);
+  const character = findCharacter(myOshi, characterId);
   const [feedback, setFeedback] = useState(null);
-  const [levelUpTo, setLevelUpTo] = useState(null); // 레벨업 감지 시 새 레벨 저장
+  const [levelUpTo, setLevelUpTo] = useState(null);
 
   if (!character) {
     return (
@@ -69,14 +71,32 @@ export default function CharacterDetail({
 
         {/* 캐릭터 헤더 */}
         <section
-          className="rounded-3xl p-6 text-center shadow-md"
+          className="rounded-3xl p-6 text-center shadow-md relative"
           style={{ backgroundColor: character.bgColor }}
         >
+          {character.isMyOshi && onEditMyOshi && (
+            <button
+              onClick={onEditMyOshi}
+              className="absolute top-3 right-3 bg-white/80 rounded-full px-3 py-1 text-xs font-bold text-oshi-dark border border-oshi-sub active:scale-95"
+            >
+              ✏️ 編集
+            </button>
+          )}
+
           <div
-            className="mx-auto w-32 h-32 rounded-full flex items-center justify-center text-7xl shadow-inner mb-3 animate-float"
-            style={{ backgroundColor: character.themeColor + '55' }}
+            className="mx-auto w-32 h-32 rounded-full flex items-center justify-center shadow-inner mb-3 overflow-hidden"
+            style={{ backgroundColor: character.themeColor + '40' }}
           >
-            {character.emoji}
+            {character.isMyOshi ? (
+              <div style={{ transform: 'translateY(6%) scale(1.05)' }}>
+                <AvatarSVG
+                  selections={{ parts: character.parts, colors: character.colors }}
+                  size={130}
+                />
+              </div>
+            ) : (
+              <div className="text-7xl animate-float">{character.emoji}</div>
+            )}
           </div>
 
           <div className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full text-white mb-2"

@@ -1,21 +1,39 @@
 import { calcLevel, calcExp } from '../data/characters';
+import AvatarSVG from './AvatarSVG';
 
-export default function CharacterCard({ character, supportPoints, onClick }) {
+export default function CharacterCard({ character, supportPoints, onClick, highlight = false }) {
   const level = calcLevel(supportPoints);
   const exp = calcExp(supportPoints);
 
   return (
     <button
       onClick={onClick}
-      className="card w-full text-left active:scale-[0.98] transition-transform"
+      className={`card w-full text-left active:scale-[0.98] transition-transform relative ${
+        highlight ? 'ring-2 ring-oshi-main' : ''
+      }`}
       style={{ backgroundColor: character.bgColor }}
     >
+      {highlight && (
+        <div className="absolute -top-2 -right-2 bg-oshi-main text-white text-[10px] font-black px-2 py-1 rounded-full shadow">
+          マイ推し
+        </div>
+      )}
+
       <div className="flex items-start gap-4">
         <div
-          className="text-6xl animate-float flex-shrink-0 w-20 h-20 rounded-full flex items-center justify-center shadow-inner"
-          style={{ backgroundColor: character.themeColor + '40' }}
+          className="flex-shrink-0 w-20 h-20 rounded-full flex items-center justify-center shadow-inner overflow-hidden"
+          style={{ backgroundColor: character.themeColor + '30' }}
         >
-          {character.emoji}
+          {character.isMyOshi ? (
+            <div style={{ transform: 'translateY(8%)' }}>
+              <AvatarSVG
+                selections={{ parts: character.parts, colors: character.colors }}
+                size={64}
+              />
+            </div>
+          ) : (
+            <div className="text-5xl animate-float">{character.emoji}</div>
+          )}
         </div>
 
         <div className="flex-1 min-w-0">

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getDialogueForLevel } from '../data/characters';
+import AvatarSVG from './AvatarSVG';
 
 // 파티클 25개 랜덤 생성
 const makeParticles = (count = 25) =>
@@ -73,10 +74,19 @@ export default function LevelUpModal({ character, newLevel, onClose }) {
 
         {/* 캐릭터 아바타 */}
         <div
-          className="mx-auto w-24 h-24 rounded-full flex items-center justify-center text-6xl mb-3 shadow-inner animate-float"
+          className="mx-auto w-24 h-24 rounded-full flex items-center justify-center mb-3 shadow-inner overflow-hidden animate-float"
           style={{ backgroundColor: character.themeColor + '55' }}
         >
-          {character.emoji}
+          {character.isMyOshi ? (
+            <div style={{ transform: 'translateY(6%) scale(1.05)' }}>
+              <AvatarSVG
+                selections={{ parts: character.parts, colors: character.colors }}
+                size={96}
+              />
+            </div>
+          ) : (
+            <div className="text-6xl">{character.emoji}</div>
+          )}
         </div>
 
         {/* 캐릭터 이름 + 새 레벨 */}
