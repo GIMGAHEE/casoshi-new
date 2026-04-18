@@ -2,11 +2,9 @@ import { useState } from 'react';
 import {
   MY_OSHI_PRESETS, DEFAULT_PRESET_ID,
   HAIRSTYLES, DEFAULT_HAIRSTYLE_ID,
-  getDefaultHairTransform,
+  DEFAULT_HAIR_OFFSET, computeHairTransform,
 } from '../data/characters';
 import PixelAvatar from '../components/PixelAvatar';
-
-const DEFAULT_TRANSFORM = { x: 0, y: 0, scale: 1 };
 
 export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
   const [presetId, setPresetId] = useState(
@@ -15,9 +13,9 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
   const [hairstyleId, setHairstyleId] = useState(
     initialOshi?.hairstyleId || DEFAULT_HAIRSTYLE_ID
   );
-  const [hairTransform, setHairTransform] = useState(
-    initialOshi?.hairTransform ||
-    getDefaultHairTransform(initialOshi?.hairstyleId || DEFAULT_HAIRSTYLE_ID)
+  // hairOffset: "0포인트 기준" 조정값 — 처음엔 {y:0, scale:0}
+  const [hairOffset, setHairOffset] = useState(
+    initialOshi?.hairOffset || DEFAULT_HAIR_OFFSET
   );
   const [name, setName] = useState(initialOshi?.name || '');
 
@@ -26,6 +24,9 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
   const hairstyle =
     HAIRSTYLES.find(h => h.id === hairstyleId) || HAIRSTYLES[0];
   const hasHair = !!hairstyle.overlay;
+
+  // 프리뷰에 쓸 실제 transform = 기본값 + 오프셋
+  const effectiveTransform = computeHairTransform(hairstyleId, hairOffset);
 
   const handleSave = () => {
     const trimmed = name.trim();
@@ -37,20 +38,20 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
       name: trimmed,
       presetId,
       hairstyleId,
-      hairTransform: hasHair ? hairTransform : DEFAULT_TRANSFORM,
+      hairOffset,
     });
   };
 
-  const updateTransform = (key, value) => {
-    setHairTransform(t => ({ ...t, [key]: value }));
+  const updateOffset = (key, value) => {
+    setHairOffset(o => ({ ...o, [key]: value }));
   };
 
-  const resetTransform = () => setHairTransform(getDefaultHairTransform(hairstyleId));
+  const resetOffset = () => setHairOffset(DEFAULT_HAIR_OFFSET);
 
-  // 헤어 바꾸면 해당 헤어의 기본 위치/크기로 초기화
+  // 헤어 바꾸면 오프셋 0으로 초기화 → 새 헤어의 defaultTransform이 그대로 보임
   const pickHair = (id) => {
     setHairstyleId(id);
-    setHairTransform(getDefaultHairTransform(id));
+    setHairOffset(DEFAULT_HAIR_OFFSET);
   };
 
   return (
@@ -77,7 +78,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
             sprite={preset.sprite}
             size={180}
             hairOverlay={hairstyle.overlay}
-            hairTransform={hasHair ? hairTransform : null}
+            hairTransform={hasHair ? effectiveTransform : null}
           />
           <input
             value={name}
@@ -95,7 +96,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
           <div className="flex items-center justify-between mb-2">
             <div className="text-xs font-bold text-oshi-dark/60">ヘアの微調整</div>
             <button
-              onClick={resetTransform}
+              onClick={resetOffset}
               className="text-[10px] text-oshi-main font-bold underline active:scale-95"
             >
               リセット
@@ -103,25 +104,18 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
           </div>
           <div className="bg-white rounded-2xl border border-oshi-sub p-3 space-y-2.5">
             <SliderRow
-              label="よこ"
-              value={hairTransform.x}
-              min={-50} max={50} step={1}
-              suffix="%"
-              onChange={(v) => updateTransform('x', v)}
-            />
-            <SliderRow
               label="たて"
-              value={hairTransform.y}
-              min={-50} max={50} step={1}
+              value={hairOffset.y}
+              min={-30} max={30} step={1}
               suffix="%"
-              onChange={(v) => updateTransform('y', v)}
+              onChange={(v) => updateOffset('y', v)}
             />
             <SliderRow
               label="サイズ"
-              value={Math.round(hairTransform.scale * 100)}
-              min={40} max={180} step={1}
+              value={hairOffset.scale}
+              min={-30} max={30} step={1}
               suffix="%"
-              onChange={(v) => updateTransform('scale', v / 100)}
+              onChange={(v) => updateOffset('scale', v)}
             />
           </div>
         </div>

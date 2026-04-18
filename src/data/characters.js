@@ -145,22 +145,32 @@ export const MY_OSHI_PRESETS = [
 export const DEFAULT_PRESET_ID = 'preset_basic';
 
 // 머리스타일 목록 — basic.png 위에 레이어로 겹쳐지는 오버레이 PNG
-// defaultTransform: ウェーブ(long_wavy)를 기준으로 각 헤어의 초기 위치/크기를 basic body에 맞춤
+// defaultTransform: 사용자가 직접 맞춘 basic body 기준 0포인트 (이후 조정은 이 값에 +/- 오프셋)
 export const HAIRSTYLES = [
-  { id: 'hair_bob_short',     label: 'ショート',   overlay: '/sprites/hair_bob_short.png',     defaultTransform: { x: 0, y: -6, scale: 1.12 } },
-  { id: 'hair_medium',        label: 'ミディアム', overlay: '/sprites/hair_medium.png',        defaultTransform: { x: 0, y: -5, scale: 1.25 } },
-  { id: 'hair_long_straight', label: 'ロング',     overlay: '/sprites/hair_long_straight.png', defaultTransform: { x: 0, y: -3, scale: 1.10 } },
-  { id: 'hair_long_wavy',     label: 'ウェーブ',   overlay: '/sprites/hair_long_wavy.png',     defaultTransform: { x: 0, y:  0, scale: 1.00 } },
-  { id: 'hair_twintails',     label: 'ツインテ',   overlay: '/sprites/hair_twintails.png',     defaultTransform: { x: 0, y: -4, scale: 1.05 } },
-  { id: 'hair_bun',           label: 'お団子',     overlay: '/sprites/hair_bun.png',           defaultTransform: { x: 0, y: -3, scale: 1.20 } },
+  { id: 'hair_bob_short',     label: 'ショート',   overlay: '/sprites/hair_bob_short.png',     defaultTransform: { x: 0, y: -18, scale: 1.74 } },
+  { id: 'hair_medium',        label: 'ミディアム', overlay: '/sprites/hair_medium.png',        defaultTransform: { x: 0, y: -10, scale: 1.80 } },
+  { id: 'hair_long_straight', label: 'ロング',     overlay: '/sprites/hair_long_straight.png', defaultTransform: { x: 0, y:  -7, scale: 1.84 } },
+  { id: 'hair_long_wavy',     label: 'ウェーブ',   overlay: '/sprites/hair_long_wavy.png',     defaultTransform: { x: 0, y:  -2, scale: 1.90 } },
+  { id: 'hair_twintails',     label: 'ツインテ',   overlay: '/sprites/hair_twintails.png',     defaultTransform: { x: 0, y: -11, scale: 1.81 } },
+  { id: 'hair_bun',           label: 'お団子',     overlay: '/sprites/hair_bun.png',           defaultTransform: { x: 0, y: -13, scale: 1.81 } },
 ];
 
 export const DEFAULT_HAIRSTYLE_ID = 'hair_bob_short';
 
-// 유틸: hairstyleId로 기본 transform 가져오기
-export const getDefaultHairTransform = (hairstyleId) => {
+// hairOffset: 사용자가 슬라이더로 설정한 "0포인트 대비 오프셋"
+// { y: -30~+30 (percent-point), scale: -30~+30 (percent-point) }
+export const DEFAULT_HAIR_OFFSET = { y: 0, scale: 0 };
+
+// 실제 렌더링에 쓸 transform = 기본값 + 오프셋
+export const computeHairTransform = (hairstyleId, offset) => {
   const hs = HAIRSTYLES.find(h => h.id === hairstyleId);
-  return hs?.defaultTransform || { x: 0, y: 0, scale: 1 };
+  const def = hs?.defaultTransform || { x: 0, y: 0, scale: 1 };
+  const o = offset || DEFAULT_HAIR_OFFSET;
+  return {
+    x: def.x,
+    y: def.y + o.y,
+    scale: def.scale + o.scale / 100,
+  };
 };
 
 // 제네릭 대사 (유저 캐릭터용 - 이름 자리표시자 {name} 치환)
@@ -196,10 +206,7 @@ export const asCharacter = (myOshi) => {
     bgColor: preset.bgColor,
     sprite: preset.sprite,
     hairOverlay: hairstyle.overlay,
-    hairTransform:
-      myOshi.hairTransform ||
-      hairstyle.defaultTransform ||
-      { x: 0, y: 0, scale: 1 },
+    hairTransform: computeHairTransform(myOshi.hairstyleId, myOshi.hairOffset),
     catchphrase: 'あなたが作った、あなただけの推し。',
     bio: `${myOshi.name}は、あなただけのために生まれた推しです。一緒に育てていこう！`,
     dialogues: GENERIC_DIALOGUES.map(d => ({
