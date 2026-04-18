@@ -1,30 +1,25 @@
 import { shade } from '../utils/color';
 
 /**
- * Cyworld-style isometric mini-room
- * - 캐릭터의 테마 컬러에 맞춰 벽지/러그/침대 컬러 변경
- * - 바닥/가구 구조는 고정
- * - 완전 픽셀은 아니지만 크리스프 엣지 + 한정 팔레트로 픽셀 감성
+ * 1-point perspective mini-room
+ * - 뒤쪽 코너가 중앙 소실점, 벽이 좌우로 퍼짐
+ * - 바닥은 앞쪽이 넓은 삼각형/사다리꼴
+ * - 캐릭터는 바닥 중앙에 서있음
  */
 export default function IsometricRoom({
   character,
-  children, // 방 안에 서있는 캐릭터 등 오버레이
+  children,
   size = 340,
 }) {
   const themeColor = character?.themeColor || '#FF6B9D';
   const accent = themeColor;
   const accentDark = shade(accent, -0.3);
-  const accentLight = shade(accent, 0.4);
 
-  // 벽지 스트라이프 컬러
-  const wallBase = '#F5E6D3';
-  const wallShadow = shade(wallBase, -0.15);
-  const wallStripe = shade(accent, 0.6);
-
-  // 바닥 나무
-  const floorLight = '#E8C896';
-  const floorDark = '#C9A878';
-  const floorLine = '#8B6B45';
+  // 벽/바닥 팔레트
+  const wallLeft  = '#F5E6D3';
+  const wallRight = shade(wallLeft, -0.08);
+  const floorColor = '#C9A878';
+  const floorDark  = '#8B6B45';
 
   return (
     <svg
@@ -35,71 +30,62 @@ export default function IsometricRoom({
       shapeRendering="crispEdges"
       style={{ display: 'block' }}
     >
-      {/* ===== 벽 (뒤에 먼저 그림) ===== */}
-      {/* 방 레이아웃 (isometric 2:1):
-          바닥 다이아몬드:  L(0,270) B(200,170) R(400,270) F(200,370)
-          벽 높이: 170 (수직)
-          벽 위 꼭지점:    LT(0,100) BT(200,0)  RT(400,100)              */}
+      {/* 방 좌표 체계:
+          소실점(뒤 코너 위): (200, 120)
+          뒤 코너 아래(바닥과 벽 만남): (200, 220)
+          앞 모서리: 화면 네 귀퉁이 (0,0)(400,0)(0,400)(400,400)
+          바닥 앞 모서리: (0,400)-(400,400)
+          바닥 뒤: (200,220) 한 점(수렴) */}
 
-      {/* 왼쪽 벽 */}
+      {/* ===== 왼쪽 벽 ===== */}
       <polygon
-        points="0,270 200,170 200,0 0,100"
-        fill={wallBase}
-        stroke="#8B6B45"
+        points="0,0 200,120 200,220 0,400"
+        fill={wallLeft}
+        stroke={floorDark}
         strokeWidth="1"
       />
-      {/* 왼쪽 벽 세로 스트라이프 */}
-      <g stroke={wallStripe} strokeWidth="2" fill="none">
-        <line x1="50"  y1="245" x2="50"  y2="75"  />
-        <line x1="100" y1="220" x2="100" y2="50"  />
-        <line x1="150" y1="195" x2="150" y2="25"  />
-      </g>
 
-      {/* 오른쪽 벽 */}
+      {/* ===== 오른쪽 벽 ===== */}
       <polygon
-        points="200,170 400,270 400,100 200,0"
-        fill={shade(wallBase, -0.04)}
-        stroke="#8B6B45"
+        points="400,0 200,120 200,220 400,400"
+        fill={wallRight}
+        stroke={floorDark}
         strokeWidth="1"
       />
-      {/* 오른쪽 벽 스트라이프 */}
-      <g stroke={shade(wallStripe, -0.1)} strokeWidth="2" fill="none">
-        <line x1="250" y1="195" x2="250" y2="25"  />
-        <line x1="300" y1="220" x2="300" y2="50"  />
-        <line x1="350" y1="245" x2="350" y2="75"  />
+
+      {/* ===== 바닥 (삼각형) ===== */}
+      <polygon
+        points="200,220 0,400 400,400"
+        fill={floorColor}
+        stroke={floorDark}
+        strokeWidth="1.5"
+      />
+      {/* 바닥 depth 라인 (뒤→앞 방향 깊이감) */}
+      <g stroke={floorDark} strokeWidth="1" opacity="0.35">
+        <line x1="150" y1="265" x2="250" y2="265" />
+        <line x1="100" y1="310" x2="300" y2="310" />
+        <line x1="50"  y1="355" x2="350" y2="355" />
       </g>
 
-      {/* ===== 창문 (오른쪽 벽, isometric 2:1 slope) ===== */}
+      {/* ===== 창문 (오른쪽 벽, 원근 적용) ===== */}
       <g>
         <polygon
-          points="250,60 340,105 340,185 250,140"
+          points="260,80 330,50 330,220 260,190"
           fill="#FFF8F0"
           stroke={accentDark}
           strokeWidth="2"
         />
+        {/* 하늘 */}
         <polygon
-          points="254,66 336,107 336,179 254,134"
+          points="264,84 326,56 326,216 264,186"
           fill="#B5E0FA"
         />
-        <ellipse cx="275" cy="82" rx="8" ry="3" fill="white" opacity="0.9" />
-        <ellipse cx="305" cy="125" rx="10" ry="3" fill="white" opacity="0.8" />
+        {/* 구름 */}
+        <ellipse cx="285" cy="95" rx="8" ry="3" fill="white" opacity="0.9" />
+        <ellipse cx="305" cy="130" rx="10" ry="3" fill="white" opacity="0.8" />
         {/* 창틀 십자 */}
-        <line x1="254" y1="100" x2="336" y2="145" stroke={accentDark} strokeWidth="1.5" />
-        <line x1="295" y1="83"  x2="295" y2="162" stroke={accentDark} strokeWidth="1.5" />
-      </g>
-
-      {/* ===== 바닥 ===== */}
-      <polygon
-        points="0,270 200,170 400,270 200,370"
-        fill={floorLight}
-        stroke={floorLine}
-        strokeWidth="1.5"
-      />
-      {/* 나무 널빤지 라인 (isometric 평행) */}
-      <g stroke={floorLine} strokeWidth="1" opacity="0.5">
-        <line x1="50"  y1="245" x2="250" y2="345" />
-        <line x1="100" y1="220" x2="300" y2="320" />
-        <line x1="150" y1="195" x2="350" y2="295" />
+        <line x1="264" y1="135" x2="326" y2="105" stroke={accentDark} strokeWidth="1.5" />
+        <line x1="295" y1="67"  x2="295" y2="205" stroke={accentDark} strokeWidth="1.5" />
       </g>
 
       {/* ===== 오버레이 (캐릭터 등) ===== */}
