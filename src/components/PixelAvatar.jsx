@@ -13,7 +13,10 @@ import {
  * }
  * size: target rendered width in px (height auto-computed by aspect ratio)
  */
-export default function PixelAvatar({ selections, sprite, size = 96, hairOverlay }) {
+export default function PixelAvatar({
+  selections, sprite, size = 96,
+  hairOverlay, hairTransform,
+}) {
   // PNG sprite path wins over parts-based rendering.
   if (sprite) {
     const imgStyle = {
@@ -28,6 +31,16 @@ export default function PixelAvatar({ selections, sprite, size = 96, hairOverlay
     );
     // Hair overlay stacks on top via absolute positioning (same canvas size).
     if (hairOverlay) {
+      const t = hairTransform || { x: 0, y: 0, scale: 1 };
+      const overlayStyle = {
+        ...imgStyle,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        pointerEvents: 'none',
+        transform: `translate(${t.x}%, ${t.y}%) scale(${t.scale})`,
+        transformOrigin: 'center center',
+      };
       return (
         <div style={{ position: 'relative', width: size, display: 'inline-block' }}>
           {baseImg}
@@ -35,7 +48,7 @@ export default function PixelAvatar({ selections, sprite, size = 96, hairOverlay
             src={hairOverlay}
             alt=""
             width={size}
-            style={{ ...imgStyle, position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
+            style={overlayStyle}
             draggable={false}
           />
         </div>

@@ -97,7 +97,7 @@ export default function CharacterDetail({
             style={{ backgroundColor: character.themeColor + '40' }}
           >
             {character.sprite ? (
-              <PixelAvatar sprite={character.sprite} size={128} hairOverlay={character.hairOverlay} />
+              <PixelAvatar sprite={character.sprite} size={128} hairOverlay={character.hairOverlay} hairTransform={character.hairTransform} />
             ) : character.isMyOshi ? (
               <PixelAvatar
                 selections={{ parts: character.parts, colors: character.colors }}

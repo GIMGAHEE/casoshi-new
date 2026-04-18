@@ -184,6 +184,7 @@ export const asCharacter = (myOshi) => {
     bgColor: preset.bgColor,
     sprite: preset.sprite,
     hairOverlay: hairstyle.overlay,
+    hairTransform: myOshi.hairTransform || { x: 0, y: 0, scale: 1 },
     catchphrase: 'あなたが作った、あなただけの推し。',
     bio: `${myOshi.name}は、あなただけのために生まれた推しです。一緒に育てていこう！`,
     dialogues: GENERIC_DIALOGUES.map(d => ({

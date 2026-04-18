@@ -5,6 +5,8 @@ import {
 } from '../data/characters';
 import PixelAvatar from '../components/PixelAvatar';
 
+const DEFAULT_TRANSFORM = { x: 0, y: 0, scale: 1 };
+
 export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
   const [presetId, setPresetId] = useState(
     initialOshi?.presetId || DEFAULT_PRESET_ID
@@ -12,12 +14,16 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
   const [hairstyleId, setHairstyleId] = useState(
     initialOshi?.hairstyleId || DEFAULT_HAIRSTYLE_ID
   );
+  const [hairTransform, setHairTransform] = useState(
+    initialOshi?.hairTransform || DEFAULT_TRANSFORM
+  );
   const [name, setName] = useState(initialOshi?.name || '');
 
   const preset =
     MY_OSHI_PRESETS.find(p => p.id === presetId) || MY_OSHI_PRESETS[0];
   const hairstyle =
     HAIRSTYLES.find(h => h.id === hairstyleId) || HAIRSTYLES[0];
+  const hasHair = !!hairstyle.overlay;
 
   const handleSave = () => {
     const trimmed = name.trim();
@@ -29,7 +35,20 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
       name: trimmed,
       presetId,
       hairstyleId,
+      hairTransform: hasHair ? hairTransform : DEFAULT_TRANSFORM,
     });
+  };
+
+  const updateTransform = (key, value) => {
+    setHairTransform(t => ({ ...t, [key]: value }));
+  };
+
+  const resetTransform = () => setHairTransform(DEFAULT_TRANSFORM);
+
+  // 헤어 바꾸면 위치 초기화 (이전 조정값이 다른 헤어에 맞지 않음)
+  const pickHair = (id) => {
+    setHairstyleId(id);
+    setHairTransform(DEFAULT_TRANSFORM);
   };
 
   return (
@@ -56,6 +75,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
             sprite={preset.sprite}
             size={180}
             hairOverlay={hairstyle.overlay}
+            hairTransform={hasHair ? hairTransform : null}
           />
           <input
             value={name}
@@ -114,7 +134,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
             return (
               <button
                 key={h.id}
-                onClick={() => setHairstyleId(h.id)}
+                onClick={() => pickHair(h.id)}
                 className={`rounded-2xl p-2 border-2 transition active:scale-95 ${
                   active
                     ? 'border-oshi-main shadow-md scale-[1.02] bg-oshi-bg'
@@ -122,11 +142,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
                 }`}
               >
                 <div className="flex items-center justify-center h-24 overflow-hidden">
-                  <PixelAvatar
-                    sprite={preset.sprite}
-                    size={80}
-                    hairOverlay={h.overlay}
-                  />
+                  <PixelAvatar sprite={preset.sprite} size={80} hairOverlay={h.overlay} />
                 </div>
                 <div
                   className="text-[10px] text-center font-bold mt-1 truncate"
@@ -140,10 +156,48 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
         </div>
       </div>
 
+      {/* 헤어 위치/크기 미세조정 — 헤어 선택 시에만 */}
+      {hasHair && (
+        <div className="px-4 mt-5">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-xs font-bold text-oshi-dark/60">ヘアの微調整</div>
+            <button
+              onClick={resetTransform}
+              className="text-[10px] text-oshi-main font-bold underline active:scale-95"
+            >
+              リセット
+            </button>
+          </div>
+          <div className="bg-white rounded-2xl border border-oshi-sub p-3 space-y-3">
+            <SliderRow
+              label="よこ"
+              value={hairTransform.x}
+              min={-30} max={30} step={1}
+              suffix="%"
+              onChange={(v) => updateTransform('x', v)}
+            />
+            <SliderRow
+              label="たて"
+              value={hairTransform.y}
+              min={-30} max={30} step={1}
+              suffix="%"
+              onChange={(v) => updateTransform('y', v)}
+            />
+            <SliderRow
+              label="サイズ"
+              value={Math.round(hairTransform.scale * 100)}
+              min={50} max={150} step={1}
+              suffix="%"
+              onChange={(v) => updateTransform('scale', v / 100)}
+            />
+          </div>
+        </div>
+      )}
+
       {/* 안내 문구 */}
       <div className="px-4 mt-4 text-center">
         <div className="text-[11px] text-oshi-dark/50 leading-relaxed">
-          あなただけの推しに名前をつけよう！<br />
+          名前と見た目を決めて、保存してね！<br />
           他のパーツも今後追加予定 🔜
         </div>
       </div>
@@ -159,6 +213,28 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function SliderRow({ label, value, min, max, step, suffix = '', onChange }) {
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[11px] font-bold text-oshi-dark/70">{label}</span>
+        <span className="text-[11px] text-oshi-dark/50 tabular-nums">
+          {value > 0 ? '+' : ''}{value}{suffix}
+        </span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="w-full h-2 rounded-full bg-oshi-bg appearance-none cursor-pointer accent-oshi-main"
+      />
     </div>
   );
 }
