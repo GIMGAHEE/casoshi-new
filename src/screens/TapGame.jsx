@@ -64,7 +64,7 @@ export default function TapGame({ points, setPoints, onBack }) {
       </div>
 
       <div className="text-center text-[10px] text-oshi-dark/40 pb-2">
-        ※ Phase 1: 쿨다운 없음. Phase 2 에서 밸런싱 예정
+        ※ Phase 1: クールダウンなし。Phase 2 でバランス調整予定
       </div>
 
       <style>{`

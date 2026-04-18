@@ -127,14 +127,14 @@ export default function MiniHome({
 
         {/* 하단 액션 메뉴 (Cyworld 느낌) */}
         <div className="grid grid-cols-4 divide-x divide-oshi-sub border-t-2 border-oshi-sub bg-oshi-bg/40">
-          <MenuButton emoji="💬" label="방명록" onClick={() => alert('방명록は Phase 2 で実装予定！')} />
+          <MenuButton emoji="💬" label="ゲストブック" onClick={() => alert('ゲストブックは Phase 2 で実装予定！')} />
           <MenuButton emoji="🛋️" label="家具追加" onClick={onEditRoom} />
           <MenuButton
             emoji={<img src="/icons/heart.png" alt="" className="w-5 h-5" style={{ imageRendering: 'pixelated' }} />}
-            label="응원"
+            label="応援"
             onClick={() => onOpenDetail(characterId)}
           />
-          <MenuButton emoji="📷" label="앨범" onClick={() => alert('アルバム機能は Phase 2 で！')} />
+          <MenuButton emoji="📷" label="アルバム" onClick={() => alert('アルバム機能は Phase 2 で！')} />
         </div>
       </section>
 
