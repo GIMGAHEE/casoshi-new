@@ -128,7 +128,11 @@ export default function MiniHome({
         <div className="grid grid-cols-4 divide-x divide-oshi-sub border-t-2 border-oshi-sub bg-oshi-bg/40">
           <MenuButton emoji="💬" label="방명록" onClick={() => alert('방명록は Phase 2 で実装予定！')} />
           <MenuButton emoji="🛋️" label="家具追加" onClick={onEditRoom} />
-          <MenuButton emoji="💖" label="응원" onClick={() => onOpenDetail(characterId)} />
+          <MenuButton
+            emoji={<img src="/icons/heart.png" alt="" className="w-5 h-5" style={{ imageRendering: 'pixelated' }} />}
+            label="응원"
+            onClick={() => onOpenDetail(characterId)}
+          />
           <MenuButton emoji="📷" label="앨범" onClick={() => alert('アルバム機能は Phase 2 で！')} />
         </div>
       </section>
@@ -176,7 +180,10 @@ export default function MiniHome({
 
         <div className="text-xs font-bold text-oshi-dark/60 mt-4 mb-2">✨ 最近のアクション</div>
         <div className="space-y-1 text-xs text-oshi-dark/80">
-          <ActivityLine emoji="💖" text={`${supportPoints}ポイント 応援しました`} />
+          <ActivityLine
+            emoji={<img src="/icons/heart.png" alt="" className="w-4 h-4 inline-block" style={{ imageRendering: 'pixelated' }} />}
+            text={`${supportPoints}ポイント 応援しました`}
+          />
           <ActivityLine emoji="⭐" text={`Lv.${level} に到達！`} />
           <ActivityLine emoji="🏠" text="おへやに遊びに来ました" />
         </div>

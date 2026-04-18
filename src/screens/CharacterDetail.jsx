@@ -207,7 +207,13 @@ export default function CharacterDetail({
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            💖 応援する（-{SUPPORT_COST} ポイント）
+            <img
+              src="/icons/heart.png"
+              alt=""
+              className="w-5 h-5 inline-block mr-1 align-middle"
+              style={{ imageRendering: 'pixelated' }}
+            />
+            応援する（-{SUPPORT_COST} ポイント）
           </button>
 
           {feedback && (

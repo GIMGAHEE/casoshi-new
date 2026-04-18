@@ -38,7 +38,12 @@ export default function TapGame({ points, setPoints, onBack }) {
           onClick={handleTap}
           className="w-56 h-56 rounded-full bg-gradient-to-br from-oshi-main to-oshi-accent text-white text-5xl font-black shadow-2xl active:scale-95 transition-transform select-none"
         >
-          💖
+          <img
+            src="/icons/heart.png"
+            alt=""
+            className="w-28 h-28 mx-auto"
+            style={{ imageRendering: 'pixelated' }}
+          />
           <div className="text-sm font-bold mt-1">TAP!</div>
         </button>
 

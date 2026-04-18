@@ -215,7 +215,13 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
             onClick={handleSave}
             className="w-full py-4 rounded-full font-black text-lg bg-oshi-main text-white shadow-xl active:scale-95 hover:bg-pink-500 transition"
           >
-            💖 保存する
+            <img
+              src="/icons/heart.png"
+              alt=""
+              className="w-5 h-5 inline-block mr-1 align-middle"
+              style={{ imageRendering: 'pixelated' }}
+            />
+            保存する
           </button>
         </div>
       </div>

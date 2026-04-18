@@ -3,7 +3,12 @@ export default function PointsBar({ points, onReset }) {
     <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b-2 border-oshi-sub">
       <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">💖</span>
+          <img
+            src="/icons/heart.png"
+            alt=""
+            className="w-7 h-7"
+            style={{ imageRendering: 'pixelated' }}
+          />
           <div>
             <div className="text-xs text-oshi-dark/60 leading-none">ポイント</div>
             <div className="text-xl font-black text-oshi-main leading-tight">
