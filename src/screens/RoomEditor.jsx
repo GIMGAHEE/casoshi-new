@@ -170,9 +170,8 @@ export default function RoomEditor({
             );
           })}
 
-          {/* 캐릭터 (드래그 가능 / 발 기준 anchor)
-             가구와 동일한 구조: width%, aspectRatio, <img width:100%>
-             sprite는 크롭된 (447x854) hairBaked preset에만 사용 */}
+          {/* 캐릭터 (드래그 가능 / 가구와 완전 동일한 구조)
+             hairBaked preset(크롭된 basic_bob)만 이 경로 사용 */}
           {character?.sprite && character?.spriteSize && !character.hairOverlay && (
             <div
               onPointerDown={(e) => handlePointerDown(e, CHAR_ID)}
@@ -181,9 +180,9 @@ export default function RoomEditor({
                 position: 'absolute',
                 left: `${characterPos.x}%`,
                 top: `${characterPos.y}%`,
-                width: '11%',  // 방 너비 대비 캐릭터 너비 (~39px at 360px room)
-                aspectRatio: 447 / 854,  // basic_bob.png의 실제 비율
-                transform: 'translate(-50%, -100%)',
+                width: '8%',   // 가구와 비슷한 스케일
+                aspectRatio: 447 / 854,
+                transform: 'translate(-50%, -50%)',  // 가구와 동일한 center anchor
                 cursor: 'grab',
                 touchAction: 'none',
                 outline: isCharSelected ? '2px dashed #FF6B9D' : 'none',
