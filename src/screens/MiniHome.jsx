@@ -77,46 +77,65 @@ export default function MiniHome({
               );
             })}
 
-            {/* 캐릭터 + 그림자 (한 그룹으로 바닥 중앙에 배치) */}
-            <div
-              style={{
-                position: 'absolute',
-                left: `${characterPos.x}%`,
-                top: `${characterPos.y}%`,
-                transform: 'translate(-50%, -100%)',
-                pointerEvents: 'none',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-            >
-              {/* 캐릭터 본체 — 발 아래 PNG 여백을 잘라냄 (basic.png만, 크롭된 sprite는 불필요) */}
-              {(() => {
-                const spriteSize = character.spriteSize ?? 90;
-                const wrapperHeight = character.spriteSize
-                  ? Math.round(spriteSize * 854 / 447)
-                  : 104;
-                return (
-                  <div style={{ height: wrapperHeight, width: spriteSize, overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
-                    {character.sprite ? (
-                      <PixelAvatar
-                        sprite={character.sprite}
-                        size={spriteSize}
-                        hairOverlay={character.hairOverlay}
-                        hairTransform={character.hairTransform}
-                      />
-                    ) : character.isMyOshi ? (
-                      <PixelAvatar
-                        selections={{ parts: character.parts, colors: character.colors }}
-                        size={spriteSize}
-                      />
-                    ) : (
-                      <div style={{ fontSize: 72 }}>{character.emoji}</div>
-                    )}
-                  </div>
-                );
-              })()}
-            </div>
+            {/* 캐릭터 (RoomEditor와 동일한 렌더 로직)
+               hairBaked preset(크롭된 basic_bob): width%, center anchor
+               그 외: 기존 구조(발 기준 anchor, size=90) */}
+            {character.sprite && character.spriteSize && !character.hairOverlay ? (
+              <div
+                style={{
+                  position: 'absolute',
+                  left: `${characterPos.x}%`,
+                  top: `${characterPos.y}%`,
+                  width: '8%',
+                  height: '22.9%',
+                  transform: 'translate(-50%, -50%)',
+                  pointerEvents: 'none',
+                }}
+              >
+                <img
+                  src={character.sprite}
+                  alt=""
+                  draggable={false}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    imageRendering: 'pixelated',
+                    display: 'block',
+                  }}
+                />
+              </div>
+            ) : (
+              <div
+                style={{
+                  position: 'absolute',
+                  left: `${characterPos.x}%`,
+                  top: `${characterPos.y}%`,
+                  transform: 'translate(-50%, -100%)',
+                  pointerEvents: 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
+              >
+                <div style={{ height: 104, width: 90, overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
+                  {character.sprite ? (
+                    <PixelAvatar
+                      sprite={character.sprite}
+                      size={90}
+                      hairOverlay={character.hairOverlay}
+                      hairTransform={character.hairTransform}
+                    />
+                  ) : character.isMyOshi ? (
+                    <PixelAvatar
+                      selections={{ parts: character.parts, colors: character.colors }}
+                      size={90}
+                    />
+                  ) : (
+                    <div style={{ fontSize: 72 }}>{character.emoji}</div>
+                  )}
+                </div>
+              </div>
+            )}
           </IsometricRoom>
 
           {/* 오른쪽 상단: BGM 인디케이터 */}
