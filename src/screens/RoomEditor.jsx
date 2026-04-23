@@ -254,6 +254,16 @@ export default function RoomEditor({
           >
             + 家具
           </button>
+
+          {/* 선택된 가구 삭제 버튼 (+家具 바로 밑) */}
+          {selectedItem && (
+            <button
+              onClick={(e) => { e.stopPropagation(); deleteItem(selectedItem.id); }}
+              className="absolute top-12 right-2 bg-white text-red-500 border border-red-300 rounded-full px-3 py-1.5 text-xs font-bold shadow active:scale-95"
+            >
+              🗑 削除
+            </button>
+          )}
         </IsometricRoom>
       </div>
 
@@ -292,19 +302,7 @@ export default function RoomEditor({
 
       {/* 선택된 가구 조작 패널 */}
       {selectedItem && (
-        <div className="mt-3 bg-white rounded-2xl border-2 border-oshi-main p-3 space-y-2.5">
-          <div className="flex items-center justify-between">
-            <div className="text-xs font-bold text-oshi-main">
-              {findFurniture(selectedItem.furnitureId)?.label} を編集
-            </div>
-            <button
-              onClick={() => deleteItem(selectedItem.id)}
-              className="text-[10px] text-red-500 font-bold active:scale-95"
-            >
-              🗑 削除
-            </button>
-          </div>
-
+        <div className="mt-3 bg-white rounded-2xl border-2 border-oshi-main p-2.5 space-y-2">
           <div className="grid grid-cols-2 gap-3">
             <EditSlider
               label="サイズ"
@@ -320,7 +318,7 @@ export default function RoomEditor({
             />
           </div>
 
-          <div className="flex items-center justify-between pt-1">
+          <div className="flex items-center justify-between">
             <button
               onClick={() => updateItem(selectedItem.id, { scale: 1, rotation: 0 })}
               className="text-[10px] text-oshi-dark/60 font-bold underline active:scale-95"
