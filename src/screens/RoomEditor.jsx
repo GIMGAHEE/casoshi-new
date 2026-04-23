@@ -171,8 +171,7 @@ export default function RoomEditor({
           })}
 
           {/* 캐릭터 (드래그 가능 / 발 기준 anchor)
-             스프라이트 PNG가 큰 투명 여백(위 18% / 좌우 28%)을 포함하므로
-             wrapper 크기를 content 영역에 맞추고 스프라이트를 translate로 당겨 표시. */}
+             wrapper = img 정확한 렌더 크기. outline은 img 박스에 딱 맞음. */}
           <div
             onPointerDown={(e) => handlePointerDown(e, CHAR_ID)}
             onClick={(e) => e.stopPropagation()}
@@ -180,47 +179,34 @@ export default function RoomEditor({
               position: 'absolute',
               left: `${characterPos.x}%`,
               top: `${characterPos.y}%`,
-              // 발 기준 anchor — wrapper 하단이 발바닥
               transform: 'translate(-50%, -100%)',
               cursor: 'grab',
               touchAction: 'none',
               outline: isCharSelected ? '2px dashed #FF6B9D' : 'none',
-              outlineOffset: '1px',
+              outlineOffset: '-2px',
               borderRadius: '4px',
-              // 실제 캐릭터 content 크기 (size=90 의 img 기준)
-              // img는 90w × 135h, content는 약 43%×55% → 39×75
-              width: 39,
-              height: 75,
+              lineHeight: 0,
+              fontSize: 0,
+              width: 90,
+              height: 104, // 발바닥 아래 투명 영역(15px) 자르기
               overflow: 'hidden',
-              position: 'absolute',
             }}
           >
-            {/* 내부 img/avatar를 content 시작점(-28%, -18%)만큼 음수 offset으로 당김 */}
-            <div
-              style={{
-                position: 'absolute',
-                // 스프라이트 img 기준: left -28% of 90px = -25, top -18% of 135 = -24
-                left: -25,
-                top: -24,
-                pointerEvents: 'none',
-              }}
-            >
-              {character?.sprite ? (
-                <PixelAvatar
-                  sprite={character.sprite}
-                  size={90}
-                  hairOverlay={character.hairOverlay}
-                  hairTransform={character.hairTransform}
-                />
-              ) : character?.isMyOshi ? (
-                <PixelAvatar
-                  selections={{ parts: character.parts, colors: character.colors }}
-                  size={90}
-                />
-              ) : (
-                <div style={{ fontSize: 72 }}>{character?.emoji}</div>
-              )}
-            </div>
+            {character?.sprite ? (
+              <PixelAvatar
+                sprite={character.sprite}
+                size={90}
+                hairOverlay={character.hairOverlay}
+                hairTransform={character.hairTransform}
+              />
+            ) : character?.isMyOshi ? (
+              <PixelAvatar
+                selections={{ parts: character.parts, colors: character.colors }}
+                size={90}
+              />
+            ) : (
+              <div style={{ fontSize: 72 }}>{character?.emoji}</div>
+            )}
           </div>
 
           {/* 상단: 가구 추가 버튼 */}
