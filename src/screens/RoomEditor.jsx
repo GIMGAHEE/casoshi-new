@@ -171,15 +171,13 @@ export default function RoomEditor({
           })}
 
           {/* 캐릭터 (드래그 가능 / 발 기준 anchor)
-             wrapper = img 정확한 렌더 크기. outline은 img 박스에 딱 맞음.
+             wrapper = img 정확한 렌더 크기.
              hairBaked preset은 sprite가 크롭된 상태라 size도 작고 wrapper도 작음. */}
           {(() => {
             const spriteSize = character?.spriteSize ?? 90;
-            // basic.png(1024x1536)은 발 아래 여백 있어서 잘라줘야 함 (104/90 = 1.156)
-            // basic_bob.png(447x854)은 이미 타이트하게 크롭됨 → 자를 필요 없음
             const wrapperHeight = character?.spriteSize
-              ? Math.round(spriteSize * 854 / 447)  // hairBaked: 크롭된 aspect 그대로
-              : 104;                                // 기존 basic.png
+              ? Math.round(spriteSize * 854 / 447)
+              : 104;
             return (
               <div
                 onPointerDown={(e) => handlePointerDown(e, CHAR_ID)}
@@ -191,11 +189,12 @@ export default function RoomEditor({
                   transform: 'translate(-50%, -100%)',
                   cursor: 'grab',
                   touchAction: 'none',
-                  outline: isCharSelected ? '2px dashed #FF6B9D' : 'none',
-                  outlineOffset: '3px',
+                  border: isCharSelected ? '2px dashed #FF6B9D' : '2px dashed transparent',
                   borderRadius: '4px',
+                  padding: 3,
                   lineHeight: 0,
                   fontSize: 0,
+                  boxSizing: 'content-box',
                   width: spriteSize,
                   height: wrapperHeight,
                   overflow: 'hidden',
