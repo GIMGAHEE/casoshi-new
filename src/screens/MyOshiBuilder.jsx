@@ -146,7 +146,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
               リセット
             </button>
           </div>
-          <div className="bg-white rounded-2xl border border-oshi-sub p-3 space-y-2.5">
+          <div className="bg-white rounded-2xl border border-oshi-sub p-3 grid grid-cols-3 gap-3">
             <SliderRow
               label="よこ"
               value={hairOffset.x || 0}
