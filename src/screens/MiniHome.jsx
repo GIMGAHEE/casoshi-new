@@ -90,24 +90,32 @@ export default function MiniHome({
                 alignItems: 'center',
               }}
             >
-              {/* 캐릭터 본체 — 발 아래 PNG 여백을 잘라냄 */}
-              <div style={{ height: 104, overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
-                {character.sprite ? (
-                  <PixelAvatar
-                    sprite={character.sprite}
-                    size={90}
-                    hairOverlay={character.hairOverlay}
-                    hairTransform={character.hairTransform}
-                  />
-                ) : character.isMyOshi ? (
-                  <PixelAvatar
-                    selections={{ parts: character.parts, colors: character.colors }}
-                    size={90}
-                  />
-                ) : (
-                  <div style={{ fontSize: 72 }}>{character.emoji}</div>
-                )}
-              </div>
+              {/* 캐릭터 본체 — 발 아래 PNG 여백을 잘라냄 (basic.png만, 크롭된 sprite는 불필요) */}
+              {(() => {
+                const spriteSize = character.spriteSize ?? 90;
+                const wrapperHeight = character.spriteSize
+                  ? Math.round(spriteSize * 854 / 447)
+                  : 104;
+                return (
+                  <div style={{ height: wrapperHeight, width: spriteSize, overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
+                    {character.sprite ? (
+                      <PixelAvatar
+                        sprite={character.sprite}
+                        size={spriteSize}
+                        hairOverlay={character.hairOverlay}
+                        hairTransform={character.hairTransform}
+                      />
+                    ) : character.isMyOshi ? (
+                      <PixelAvatar
+                        selections={{ parts: character.parts, colors: character.colors }}
+                        size={spriteSize}
+                      />
+                    ) : (
+                      <div style={{ fontSize: 72 }}>{character.emoji}</div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           </IsometricRoom>
 

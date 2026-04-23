@@ -171,43 +171,54 @@ export default function RoomEditor({
           })}
 
           {/* 캐릭터 (드래그 가능 / 발 기준 anchor)
-             wrapper = img 정확한 렌더 크기. outline은 img 박스에 딱 맞음. */}
-          <div
-            onPointerDown={(e) => handlePointerDown(e, CHAR_ID)}
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              position: 'absolute',
-              left: `${characterPos.x}%`,
-              top: `${characterPos.y}%`,
-              transform: 'translate(-50%, -100%)',
-              cursor: 'grab',
-              touchAction: 'none',
-              outline: isCharSelected ? '2px dashed #FF6B9D' : 'none',
-              outlineOffset: '5px',
-              borderRadius: '4px',
-              lineHeight: 0,
-              fontSize: 0,
-              width: 90,
-              height: 104, // 발바닥 아래 투명 영역(15px) 자르기
-              overflow: 'hidden',
-            }}
-          >
-            {character?.sprite ? (
-              <PixelAvatar
-                sprite={character.sprite}
-                size={90}
-                hairOverlay={character.hairOverlay}
-                hairTransform={character.hairTransform}
-              />
-            ) : character?.isMyOshi ? (
-              <PixelAvatar
-                selections={{ parts: character.parts, colors: character.colors }}
-                size={90}
-              />
-            ) : (
-              <div style={{ fontSize: 72 }}>{character?.emoji}</div>
-            )}
-          </div>
+             wrapper = img 정확한 렌더 크기. outline은 img 박스에 딱 맞음.
+             hairBaked preset은 sprite가 크롭된 상태라 size도 작고 wrapper도 작음. */}
+          {(() => {
+            const spriteSize = character?.spriteSize ?? 90;
+            // basic.png(1024x1536)은 발 아래 여백 있어서 잘라줘야 함 (104/90 = 1.156)
+            // basic_bob.png(447x854)은 이미 타이트하게 크롭됨 → 자를 필요 없음
+            const wrapperHeight = character?.spriteSize
+              ? Math.round(spriteSize * 854 / 447)  // hairBaked: 크롭된 aspect 그대로
+              : 104;                                // 기존 basic.png
+            return (
+              <div
+                onPointerDown={(e) => handlePointerDown(e, CHAR_ID)}
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  position: 'absolute',
+                  left: `${characterPos.x}%`,
+                  top: `${characterPos.y}%`,
+                  transform: 'translate(-50%, -100%)',
+                  cursor: 'grab',
+                  touchAction: 'none',
+                  outline: isCharSelected ? '2px dashed #FF6B9D' : 'none',
+                  outlineOffset: '3px',
+                  borderRadius: '4px',
+                  lineHeight: 0,
+                  fontSize: 0,
+                  width: spriteSize,
+                  height: wrapperHeight,
+                  overflow: 'hidden',
+                }}
+              >
+                {character?.sprite ? (
+                  <PixelAvatar
+                    sprite={character.sprite}
+                    size={spriteSize}
+                    hairOverlay={character.hairOverlay}
+                    hairTransform={character.hairTransform}
+                  />
+                ) : character?.isMyOshi ? (
+                  <PixelAvatar
+                    selections={{ parts: character.parts, colors: character.colors }}
+                    size={spriteSize}
+                  />
+                ) : (
+                  <div style={{ fontSize: 72 }}>{character?.emoji}</div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* 상단: 가구 추가 버튼 */}
           <button

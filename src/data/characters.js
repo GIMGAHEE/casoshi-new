@@ -214,6 +214,9 @@ export const asCharacter = (myOshi) => {
     themeColor: preset.themeColor,
     bgColor: preset.bgColor,
     sprite: preset.sprite,
+    // hairBaked preset(basic_bob.png)은 이미 content에 타이트하게 크롭되어 있어서
+    // 동일한 시각 크기를 내려면 작은 size를 써야 함. 일반 preset은 기존 size=90 유지.
+    spriteSize: preset.hairBaked ? 39 : 90,
     hairOverlay: preset.hairBaked ? null : hairstyle.overlay,
     hairTransform: preset.hairBaked ? null : computeHairTransform(myOshi.hairstyleId, myOshi.hairOffset),
     catchphrase: 'あなたが作った、あなただけの推し。',
