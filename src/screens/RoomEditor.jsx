@@ -263,14 +263,14 @@ export default function RoomEditor({
           <div className="text-xs font-bold text-oshi-dark/60 mb-2">
             家具をえらぶ
           </div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-6 gap-1.5">
             {FURNITURE_CATALOG.map(f => (
               <button
                 key={f.id}
                 onClick={() => addFurniture(f.id)}
-                className="rounded-xl border-2 border-oshi-sub bg-oshi-bg/40 p-2 hover:bg-oshi-bg active:scale-95 transition"
+                className="rounded-lg border border-oshi-sub bg-oshi-bg/40 p-1 hover:bg-oshi-bg active:scale-95 transition"
               >
-                <div className="h-20 flex items-center justify-center">
+                <div className="h-10 flex items-center justify-center">
                   <img
                     src={f.image}
                     alt=""
@@ -281,7 +281,7 @@ export default function RoomEditor({
                     }}
                   />
                 </div>
-                <div className="text-[10px] text-center font-bold text-oshi-dark/80 mt-1">
+                <div className="text-[9px] text-center font-bold text-oshi-dark/80 mt-0.5 truncate leading-tight">
                   {f.label}
                 </div>
               </button>
