@@ -305,18 +305,20 @@ export default function RoomEditor({
             </button>
           </div>
 
-          <EditSlider
-            label="サイズ"
-            value={Math.round((selectedItem.scale ?? selectedItem.scaleX ?? 1) * 100)}
-            min={30} max={250} step={1} suffix="%"
-            onChange={(v) => updateItem(selectedItem.id, { scale: v / 100 })}
-          />
-          <EditSlider
-            label="かいてん"
-            value={selectedItem.rotation}
-            min={-180} max={180} step={1} suffix="°"
-            onChange={(v) => updateItem(selectedItem.id, { rotation: v })}
-          />
+          <div className="grid grid-cols-2 gap-3">
+            <EditSlider
+              label="サイズ"
+              value={Math.round((selectedItem.scale ?? selectedItem.scaleX ?? 1) * 100)}
+              min={30} max={250} step={1} suffix="%"
+              onChange={(v) => updateItem(selectedItem.id, { scale: v / 100 })}
+            />
+            <EditSlider
+              label="かいてん"
+              value={selectedItem.rotation}
+              min={-180} max={180} step={1} suffix="°"
+              onChange={(v) => updateItem(selectedItem.id, { rotation: v })}
+            />
+          </div>
 
           <div className="flex items-center justify-between pt-1">
             <button
