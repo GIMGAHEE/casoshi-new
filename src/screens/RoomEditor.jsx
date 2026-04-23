@@ -50,7 +50,7 @@ export default function RoomEditor({
     const newItem = createRoomItem(furnitureId);
     setItems(items => [...items, newItem]);
     setSelectedId(newItem.id);
-    setShowCatalog(false);
+    // 카탈로그 유지 → 사용자가 바로 다른 가구 추가 가능
   };
 
   const deleteItem = (id) => {
