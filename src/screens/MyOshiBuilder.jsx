@@ -148,6 +148,13 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
           </div>
           <div className="bg-white rounded-2xl border border-oshi-sub p-3 space-y-2.5">
             <SliderRow
+              label="よこ"
+              value={hairOffset.x || 0}
+              min={-30} max={30} step={1}
+              suffix="%"
+              onChange={(v) => updateOffset('x', v)}
+            />
+            <SliderRow
               label="たて"
               value={hairOffset.y}
               min={-30} max={30} step={1}

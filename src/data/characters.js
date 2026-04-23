@@ -227,18 +227,19 @@ export const DEFAULT_HAIRSTYLE_BY_GENDER = {
 };
 
 // hairOffset: 사용자가 슬라이더로 설정한 "0포인트 대비 오프셋"
-// { y: -30~+30 (percent-point), scale: -30~+30 (percent-point) }
-export const DEFAULT_HAIR_OFFSET = { y: 0, scale: 0 };
+// { x, y, scale: -30~+30 (percent-point) }
+export const DEFAULT_HAIR_OFFSET = { x: 0, y: 0, scale: 0 };
 
 // 실제 렌더링에 쓸 transform = 기본값 + 오프셋
+// 구버전 저장 데이터(x 없음) 호환을 위해 o.x || 0 사용
 export const computeHairTransform = (hairstyleId, offset) => {
   const hs = HAIRSTYLES.find(h => h.id === hairstyleId);
   const def = hs?.defaultTransform || { x: 0, y: 0, scale: 1 };
   const o = offset || DEFAULT_HAIR_OFFSET;
   return {
-    x: def.x,
-    y: def.y + o.y,
-    scale: def.scale + o.scale / 100,
+    x: def.x + (o.x || 0),
+    y: def.y + (o.y || 0),
+    scale: def.scale + (o.scale || 0) / 100,
   };
 };
 
