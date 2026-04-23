@@ -37,7 +37,10 @@ export default function MiniHome({
           className="px-4 py-2 flex items-center justify-between text-white text-xs font-bold"
           style={{ backgroundColor: character.themeColor }}
         >
-          <span>🏠 {character.name}のおへや</span>
+          <span className="flex items-center gap-1.5">
+            <img src="/icons/home.png" alt="" className="w-4 h-4" style={{ imageRendering: 'pixelated' }} />
+            {character.name}のおへや
+          </span>
           <span className="opacity-80">Lv.{level}</span>
         </div>
 
@@ -154,14 +157,26 @@ export default function MiniHome({
 
         {/* 하단 액션 메뉴 (Cyworld 느낌) */}
         <div className="grid grid-cols-4 divide-x divide-oshi-sub border-t-2 border-oshi-sub bg-oshi-bg/40">
-          <MenuButton emoji="💬" label="ゲストブック" onClick={() => alert('ゲストブックは Phase 2 で実装予定！')} />
-          <MenuButton emoji="🛋️" label="家具追加" onClick={onEditRoom} />
+          <MenuButton
+            emoji={<img src="/icons/chat.png" alt="" className="w-6 h-6" style={{ imageRendering: 'pixelated' }} />}
+            label="ゲストブック"
+            onClick={() => alert('ゲストブックは Phase 2 で実装予定！')}
+          />
+          <MenuButton
+            emoji={<img src="/icons/sofa.png" alt="" className="w-6 h-6" style={{ imageRendering: 'pixelated' }} />}
+            label="家具追加"
+            onClick={onEditRoom}
+          />
           <MenuButton
             emoji={<img src="/icons/heart.png" alt="" className="w-5 h-5" style={{ imageRendering: 'pixelated' }} />}
             label="応援"
             onClick={() => onOpenDetail(characterId)}
           />
-          <MenuButton emoji="📷" label="アルバム" onClick={() => alert('アルバム機能は Phase 2 で！')} />
+          <MenuButton
+            emoji={<img src="/icons/camera.png" alt="" className="w-6 h-6" style={{ imageRendering: 'pixelated' }} />}
+            label="アルバム"
+            onClick={() => alert('アルバム機能は Phase 2 で！')}
+          />
         </div>
       </section>
 
@@ -224,7 +239,10 @@ export default function MiniHome({
             text={`${supportPoints}ポイント 応援しました`}
           />
           <ActivityLine emoji="⭐" text={`Lv.${level} に到達！`} />
-          <ActivityLine emoji="🏠" text="おへやに遊びに来ました" />
+          <ActivityLine
+            emoji={<img src="/icons/home.png" alt="" className="w-4 h-4 inline-block" style={{ imageRendering: 'pixelated' }} />}
+            text="おへやに遊びに来ました"
+          />
         </div>
       </section>
     </div>

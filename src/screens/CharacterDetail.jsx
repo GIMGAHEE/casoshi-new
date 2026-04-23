@@ -77,18 +77,20 @@ export default function CharacterDetail({
           {character.isMyOshi && onEditMyOshi && (
             <button
               onClick={onEditMyOshi}
-              className="absolute top-3 right-3 bg-white/80 rounded-full px-3 py-1 text-xs font-bold text-oshi-dark border border-oshi-sub active:scale-95"
+              className="absolute top-3 right-3 bg-white/80 rounded-full px-3 py-1 text-xs font-bold text-oshi-dark border border-oshi-sub active:scale-95 flex items-center gap-1"
             >
-              ✏️ 編集
+              <img src="/icons/edit.png" alt="" className="w-4 h-4" style={{ imageRendering: 'pixelated' }} />
+              編集
             </button>
           )}
 
           {onOpenMiniHome && (
             <button
               onClick={onOpenMiniHome}
-              className="absolute top-3 left-3 bg-white/80 rounded-full px-3 py-1 text-xs font-bold text-oshi-dark border border-oshi-sub active:scale-95"
+              className="absolute top-3 left-3 bg-white/80 rounded-full px-3 py-1 text-xs font-bold text-oshi-dark border border-oshi-sub active:scale-95 flex items-center gap-1"
             >
-              🏠 おへや
+              <img src="/icons/home.png" alt="" className="w-4 h-4" style={{ imageRendering: 'pixelated' }} />
+              おへや
             </button>
           )}
 
