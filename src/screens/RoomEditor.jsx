@@ -171,53 +171,80 @@ export default function RoomEditor({
           })}
 
           {/* 캐릭터 (드래그 가능 / 발 기준 anchor)
-             wrapper = img 정확한 렌더 크기.
-             hairBaked preset은 sprite가 크롭된 상태라 size도 작고 wrapper도 작음. */}
-          {(() => {
-            const spriteSize = character?.spriteSize ?? 90;
-            const wrapperHeight = character?.spriteSize
-              ? Math.round(spriteSize * 854 / 447)
-              : 104;
-            return (
-              <div
-                onPointerDown={(e) => handlePointerDown(e, CHAR_ID)}
-                onClick={(e) => e.stopPropagation()}
+             가구와 동일한 구조: width%, aspectRatio, <img width:100%>
+             sprite는 크롭된 (447x854) hairBaked preset에만 사용 */}
+          {character?.sprite && character?.spriteSize && !character.hairOverlay && (
+            <div
+              onPointerDown={(e) => handlePointerDown(e, CHAR_ID)}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                position: 'absolute',
+                left: `${characterPos.x}%`,
+                top: `${characterPos.y}%`,
+                width: '11%',  // 방 너비 대비 캐릭터 너비 (~39px at 360px room)
+                aspectRatio: 447 / 854,  // basic_bob.png의 실제 비율
+                transform: 'translate(-50%, -100%)',
+                cursor: 'grab',
+                touchAction: 'none',
+                outline: isCharSelected ? '2px dashed #FF6B9D' : 'none',
+                outlineOffset: '5px',
+                borderRadius: '4px',
+              }}
+            >
+              <img
+                src={character.sprite}
+                alt=""
+                draggable={false}
                 style={{
-                  position: 'absolute',
-                  left: `${characterPos.x}%`,
-                  top: `${characterPos.y}%`,
-                  transform: 'translate(-50%, -100%)',
-                  cursor: 'grab',
-                  touchAction: 'none',
-                  border: isCharSelected ? '2px dashed #FF6B9D' : '2px dashed transparent',
-                  borderRadius: '4px',
-                  padding: 3,
-                  lineHeight: 0,
-                  fontSize: 0,
-                  boxSizing: 'content-box',
-                  width: spriteSize,
-                  height: wrapperHeight,
-                  overflow: 'hidden',
+                  width: '100%',
+                  height: '100%',
+                  imageRendering: 'pixelated',
+                  pointerEvents: 'none',
+                  display: 'block',
                 }}
-              >
-                {character?.sprite ? (
-                  <PixelAvatar
-                    sprite={character.sprite}
-                    size={spriteSize}
-                    hairOverlay={character.hairOverlay}
-                    hairTransform={character.hairTransform}
-                  />
-                ) : character?.isMyOshi ? (
-                  <PixelAvatar
-                    selections={{ parts: character.parts, colors: character.colors }}
-                    size={spriteSize}
-                  />
-                ) : (
-                  <div style={{ fontSize: 72 }}>{character?.emoji}</div>
-                )}
-              </div>
-            );
-          })()}
+              />
+            </div>
+          )}
+
+          {/* fallback: 기존 basic.png + hair overlay 또는 builder-parts 캐릭터 */}
+          {character && (!character.spriteSize || character.hairOverlay) && (
+            <div
+              onPointerDown={(e) => handlePointerDown(e, CHAR_ID)}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                position: 'absolute',
+                left: `${characterPos.x}%`,
+                top: `${characterPos.y}%`,
+                transform: 'translate(-50%, -100%)',
+                cursor: 'grab',
+                touchAction: 'none',
+                outline: isCharSelected ? '2px dashed #FF6B9D' : 'none',
+                outlineOffset: '5px',
+                borderRadius: '4px',
+                lineHeight: 0,
+                fontSize: 0,
+                width: 90,
+                height: 104,
+                overflow: 'hidden',
+              }}
+            >
+              {character.sprite ? (
+                <PixelAvatar
+                  sprite={character.sprite}
+                  size={90}
+                  hairOverlay={character.hairOverlay}
+                  hairTransform={character.hairTransform}
+                />
+              ) : character.isMyOshi ? (
+                <PixelAvatar
+                  selections={{ parts: character.parts, colors: character.colors }}
+                  size={90}
+                />
+              ) : (
+                <div style={{ fontSize: 72 }}>{character.emoji}</div>
+              )}
+            </div>
+          )}
 
           {/* 상단: 가구 추가 버튼 */}
           <button
