@@ -181,10 +181,9 @@ export default function RoomEditor({
                 position: 'absolute',
                 left: `${characterPos.x}%`,
                 top: `${characterPos.y}%`,
-                // 방 폭 대비 8% width, 854/447 aspect → height는 width의 ~1.91배
-                // 방은 3:2 비율이므로 height %는 width% * (854/447) * (2/3) ≈ 10.2%
+                // 방 aspect 3:2, char aspect 447:854 → width 8% 일 때 height 22.9%
                 width: '8%',
-                height: '10.2%',
+                height: '22.9%',
                 transform: 'translate(-50%, -50%)',
                 cursor: 'grab',
                 touchAction: 'none',
