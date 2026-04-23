@@ -21,12 +21,7 @@ export default function RoomEditor({
     initialRoom?.characterPos || DEFAULT_CHAR_POS
   );
   const [selectedId, setSelectedId] = useState(null);
-  const [showCatalog, setShowCatalogRaw] = useState(false);
-  const setShowCatalog = (v) => {
-    const next = typeof v === 'function' ? v(showCatalog) : v;
-    console.log('[DEBUG] setShowCatalog:', showCatalog, '->', next, new Error().stack.split('\n').slice(1, 4));
-    setShowCatalogRaw(next);
-  };
+  const [showCatalog, setShowCatalog] = useState(false);
 
   const roomRef = useRef(null);
   const dragStateRef = useRef(null);
@@ -52,11 +47,9 @@ export default function RoomEditor({
   };
 
   const addFurniture = (furnitureId) => {
-    console.log('[DEBUG] addFurniture called:', furnitureId, 'showCatalog:', showCatalog);
     const newItem = createRoomItem(furnitureId);
     setItems(items => [...items, newItem]);
     setSelectedId(newItem.id);
-    console.log('[DEBUG] addFurniture done, showCatalog should still be true');
   };
 
   const deleteItem = (id) => {
