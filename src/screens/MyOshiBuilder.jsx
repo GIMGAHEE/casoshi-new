@@ -178,25 +178,25 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
           <div className="text-xs font-bold text-oshi-dark/60 mb-2">
             キャラクターを選ぶ
           </div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-6 gap-1.5">
             {filteredPresets.map(p => {
               const active = p.id === presetId;
               return (
                 <button
                   key={p.id}
                   onClick={() => setPresetId(p.id)}
-                  className={`rounded-2xl p-2 border-2 transition active:scale-95 ${
+                  className={`rounded-xl p-1 border transition active:scale-95 ${
                     active
-                      ? 'border-oshi-main shadow-md scale-[1.02]'
+                      ? 'border-oshi-main shadow scale-[1.03]'
                       : 'border-oshi-sub bg-white'
                   }`}
                   style={{ backgroundColor: active ? p.bgColor : '#fff' }}
                 >
-                  <div className="flex items-center justify-center h-24 overflow-hidden">
-                    <PixelAvatar sprite={p.sprite} size={Math.round(80 * (p.previewScale ?? 1))} />
+                  <div className="flex items-center justify-center h-12 overflow-hidden">
+                    <PixelAvatar sprite={p.sprite} size={Math.round(40 * (p.previewScale ?? 1))} />
                   </div>
                   <div
-                    className="text-[10px] text-center font-bold mt-1 truncate"
+                    className="text-[9px] text-center font-bold mt-0.5 truncate leading-tight"
                     style={{ color: active ? p.themeColor : '#666' }}
                   >
                     {p.label}
@@ -214,34 +214,34 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
           <div className="text-xs font-bold text-oshi-dark/60 mb-2">
             ヘアスタイル
           </div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-6 gap-1.5">
             {filteredHairstyles.map(h => {
               const active = h.id === hairstyleId;
               return (
                 <button
                   key={h.id}
                   onClick={() => pickHair(h.id)}
-                  className={`rounded-2xl p-2 border-2 transition active:scale-95 ${
+                  className={`rounded-xl p-1 border transition active:scale-95 ${
                     active
-                      ? 'border-oshi-main shadow-md scale-[1.02] bg-oshi-bg'
+                      ? 'border-oshi-main shadow scale-[1.03] bg-oshi-bg'
                       : 'border-oshi-sub bg-white'
                   }`}
                 >
-                  <div className="flex items-start justify-center h-24 overflow-hidden">
+                  <div className="flex items-start justify-center h-12 overflow-hidden">
                     <img
                       src={h.overlay}
                       alt=""
                       style={{
-                        width: 88,
+                        width: 44,
                         height: 'auto',
                         imageRendering: 'pixelated',
-                        marginTop: -8,
+                        marginTop: -4,
                       }}
                       draggable={false}
                     />
                   </div>
                   <div
-                    className="text-[10px] text-center font-bold mt-1 truncate"
+                    className="text-[9px] text-center font-bold mt-0.5 truncate leading-tight"
                     style={{ color: active ? '#FF4785' : '#666' }}
                   >
                     {h.label}
