@@ -130,45 +130,83 @@ export const getDialogueForLevel = (character, level) => {
 
 export const MY_OSHI_ID = 'my_oshi';
 
-// MyOshi 프리셋 — 기본 캐릭터 1개로 시작, 머리스타일/옷 variant 추가될 때마다 이 배열에 추가
+// MyOshi 프리셋 — gender 필드로 남/녀 분류
 // body는 대머리 상태, 헤어는 반드시 HAIRSTYLES에서 선택해서 overlay로 표시
 // hairBaked: true면 sprite에 헤어가 이미 그려져 있어서 overlay를 스킵함
 // previewScale: basic(1024×1536) 기준 동일 시각 크기를 위한 배율.
-//               basic_bob(447×854)은 content에 타이트하게 크롭돼 있어서 작게 렌더해야 함.
+//               basic_bob(447×854)처럼 타이트하게 크롭된 건 작게 렌더해야 함.
 export const MY_OSHI_PRESETS = [
+  // ===== 女の子 (girl) =====
   {
     id: 'preset_bob',
+    gender: 'girl',
     sprite: '/sprites/basic_bob.png',
     label: 'ショート',
     themeColor: '#FF6B9D',
     bgColor: '#FFE5EC',
     hairBaked: true,
-    previewScale: 0.44,  // 447/1024 ≈ 0.44
+    previewScale: 0.44,
   },
   {
     id: 'preset_basic',
+    gender: 'girl',
     sprite: '/sprites/basic.png',
     label: 'きほん',
     themeColor: '#FF6B9D',
     bgColor: '#FFE5EC',
     previewScale: 1.0,
   },
+  // ===== 男の子 (boy) =====
+  {
+    id: 'preset_boy_brown',
+    gender: 'boy',
+    sprite: '/sprites/basic_boy_brown.png',
+    label: 'ブラウン',
+    themeColor: '#5BA4E0',
+    bgColor: '#E5F0FB',
+    hairBaked: true,
+    previewScale: 0.48,  // 489/1024 ≈ 0.48
+  },
+  {
+    id: 'preset_boy_basic',
+    gender: 'boy',
+    sprite: '/sprites/basic_boy.png',
+    label: 'きほん',
+    themeColor: '#5BA4E0',
+    bgColor: '#E5F0FB',
+    previewScale: 1.0,
+  },
 ];
 
 export const DEFAULT_PRESET_ID = 'preset_bob';
+export const DEFAULT_GENDER = 'girl';
 
-// 머리스타일 목록 — basic.png 위에 레이어로 겹쳐지는 오버레이 PNG
-// defaultTransform: 사용자가 직접 맞춘 basic body 기준 0포인트 (이후 조정은 이 값에 +/- 오프셋)
+// 헤어 목록 — gender 필드로 남/녀 구분
+// defaultTransform: 기본 anchor 위에 런타임 CSS transform으로 적용
 export const HAIRSTYLES = [
-  { id: 'hair_bob_short',     label: 'ショート',   overlay: '/sprites/hair_bob_short.png',     defaultTransform: { x: 0, y: -18, scale: 0.74 } },
-  { id: 'hair_medium',        label: 'ミディアム', overlay: '/sprites/hair_medium.png',        defaultTransform: { x: 0, y: -10, scale: 0.80 } },
-  { id: 'hair_long_straight', label: 'ロング',     overlay: '/sprites/hair_long_straight.png', defaultTransform: { x: 0, y:  -7, scale: 0.84 } },
-  { id: 'hair_long_wavy',     label: 'ウェーブ',   overlay: '/sprites/hair_long_wavy.png',     defaultTransform: { x: 0, y:  -2, scale: 0.90 } },
-  { id: 'hair_twintails',     label: 'ツインテ',   overlay: '/sprites/hair_twintails.png',     defaultTransform: { x: 0, y: -11, scale: 0.81 } },
-  { id: 'hair_bun',           label: 'お団子',     overlay: '/sprites/hair_bun.png',           defaultTransform: { x: 0, y: -13, scale: 0.81 } },
+  // ===== 女の子 (girl) =====
+  { id: 'hair_bob_short',     gender: 'girl', label: 'ショート',   overlay: '/sprites/hair_bob_short.png',     defaultTransform: { x: 0, y: -18, scale: 0.74 } },
+  { id: 'hair_medium',        gender: 'girl', label: 'ミディアム', overlay: '/sprites/hair_medium.png',        defaultTransform: { x: 0, y: -10, scale: 0.80 } },
+  { id: 'hair_long_straight', gender: 'girl', label: 'ロング',     overlay: '/sprites/hair_long_straight.png', defaultTransform: { x: 0, y:  -7, scale: 0.84 } },
+  { id: 'hair_long_wavy',     gender: 'girl', label: 'ウェーブ',   overlay: '/sprites/hair_long_wavy.png',     defaultTransform: { x: 0, y:  -2, scale: 0.90 } },
+  { id: 'hair_twintails',     gender: 'girl', label: 'ツインテ',   overlay: '/sprites/hair_twintails.png',     defaultTransform: { x: 0, y: -11, scale: 0.81 } },
+  { id: 'hair_bun',           gender: 'girl', label: 'お団子',     overlay: '/sprites/hair_bun.png',           defaultTransform: { x: 0, y: -13, scale: 0.81 } },
+  // ===== 男の子 (boy) =====
+  { id: 'boy_hair_brown_wavy',    gender: 'boy', label: 'ブラウン',   overlay: '/sprites/boy_hair_brown_wavy.png',    defaultTransform: { x: 0, y: -15, scale: 0.72 } },
+  { id: 'boy_hair_black_spiky',   gender: 'boy', label: 'スパイク',   overlay: '/sprites/boy_hair_black_spiky.png',   defaultTransform: { x: 0, y: -15, scale: 0.72 } },
+  { id: 'boy_hair_blonde',        gender: 'boy', label: 'ブロンド',   overlay: '/sprites/boy_hair_blonde.png',        defaultTransform: { x: 0, y: -12, scale: 0.72 } },
+  { id: 'boy_hair_black_parted',  gender: 'boy', label: 'センター',   overlay: '/sprites/boy_hair_black_parted.png',  defaultTransform: { x: 0, y: -13, scale: 0.72 } },
+  { id: 'boy_hair_black_slick',   gender: 'boy', label: 'オールバック', overlay: '/sprites/boy_hair_black_slick.png',   defaultTransform: { x: 0, y: -10, scale: 0.72 } },
+  { id: 'boy_hair_silver',        gender: 'boy', label: 'シルバー',   overlay: '/sprites/boy_hair_silver.png',        defaultTransform: { x: 0, y: -15, scale: 0.72 } },
+  { id: 'boy_hair_brown_fluffy',  gender: 'boy', label: 'ふんわり',   overlay: '/sprites/boy_hair_brown_fluffy.png',  defaultTransform: { x: 0, y: -15, scale: 0.72 } },
+  { id: 'boy_hair_black_upspike', gender: 'boy', label: 'アップ',     overlay: '/sprites/boy_hair_black_upspike.png', defaultTransform: { x: 0, y: -18, scale: 0.72 } },
 ];
 
 export const DEFAULT_HAIRSTYLE_ID = 'hair_bob_short';
+export const DEFAULT_HAIRSTYLE_BY_GENDER = {
+  girl: 'hair_bob_short',
+  boy: 'boy_hair_brown_wavy',
+};
 
 // hairOffset: 사용자가 슬라이더로 설정한 "0포인트 대비 오프셋"
 // { y: -30~+30 (percent-point), scale: -30~+30 (percent-point) }

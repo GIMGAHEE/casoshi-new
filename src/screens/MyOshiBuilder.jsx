@@ -1,29 +1,45 @@
 import { useState } from 'react';
 import {
   MY_OSHI_PRESETS, DEFAULT_PRESET_ID,
-  HAIRSTYLES, DEFAULT_HAIRSTYLE_ID,
+  HAIRSTYLES, DEFAULT_HAIRSTYLE_ID, DEFAULT_HAIRSTYLE_BY_GENDER,
   DEFAULT_HAIR_OFFSET, computeHairTransform,
 } from '../data/characters';
 import PixelAvatar from '../components/PixelAvatar';
 
 export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
+  // 저장된 preset에서 gender 역추적
+  const initialPreset = MY_OSHI_PRESETS.find(p => p.id === initialOshi?.presetId);
+  const [gender, setGender] = useState(initialPreset?.gender || 'girl');
+
   const [presetId, setPresetId] = useState(
     initialOshi?.presetId || DEFAULT_PRESET_ID
   );
   const [hairstyleId, setHairstyleId] = useState(
     initialOshi?.hairstyleId || DEFAULT_HAIRSTYLE_ID
   );
-  // hairOffset: "0포인트 기준" 조정값 — 처음엔 {y:0, scale:0}
   const [hairOffset, setHairOffset] = useState(
     initialOshi?.hairOffset || DEFAULT_HAIR_OFFSET
   );
   const [name, setName] = useState(initialOshi?.name || '');
 
+  // gender가 바뀌면 해당 성별의 첫 프리셋/헤어로 자동 전환
+  const handleGenderChange = (newGender) => {
+    if (newGender === gender) return;
+    setGender(newGender);
+    const firstPreset = MY_OSHI_PRESETS.find(p => p.gender === newGender);
+    if (firstPreset) setPresetId(firstPreset.id);
+    const firstHair = DEFAULT_HAIRSTYLE_BY_GENDER[newGender];
+    if (firstHair) setHairstyleId(firstHair);
+    setHairOffset(DEFAULT_HAIR_OFFSET);
+  };
+
+  const filteredPresets = MY_OSHI_PRESETS.filter(p => p.gender === gender);
+  const filteredHairstyles = HAIRSTYLES.filter(h => h.gender === gender);
+
   const preset =
     MY_OSHI_PRESETS.find(p => p.id === presetId) || MY_OSHI_PRESETS[0];
   const hairstyle =
     HAIRSTYLES.find(h => h.id === hairstyleId) || HAIRSTYLES[0];
-  // preset.hairBaked: 스프라이트에 이미 헤어가 그려져 있으면 overlay 스킵
   const hasHair = !preset.hairBaked && !!hairstyle.overlay;
 
   // 프리뷰에 쓸 실제 transform = 기본값 + 오프셋
@@ -65,6 +81,33 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
           {initialOshi ? '推しを編集' : 'マイ推しを作る'}
         </div>
         <div className="w-16" />
+      </div>
+
+      {/* 성별 탭 */}
+      <div className="px-4 mb-3">
+        <div className="grid grid-cols-2 bg-white rounded-full p-1 border border-oshi-sub">
+          <button
+            onClick={() => handleGenderChange('girl')}
+            className={`py-2 rounded-full text-xs font-bold transition ${
+              gender === 'girl'
+                ? 'bg-oshi-main text-white shadow'
+                : 'text-oshi-dark/60'
+            }`}
+          >
+            👧 女の子
+          </button>
+          <button
+            onClick={() => handleGenderChange('boy')}
+            className={`py-2 rounded-full text-xs font-bold transition ${
+              gender === 'boy'
+                ? 'text-white shadow'
+                : 'text-oshi-dark/60'
+            }`}
+            style={gender === 'boy' ? { backgroundColor: '#5BA4E0' } : {}}
+          >
+            👦 男の子
+          </button>
+        </div>
       </div>
 
       {/* 프리뷰 */}
@@ -123,13 +166,13 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
       )}
 
       {/* 프리셋 선택 그리드 — 2개 이상일 때만 표시 */}
-      {MY_OSHI_PRESETS.length > 1 && (
+      {filteredPresets.length > 1 && (
         <div className="px-4 mt-5">
           <div className="text-xs font-bold text-oshi-dark/60 mb-2">
             キャラクターを選ぶ
           </div>
           <div className="grid grid-cols-3 gap-2">
-            {MY_OSHI_PRESETS.map(p => {
+            {filteredPresets.map(p => {
               const active = p.id === presetId;
               return (
                 <button
@@ -165,7 +208,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
             ヘアスタイル
           </div>
           <div className="grid grid-cols-3 gap-2">
-            {HAIRSTYLES.map(h => {
+            {filteredHairstyles.map(h => {
               const active = h.id === hairstyleId;
               return (
                 <button
