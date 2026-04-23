@@ -105,9 +105,19 @@ export default function Home({
             onClick={onOpenBuilder}
             className="w-full card flex items-center gap-4 py-5 px-5 bg-gradient-to-br from-oshi-sub/50 via-white to-oshi-bg active:scale-[0.98] transition-transform border-dashed border-2 border-oshi-main/40"
           >
-            {/* 미니 프리뷰 */}
+            {/* 미니 프리뷰 — basic_bob.png(447:854)는 세로로 길어서 프레임 높이 기준으로 sizing */}
             <div className="flex-shrink-0 w-16 h-16 rounded-xl bg-white flex items-center justify-center overflow-hidden shadow-inner border border-oshi-sub">
-              <PixelAvatar sprite={MY_OSHI_PRESETS[0].sprite} size={56} />
+              <img
+                src={MY_OSHI_PRESETS[0].sprite}
+                alt=""
+                style={{
+                  height: '90%',
+                  width: 'auto',
+                  imageRendering: 'pixelated',
+                  objectFit: 'contain',
+                }}
+                draggable={false}
+              />
             </div>
             <div className="flex-1 text-left">
               <div className="text-sm font-black text-oshi-main">✨ マイ推しを作る</div>
