@@ -192,7 +192,7 @@ export const HAIRSTYLES = [
   { id: 'hair_twintails',     gender: 'girl', label: 'ツインテ',   overlay: '/sprites/hair_twintails.png',     defaultTransform: { x: 0, y: -11, scale: 0.81 } },
   { id: 'hair_bun',           gender: 'girl', label: 'お団子',     overlay: '/sprites/hair_bun.png',           defaultTransform: { x: 0, y: -13, scale: 0.81 } },
   // ===== 男の子 (boy) =====
-  { id: 'boy_hair_brown_wavy',       gender: 'boy', label: 'ブラウンウェーブ', overlay: '/sprites/boy_hair_brown_wavy.png',       defaultTransform: { x: 0, y: -24, scale: 0.55 } },
+  { id: 'boy_hair_brown_wavy',       gender: 'boy', label: 'ブラウンウェーブ', overlay: '/sprites/boy_hair_brown_wavy.png',       defaultTransform: { x: 0, y: -21, scale: 0.62 } },
   { id: 'boy_hair_black_voluminous', gender: 'boy', label: 'ボリューム',       overlay: '/sprites/boy_hair_black_voluminous.png', defaultTransform: { x: 0, y: -20, scale: 0.63 } },
   { id: 'boy_hair_black_spiky',      gender: 'boy', label: 'スパイク',         overlay: '/sprites/boy_hair_black_spiky.png',      defaultTransform: { x: 0, y: -21, scale: 0.66 } },
   { id: 'boy_hair_blonde',           gender: 'boy', label: 'ブロンド',         overlay: '/sprites/boy_hair_blonde.png',           defaultTransform: { x: 0, y: -21, scale: 0.58 } },
