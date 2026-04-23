@@ -21,7 +21,12 @@ export default function RoomEditor({
     initialRoom?.characterPos || DEFAULT_CHAR_POS
   );
   const [selectedId, setSelectedId] = useState(null);
-  const [showCatalog, setShowCatalog] = useState(false);
+  const [showCatalog, setShowCatalogRaw] = useState(false);
+  const setShowCatalog = (v) => {
+    const next = typeof v === 'function' ? v(showCatalog) : v;
+    console.log('[DEBUG] setShowCatalog:', showCatalog, '->', next, new Error().stack.split('\n').slice(1, 4));
+    setShowCatalogRaw(next);
+  };
 
   const roomRef = useRef(null);
   const dragStateRef = useRef(null);
@@ -47,10 +52,11 @@ export default function RoomEditor({
   };
 
   const addFurniture = (furnitureId) => {
+    console.log('[DEBUG] addFurniture called:', furnitureId, 'showCatalog:', showCatalog);
     const newItem = createRoomItem(furnitureId);
     setItems(items => [...items, newItem]);
     setSelectedId(newItem.id);
-    // 카탈로그 유지 → 사용자가 바로 다른 가구 추가 가능
+    console.log('[DEBUG] addFurniture done, showCatalog should still be true');
   };
 
   const deleteItem = (id) => {
