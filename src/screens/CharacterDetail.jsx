@@ -96,7 +96,18 @@ export default function CharacterDetail({
             className="mx-auto w-32 h-32 rounded-full flex items-center justify-center shadow-inner mb-3 overflow-hidden"
             style={{ backgroundColor: character.themeColor + '40' }}
           >
-            {character.sprite ? (
+            {character.sprite && character.spriteSize && !character.hairOverlay ? (
+              <img
+                src={character.sprite}
+                alt=""
+                draggable={false}
+                style={{
+                  height: '90%',
+                  width: 'auto',
+                  imageRendering: 'pixelated',
+                }}
+              />
+            ) : character.sprite ? (
               <PixelAvatar sprite={character.sprite} size={128} hairOverlay={character.hairOverlay} hairTransform={character.hairTransform} />
             ) : character.isMyOshi ? (
               <PixelAvatar

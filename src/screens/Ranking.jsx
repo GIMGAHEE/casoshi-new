@@ -10,6 +10,21 @@ const MEDAL_BG = [
 
 // 아바타 표시 (PNG sprite > 픽셀 빌더 > 이모지 폴백)
 function Avatar({ character, size }) {
+  if (character.sprite && character.spriteSize && !character.hairOverlay) {
+    // hairBaked 크롭된 sprite: 부모 원형 프레임 기준 height 꽉 채우기
+    return (
+      <img
+        src={character.sprite}
+        alt=""
+        draggable={false}
+        style={{
+          height: '90%',
+          width: 'auto',
+          imageRendering: 'pixelated',
+        }}
+      />
+    );
+  }
   if (character.sprite) {
     return <PixelAvatar sprite={character.sprite} size={size} hairOverlay={character.hairOverlay} hairTransform={character.hairTransform} />;
   }

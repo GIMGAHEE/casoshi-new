@@ -172,7 +172,18 @@ export default function MiniHome({
             className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0"
             style={{ backgroundColor: character.themeColor + '40' }}
           >
-            {character.sprite ? (
+            {character.sprite && character.spriteSize && !character.hairOverlay ? (
+              <img
+                src={character.sprite}
+                alt=""
+                draggable={false}
+                style={{
+                  height: '90%',
+                  width: 'auto',
+                  imageRendering: 'pixelated',
+                }}
+              />
+            ) : character.sprite ? (
               <PixelAvatar sprite={character.sprite} size={48} hairOverlay={character.hairOverlay} hairTransform={character.hairTransform} />
             ) : character.isMyOshi ? (
               <PixelAvatar

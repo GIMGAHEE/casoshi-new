@@ -24,7 +24,19 @@ export default function CharacterCard({ character, supportPoints, onClick, highl
           className="flex-shrink-0 w-20 h-20 rounded-full flex items-center justify-center shadow-inner overflow-hidden"
           style={{ backgroundColor: character.themeColor + '30' }}
         >
-          {character.sprite ? (
+          {character.sprite && character.spriteSize && !character.hairOverlay ? (
+            // hairBaked 크롭된 sprite (basic_bob 447×854): 원형 프레임에 높이 기준 fit
+            <img
+              src={character.sprite}
+              alt=""
+              draggable={false}
+              style={{
+                height: '90%',
+                width: 'auto',
+                imageRendering: 'pixelated',
+              }}
+            />
+          ) : character.sprite ? (
             <PixelAvatar sprite={character.sprite} size={72} hairOverlay={character.hairOverlay} hairTransform={character.hairTransform} />
           ) : character.isMyOshi ? (
             <div style={{ imageRendering: 'pixelated' }}>
