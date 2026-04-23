@@ -170,8 +170,9 @@ export default function RoomEditor({
             );
           })}
 
-          {/* 캐릭터 (드래그 가능 / 가구와 완전 동일한 구조)
-             hairBaked preset(크롭된 basic_bob)만 이 경로 사용 */}
+          {/* 캐릭터 (드래그 가능)
+             aspectRatio가 0.5 같은 작은 값일 때 모바일 브라우저에서 height auto가 
+             이상하게 잡히는 이슈를 피하려고 명시적으로 width+height 모두 지정. */}
           {character?.sprite && character?.spriteSize && !character.hairOverlay && (
             <div
               onPointerDown={(e) => handlePointerDown(e, CHAR_ID)}
@@ -180,9 +181,11 @@ export default function RoomEditor({
                 position: 'absolute',
                 left: `${characterPos.x}%`,
                 top: `${characterPos.y}%`,
-                width: '8%',   // 가구와 비슷한 스케일
-                aspectRatio: 447 / 854,
-                transform: 'translate(-50%, -50%)',  // 가구와 동일한 center anchor
+                // 방 폭 대비 8% width, 854/447 aspect → height는 width의 ~1.91배
+                // 방은 3:2 비율이므로 height %는 width% * (854/447) * (2/3) ≈ 10.2%
+                width: '8%',
+                height: '10.2%',
+                transform: 'translate(-50%, -50%)',
                 cursor: 'grab',
                 touchAction: 'none',
                 outline: isCharSelected ? '2px dashed #FF6B9D' : 'none',
