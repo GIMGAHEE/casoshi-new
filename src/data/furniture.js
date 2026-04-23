@@ -1,49 +1,50 @@
 // 방 꾸미기용 가구 카탈로그
 // defaultWidthPercent: 방 너비 대비 가구 기본 너비 (%)
 // aspectRatio: PNG의 width/height (레이아웃 계산용)
+// ※ 2026-04: PNG들을 content bbox로 크롭해서 여백 제거 → aspectRatio / defaultWidthPercent 재계산됨
 
 export const FURNITURE_CATALOG = [
   {
     id: 'bed',
     label: 'ベッド',
     image: '/furniture/bed.png',
-    aspectRatio: 1.5,
-    defaultWidthPercent: 42,
+    aspectRatio: 1.42,
+    defaultWidthPercent: 22.5,
   },
   {
     id: 'chair',
     label: 'いす',
     image: '/furniture/chair.png',
-    aspectRatio: 1.0,
-    defaultWidthPercent: 20,
+    aspectRatio: 0.87,
+    defaultWidthPercent: 8.6,
   },
   {
     id: 'vanity',
     label: 'ドレッサー',
     image: '/furniture/vanity.png',
-    aspectRatio: 1.0,
-    defaultWidthPercent: 30,
+    aspectRatio: 0.82,
+    defaultWidthPercent: 17.1,
   },
   {
     id: 'drawer',
     label: 'チェスト',
     image: '/furniture/drawer.png',
-    aspectRatio: 1.0,
-    defaultWidthPercent: 25,
+    aspectRatio: 1.25,
+    defaultWidthPercent: 13.0,
   },
   {
     id: 'carpet1',
     label: 'カーペット',
     image: '/furniture/carpet1.png',
-    aspectRatio: 1.79,
-    defaultWidthPercent: 55,
+    aspectRatio: 2.03,
+    defaultWidthPercent: 48.7,
   },
   {
     id: 'carpet2',
     label: 'ハートマット',
     image: '/furniture/carpet2.png',
-    aspectRatio: 1.53,
-    defaultWidthPercent: 48,
+    aspectRatio: 1.71,
+    defaultWidthPercent: 39.6,
   },
 ];
 

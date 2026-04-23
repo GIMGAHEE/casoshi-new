@@ -151,7 +151,7 @@ export default function RoomEditor({
                   cursor: 'grab',
                   touchAction: 'none',
                   outline: isSelected ? '2px dashed #FF6B9D' : 'none',
-                  outlineOffset: '4px',
+                  outlineOffset: '-2px',
                   borderRadius: '4px',
                 }}
               >
