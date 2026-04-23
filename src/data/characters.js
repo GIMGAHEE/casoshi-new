@@ -198,7 +198,7 @@ export const HAIRSTYLES = [
   { id: 'boy_hair_blonde',           gender: 'boy', label: 'ブロンド',         overlay: '/sprites/boy_hair_blonde.png',           defaultTransform: { x: 0, y: -21, scale: 0.58 } },
   { id: 'boy_hair_brown_dark_bangs', gender: 'boy', label: '前髪ダーク',       overlay: '/sprites/boy_hair_brown_dark_bangs.png', defaultTransform: { x: 0, y: -21, scale: 0.68 } },
   { id: 'boy_hair_auburn_wavy',      gender: 'boy', label: 'オーバーン',       overlay: '/sprites/boy_hair_auburn_wavy.png',      defaultTransform: { x: 0, y: -21, scale: 0.62 } },
-  { id: 'boy_hair_brown_fluffy',     gender: 'boy', label: 'ふんわり',         overlay: '/sprites/boy_hair_brown_fluffy.png',     defaultTransform: { x: 0, y: -14, scale: 0.82 } },
+  { id: 'boy_hair_brown_fluffy',     gender: 'boy', label: 'ふんわり',         overlay: '/sprites/boy_hair_brown_fluffy.png',     defaultTransform: { x: 0, y: -21, scale: 0.62 } },
   { id: 'boy_hair_black_parted',     gender: 'boy', label: 'センター',         overlay: '/sprites/boy_hair_black_parted.png',     defaultTransform: { x: 0, y: -21, scale: 0.64 } },
   { id: 'boy_hair_black_short_spike',gender: 'boy', label: 'ショートスパイク', overlay: '/sprites/boy_hair_black_short_spike.png',defaultTransform: { x: 0, y: -22, scale: 0.66 } },
   { id: 'boy_hair_black_slick',      gender: 'boy', label: 'オールバック',     overlay: '/sprites/boy_hair_black_slick.png',      defaultTransform: { x: 0, y: -21, scale: 0.65 } },
