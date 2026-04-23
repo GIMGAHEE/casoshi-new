@@ -133,6 +133,8 @@ export const MY_OSHI_ID = 'my_oshi';
 // MyOshi 프리셋 — 기본 캐릭터 1개로 시작, 머리스타일/옷 variant 추가될 때마다 이 배열에 추가
 // body는 대머리 상태, 헤어는 반드시 HAIRSTYLES에서 선택해서 overlay로 표시
 // hairBaked: true면 sprite에 헤어가 이미 그려져 있어서 overlay를 스킵함
+// previewScale: basic(1024×1536) 기준 동일 시각 크기를 위한 배율.
+//               basic_bob(447×854)은 content에 타이트하게 크롭돼 있어서 작게 렌더해야 함.
 export const MY_OSHI_PRESETS = [
   {
     id: 'preset_bob',
@@ -141,6 +143,7 @@ export const MY_OSHI_PRESETS = [
     themeColor: '#FF6B9D',
     bgColor: '#FFE5EC',
     hairBaked: true,
+    previewScale: 0.44,  // 447/1024 ≈ 0.44
   },
   {
     id: 'preset_basic',
@@ -148,6 +151,7 @@ export const MY_OSHI_PRESETS = [
     label: 'きほん',
     themeColor: '#FF6B9D',
     bgColor: '#FFE5EC',
+    previewScale: 1.0,
   },
 ];
 

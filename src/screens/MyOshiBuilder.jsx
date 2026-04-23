@@ -77,7 +77,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
         >
           <PixelAvatar
             sprite={preset.sprite}
-            size={180}
+            size={Math.round(180 * (preset.previewScale ?? 1))}
             hairOverlay={hasHair ? hairstyle.overlay : null}
             hairTransform={hasHair ? effectiveTransform : null}
           />
@@ -143,7 +143,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
                   style={{ backgroundColor: active ? p.bgColor : '#fff' }}
                 >
                   <div className="flex items-center justify-center h-24 overflow-hidden">
-                    <PixelAvatar sprite={p.sprite} size={80} />
+                    <PixelAvatar sprite={p.sprite} size={Math.round(80 * (p.previewScale ?? 1))} />
                   </div>
                   <div
                     className="text-[10px] text-center font-bold mt-1 truncate"
