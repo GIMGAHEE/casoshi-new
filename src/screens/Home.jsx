@@ -103,7 +103,7 @@ export default function Home({
               推しコール
               <span className="text-[9px] font-black bg-oshi-main text-white px-1.5 py-0.5 rounded-full">NEW</span>
             </div>
-            <div className="text-[10px] text-oshi-dark/60">リズムに合わせてコール！ 60秒の推し活</div>
+            <div className="text-[10px] text-oshi-dark/60">リズムに合わせてコール！ 30秒の推し活</div>
           </div>
           <div className="text-purple-400 text-lg">›</div>
         </button>

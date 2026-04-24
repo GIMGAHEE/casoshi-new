@@ -45,9 +45,9 @@ export const JUDGMENT_SCORE = {
 export const NOTE_TRAVEL_MS = 1400;  // 1.4초 동안 날아옴
 
 // 세션 시간/노트 수
-export const SESSION_DURATION_MS = 60_000;  // 60초 플레이
-export const TOTAL_NOTES = 48;              // 총 노트 수
-// = 평균 1.25초에 하나 → 살짝 변동 추가
+export const SESSION_DURATION_MS = 30_000;  // 30초 플레이
+export const TOTAL_NOTES = 24;              // 총 노트 수
+// = 평균 1.07초에 하나 → 살짝 변동 추가
 
 // 희귀도 뽑기
 export function rollNoteRarity() {
