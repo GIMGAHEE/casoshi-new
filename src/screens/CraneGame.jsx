@@ -52,6 +52,7 @@ export default function CraneGame({ points, setPoints, onBack }) {
   const boardRef = useRef(null);
   const phaseRef = useRef(-Math.PI / 2); // 사인파 위상 (-π/2 = 왼쪽 끝)
   const [craneDropY, setCraneDropY] = useState(0); // 0~1 (0 = 윗쪽, 1 = 바닥)
+  const [clawPhase, setClawPhase] = useState('open'); // 'open' | 'closed'
   const [confetti, setConfetti] = useState([]); // 성공 시 파티클
 
   const canFree = Date.now() - lastFreeAt > CRANE_FREE_INTERVAL_MS;
@@ -64,7 +65,7 @@ export default function CraneGame({ points, setPoints, onBack }) {
     if (state !== 'moving') return;
     const CENTER = 50;
     const AMPLITUDE = 40;          // 10% ~ 90% 사이
-    const ANGULAR_SPEED = 2.3;     // rad/sec → 한 사이클 약 2.7초
+    const ANGULAR_SPEED = 1.8;     // rad/sec → 한 사이클 약 3.5초 (느리게)
     let lastT = performance.now();
     const loop = () => {
       const now = performance.now();
@@ -139,20 +140,46 @@ export default function CraneGame({ points, setPoints, onBack }) {
     sfx.click();
     sfx.whir();
     setState('dropping');
+    setClawPhase('open');
 
-    // 크레인 내려가기 애니메이션 (1초)
+    // 3단계 애니메이션:
+    // (1) DOWN_MS : 하강 (open claw, craneDropY 0→1)
+    // (2) PAUSE_MS: 바닥에서 집게 닫힘 + grab 판정
+    // (3) UP_MS   : 상승 (closed claw, craneDropY 1→0, 성공 시 인형 동반)
+    const DOWN_MS = 900;
+    const PAUSE_MS = 380;
+    const UP_MS = 900;
     const startTime = Date.now();
-    const dropAnim = () => {
-      const t = Math.min(1, (Date.now() - startTime) / 900);
-      setCraneDropY(easeInOut(t));
-      if (t < 1) {
-        requestAnimationFrame(dropAnim);
+    let grabResolved = false;
+
+    const animate = () => {
+      const t = Date.now() - startTime;
+
+      if (t < DOWN_MS) {
+        // Phase 1: 하강
+        setCraneDropY(easeInOut(t / DOWN_MS));
+        animationRef.current = requestAnimationFrame(animate);
+      } else if (t < DOWN_MS + PAUSE_MS) {
+        // Phase 2: 바닥에서 잠시 멈춤 → 집게 닫기 + 판정 (한 번만)
+        setCraneDropY(1);
+        if (!grabResolved) {
+          grabResolved = true;
+          setClawPhase('closed');
+          resolveGrab();
+        }
+        animationRef.current = requestAnimationFrame(animate);
+      } else if (t < DOWN_MS + PAUSE_MS + UP_MS) {
+        // Phase 3: 상승 (closed claw, 인형 동반)
+        const p = (t - DOWN_MS - PAUSE_MS) / UP_MS;
+        setCraneDropY(1 - easeInOut(p));
+        animationRef.current = requestAnimationFrame(animate);
       } else {
-        // 집기 판정
-        resolveGrab();
+        // Phase 4: 종료 → 결과 오버레이
+        setCraneDropY(0);
+        setState('result');
       }
     };
-    requestAnimationFrame(dropAnim);
+    animationRef.current = requestAnimationFrame(animate);
   };
 
   const resolveGrab = () => {
@@ -176,29 +203,23 @@ export default function CraneGame({ points, setPoints, onBack }) {
     const success = Math.random() < successProb;
 
     if (success && closest) {
-      // 인형 판정: 가장 가까운 인형의 희귀도에 따라, 단 랜덤 편차 있음
-      // 간단히: 잡힌 인형 = 보드에 있던 그 인형 그대로 사용
       const rarityInfo = RARITY_INFO[closest.rarity];
-
-      // 보상 계산
-      let reward = rarityInfo.reward || 0;
+      const reward = rarityInfo.reward || 0;
       setGrabbedDoll(closest);
       setLastResult({ doll: closest, reward, success: true });
 
-      // 보드에서 제거하고 애니메이션용으로 띄움
+      // 보드에서 제거
       setDolls(ds => ds.filter(d => d.id !== closest.id));
 
       // 포인트 지급
       if (reward > 0) setPoints(p => p + reward);
 
-      // 🎉 컨페티 파티클 (희귀도에 따라 개수 조정)
+      // 🎉 컨페티 파티클
       const confettiCount = { N: 20, R: 28, SR: 40, SSR: 55 }[closest.rarity] || 24;
       spawnConfetti(closest.x, 70, confettiCount, closest.rarity);
 
-      // 효과음
       sfx.success();
 
-      // 이력 저장
       setHistory(h => [
         { ts: Date.now(), doll: closest, success: true, reward },
         ...h.slice(0, 49),
@@ -211,8 +232,7 @@ export default function CraneGame({ points, setPoints, onBack }) {
         ...h.slice(0, 49),
       ]);
     }
-
-    setTimeout(() => setState('result'), 600);
+    // 주의: setState('result')는 애니메이션 끝에서 (상승 완료 후) 호출됨
   };
 
   const nextRound = () => {
@@ -220,6 +240,7 @@ export default function CraneGame({ points, setPoints, onBack }) {
     setDolls(ds => ds.length < 3 ? generateDolls() : ds);
     setState('idle');
     setCraneDropY(0);
+    setClawPhase('open');
   };
 
   // 24시간 다음 무료까지 남은 시간
@@ -307,9 +328,9 @@ export default function CraneGame({ points, setPoints, onBack }) {
             }}
           />
 
-          {/* 집게 이미지 */}
+          {/* 집게 이미지 (clawPhase에 따라 open/closed 전환) */}
           <img
-            src={state === 'dropping' && craneDropY > 0.85 ? CLAW_CLOSED : CLAW_OPEN}
+            src={clawPhase === 'closed' ? CLAW_CLOSED : CLAW_OPEN}
             alt=""
             className="absolute select-none pointer-events-none"
             style={{
@@ -323,22 +344,21 @@ export default function CraneGame({ points, setPoints, onBack }) {
             draggable={false}
           />
 
-          {/* 잡힌 인형 (집게 아래에서 살짝 위로 lift) */}
-          {grabbedDoll && state === 'result' && (
+          {/* 잡힌 인형: 집게 상승 중 + 결과 모달 표시 중 → 집게 아래에 붙어서 따라옴 */}
+          {grabbedDoll && clawPhase === 'closed' && (
             <img
               src={grabbedDoll.image}
               alt={grabbedDoll.name}
               className="absolute select-none pointer-events-none"
               style={{
                 left: `${cranePos}%`,
-                top: `calc(14% + ${craneDropY * DROP_MAX_PCT}% + 48px)`,
+                top: `calc(14% + ${craneDropY * DROP_MAX_PCT}% + 40px)`,
                 transform: 'translateX(-50%)',
-                width: 44,
+                width: 46,
                 height: 'auto',
                 imageRendering: 'pixelated',
-                animation: 'lift 0.8s ease-out forwards',
                 filter: `drop-shadow(0 3px 4px rgba(0,0,0,0.25))`,
-                zIndex: 6,
+                zIndex: 4,  // 집게(5)보다 뒤 → 집게 prong이 인형 위를 덮음
               }}
               draggable={false}
             />
