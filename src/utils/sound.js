@@ -81,4 +81,10 @@ export const sfx = {
       playNote({ freq: f, duration: 0.25, type: 'triangle', gain: 0.14, delay: i * 0.12 });
     });
   }),
+  // 놓침: 빠르게 떨어지는 wobble + 아쉬운 느낌
+  drop: gated(() => {
+    playSweep({ from: 520, to: 130, duration: 0.42, type: 'triangle', gain: 0.13 });
+    // 낙하 끝 thud
+    playNote({ freq: 90, duration: 0.2, type: 'sine', gain: 0.18, delay: 0.42 });
+  }),
 };
