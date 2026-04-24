@@ -74,7 +74,9 @@ export default function App() {
   // 현재 화면으로부터 활성 탭 결정
   const activeTab = (() => {
     if (screen.name === 'ranking') return 'ranking';
-    return 'home'; // minihome / characterDetail 등은 home 트리로 간주
+    if (screen.name === 'minihome' && screen.params?.id === 'my_oshi') return 'myoshi';
+    if (screen.name === 'builder') return 'myoshi';
+    return 'home'; // 기타 화면은 home 트리로 간주
   })();
 
   const handleNav = (tabId) => {
@@ -86,8 +88,13 @@ export default function App() {
       case 'support':
         setScreen({ name: 'ranking' });
         break;
-      case 'shop':
-        alert('ショップは準備中です 🛍️');
+      case 'myoshi':
+        // MyOshi 있으면 미니홈, 없으면 빌더
+        if (myOshi) {
+          setScreen({ name: 'minihome', params: { id: 'my_oshi' } });
+        } else {
+          setScreen({ name: 'builder' });
+        }
         break;
       case 'menu':
         alert('メニューは準備中です ☰');
