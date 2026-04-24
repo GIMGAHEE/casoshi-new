@@ -5,9 +5,26 @@ import {
   calcSuccessProb, rollRarity, rollDoll,
 } from '../data/crane';
 
-// 게임판 내부 좌표계는 % 기반
-const MACHINE_WIDTH_PX = 320;   // 내부 바닥 기준 너비 (판정용 px)
-const DOLL_SIZE = 56;           // 인형 렌더 크기 (px)
+// 기계 이미지 에셋 (public/crane/)
+const MACHINE_IMG = '/crane/machine.png';
+const CLAW_OPEN   = '/crane/claw_open.png';
+const CLAW_CLOSED = '/crane/claw_closed.png';
+const MACHINE_ASPECT = 494 / 800;  // machine.png 비율
+
+// 유리 영역 (machine.png 기준 % 위치)
+// 좌표 측정: 유리 내부 박스
+const GLASS = {
+  top:    '29%',
+  bottom: '27%',  // = 100% - 73%  (핑크 바닥까지 포함)
+  left:   '17%',
+  right:  '17%',
+};
+
+// 크레인 드롭 범위 (playfield 높이 % 기준, 집게 상단 기준)
+const DROP_MAX_PCT = 62;
+
+const MACHINE_WIDTH_PX = 320;
+const DOLL_SIZE = 56;
 
 // 게임 상태: 'idle' | 'moving' | 'dropping' | 'result'
 // idle     : 초기 / 결과 확인 후 다음 판 대기
@@ -167,141 +184,167 @@ export default function CraneGame({ points, setPoints, onBack }) {
       </h2>
 
       {/* 기계 본체 */}
-      <div className="relative mx-auto" style={{ width: '100%', maxWidth: 340 }}>
-        {/* 기계 프레임 */}
-        <div className="relative bg-gradient-to-b from-pink-100 via-pink-50 to-pink-100 rounded-2xl p-2 shadow-2xl border-4 border-pink-300"
-          style={{
-            boxShadow: '0 8px 0 #E498BD, 0 12px 30px rgba(0,0,0,0.1)',
-          }}>
-          {/* 상단 로고/라벨 */}
-          <div className="text-center mb-1">
-            <div className="text-xs font-black text-pink-500 tracking-wider">
-              ♡ LUCKY CATCHER ♡
-            </div>
-          </div>
+      <div
+        className="relative mx-auto"
+        style={{
+          width: '100%',
+          maxWidth: MACHINE_WIDTH_PX,
+          aspectRatio: `${MACHINE_ASPECT}`,
+        }}
+      >
+        {/* 기계 배경 이미지 */}
+        <img
+          src={MACHINE_IMG}
+          alt=""
+          className="absolute inset-0 w-full h-full pointer-events-none select-none"
+          style={{ imageRendering: 'pixelated' }}
+          draggable={false}
+        />
 
-          {/* 유리 게임판 */}
+        {/* 유리 내부 플레이필드 */}
+        <div
+          ref={boardRef}
+          className="absolute overflow-hidden"
+          style={{
+            top: GLASS.top,
+            bottom: GLASS.bottom,
+            left: GLASS.left,
+            right: GLASS.right,
+          }}
+        >
+          {/* 크레인 레일 */}
+          <div className="absolute left-0 right-0 top-0 h-[2px] bg-gray-500/60 rounded-full" />
+
+          {/* 크레인 (레일 → 집게) */}
           <div
-            ref={boardRef}
-            className="relative bg-gradient-to-b from-sky-50 via-white to-pink-50 border-2 border-pink-300 rounded-lg overflow-hidden"
+            className="absolute top-0"
             style={{
-              height: 320,
-              backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 24px, rgba(255,255,255,0.3) 24px, rgba(255,255,255,0.3) 25px)',
+              left: `${cranePos}%`,
+              transform: 'translateX(-50%)',
+              zIndex: 5,
             }}
           >
-            {/* 크레인 레일 (상단 가로선) */}
-            <div className="absolute left-0 right-0 top-3 h-1 bg-gray-400 rounded-full" />
-
-            {/* 크레인 */}
+            {/* 케이블 */}
             <div
-              className="absolute top-3 transition-none"
+              className="absolute left-1/2 -translate-x-1/2 bg-gray-400"
               style={{
-                left: `${cranePos}%`,
-                transform: 'translateX(-50%)',
-                top: `${12 + craneDropY * 220}px`,
+                top: 0,
+                width: 2,
+                height: `calc(${craneDropY * DROP_MAX_PCT}% + 2px)`,
               }}
-            >
-              {/* 케이블 */}
+            />
+            {/* 집게 이미지 */}
+            <img
+              src={state === 'dropping' && craneDropY > 0.85 ? CLAW_CLOSED : CLAW_OPEN}
+              alt=""
+              className="absolute left-1/2 -translate-x-1/2 select-none pointer-events-none"
+              style={{
+                top: `${craneDropY * DROP_MAX_PCT}%`,
+                width: 46,
+                imageRendering: 'pixelated',
+              }}
+              draggable={false}
+            />
+            {/* 잡힌 인형 (집게 아래에서 살짝 위로 lift) */}
+            {grabbedDoll && state === 'result' && (
               <div
-                className="absolute left-1/2 -translate-x-1/2 bg-gray-500 w-0.5"
-                style={{ top: -12 - craneDropY * 220, height: 12 + craneDropY * 220 }}
-              />
-              {/* 집게 */}
-              <div className="relative text-3xl" style={{ lineHeight: 1 }}>
-                {state === 'dropping' && craneDropY > 0.85 ? '🤏' : '✋'}
-              </div>
-              {/* 잡힌 인형 (dropping 끝날 때 집게에 딸려올라옴) */}
-              {grabbedDoll && state === 'result' && (
-                <div
-                  className="absolute left-1/2 -translate-x-1/2 text-4xl"
-                  style={{ top: 24, animation: 'lift 0.8s ease-out forwards' }}
-                >
-                  {grabbedDoll.emoji}
-                </div>
-              )}
-            </div>
-
-            {/* 인형들 (바닥에 배치) */}
-            {dolls.map(d => (
-              <div
-                key={d.id}
-                className="absolute"
+                className="absolute left-1/2 -translate-x-1/2"
                 style={{
-                  left: `${d.x}%`,
-                  bottom: 18,
-                  transform: 'translateX(-50%)',
-                  fontSize: DOLL_SIZE * 0.7,
+                  top: `calc(${craneDropY * DROP_MAX_PCT}% + 40px)`,
+                  fontSize: 36,
                   lineHeight: 1,
-                  filter: `drop-shadow(0 2px 3px rgba(0,0,0,0.15))`,
+                  animation: 'lift 0.8s ease-out forwards',
+                  filter: `drop-shadow(0 3px 4px rgba(0,0,0,0.25))`,
                 }}
               >
-                <div className="relative">
-                  {d.emoji}
-                  {/* 레어도 뱃지 */}
-                  {d.rarity !== 'N' && (
-                    <span
-                      className="absolute -top-1 -right-1 text-[8px] font-black text-white px-1 rounded-full"
-                      style={{
-                        background: RARITY_INFO[d.rarity].color,
-                        fontSize: 9,
-                        padding: '1px 4px',
-                      }}
-                    >
-                      {d.rarity}
-                    </span>
-                  )}
-                </div>
+                {grabbedDoll.emoji}
               </div>
-            ))}
-
-            {/* 바닥 */}
-            <div className="absolute left-0 right-0 bottom-0 h-3 bg-gradient-to-b from-pink-200 to-pink-300" />
-
-            {/* 받침 구멍 (오른쪽 아래) */}
-            <div className="absolute bottom-3 right-3 w-10 h-3 bg-gray-700 rounded-full shadow-inner" />
+            )}
           </div>
 
-          {/* 하단 컨트롤 패널 */}
-          <div className="mt-2 bg-pink-200 rounded-lg p-2">
-            <div className="text-[9px] text-center text-pink-700 font-bold mb-1">
-              コントロール
+          {/* 인형들 (핑크 바닥 위) */}
+          {dolls.map(d => (
+            <div
+              key={d.id}
+              className="absolute"
+              style={{
+                left: `${d.x}%`,
+                bottom: 2,
+                transform: 'translateX(-50%)',
+                fontSize: DOLL_SIZE * 0.65,
+                lineHeight: 1,
+                filter: `drop-shadow(0 2px 2px rgba(0,0,0,0.2))`,
+                zIndex: 2,
+              }}
+            >
+              <div className="relative">
+                {d.emoji}
+                {d.rarity !== 'N' && (
+                  <span
+                    className="absolute -top-1 -right-1 font-black text-white rounded-full"
+                    style={{
+                      background: RARITY_INFO[d.rarity].color,
+                      fontSize: 9,
+                      padding: '1px 4px',
+                      lineHeight: 1,
+                    }}
+                  >
+                    {d.rarity}
+                  </span>
+                )}
+              </div>
             </div>
-            {state === 'idle' && (
-              <button
-                onClick={startGame}
-                disabled={!canPlay}
-                className={`w-full py-2 rounded-lg font-black text-sm transition ${
-                  canPlay
-                    ? 'bg-pink-500 text-white active:scale-95 shadow-md'
-                    : 'bg-gray-300 text-gray-500'
-                }`}
-              >
-                {canFree ? '🎁 無料でプレイ！' : `▶ スタート (${CRANE_COST}pt)`}
-              </button>
-            )}
-            {state === 'moving' && (
-              <button
-                onClick={stopAndGrab}
-                className="w-full py-2 rounded-lg bg-red-500 text-white font-black text-base active:scale-95 shadow-md animate-pulse"
-              >
-                ⏹ STOP！
-              </button>
-            )}
-            {state === 'dropping' && (
-              <div className="w-full py-2 text-center text-pink-700 font-bold text-sm">
-                つかめるかな？...
-              </div>
-            )}
-            {state === 'result' && (
-              <button
-                onClick={nextRound}
-                className="w-full py-2 rounded-lg bg-pink-500 text-white font-black text-sm active:scale-95 shadow-md"
-              >
-                ▶ もう一回
-              </button>
-            )}
-          </div>
+          ))}
         </div>
+
+        {/* 투명 탭 영역: 기계 하단 컨트롤 패널 위 전체를 덮음 → 핑크 별 버튼을 누르는 느낌 */}
+        {state !== 'dropping' && (
+          <button
+            onClick={
+              state === 'idle' ? startGame :
+              state === 'moving' ? stopAndGrab :
+              nextRound
+            }
+            disabled={state === 'idle' && !canPlay}
+            aria-label={
+              state === 'idle' ? 'Start' :
+              state === 'moving' ? 'Stop' :
+              'Next'
+            }
+            className="absolute left-0 right-0 cursor-pointer active:scale-95 transition-transform disabled:cursor-not-allowed disabled:opacity-0"
+            style={{
+              top: '74%',
+              bottom: 0,
+              background: 'transparent',
+            }}
+          />
+        )}
+      </div>
+
+      {/* 상태 안내 라벨 (기계 아래) */}
+      <div className="mt-3 text-center">
+        {state === 'idle' && (
+          <div className={`inline-block px-4 py-2 rounded-full font-black text-sm shadow ${
+            canPlay ? 'bg-oshi-main text-white' : 'bg-gray-300 text-gray-500'
+          }`}>
+            {canFree ? '🎁 無料でプレイ！タップ' : `▶ スタート (${CRANE_COST}pt) — タップ`}
+          </div>
+        )}
+        {state === 'moving' && (
+          <div className="inline-block px-4 py-2 rounded-full bg-red-500 text-white font-black text-base shadow animate-pulse">
+            ⏹ STOP！ タップ
+          </div>
+        )}
+        {state === 'dropping' && (
+          <div className="inline-block px-4 py-2 rounded-full bg-pink-200 text-pink-700 font-bold text-sm shadow">
+            つかめるかな？...
+          </div>
+        )}
+        {state === 'result' && (
+          <div className="inline-block px-4 py-2 rounded-full bg-oshi-main text-white font-black text-sm shadow">
+            ▶ もう一回 — タップ
+          </div>
+        )}
       </div>
 
       {/* 결과 오버레이 */}
