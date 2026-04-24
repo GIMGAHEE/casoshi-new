@@ -95,6 +95,7 @@ export default function App() {
       {screen.name === 'rhythm' && (
         <RhythmGame
           points={points} setPoints={setPoints}
+          myOshi={myOshi}
           onBack={() => setScreen({ name: 'home' })}
         />
       )}

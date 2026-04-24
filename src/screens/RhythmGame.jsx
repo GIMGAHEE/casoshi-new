@@ -27,7 +27,12 @@ const LANE_ORIGIN = {
 // 히트 존 중심 (%)
 const HIT_CENTER = { x: 50, y: 55 };
 
-export default function RhythmGame({ points, setPoints, onBack }) {
+export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
+  // 캐릭터 에셋 결정 (내 오시 성별 기반, 기본은 여자)
+  const gender = myOshi?.gender === 'boy' ? 'boy' : 'girl';
+  const CHAR_NORMAL = `/rhythm/character_dance_${gender}.png`;
+  const CHAR_FEVER = '/rhythm/character_fever.png'; // fever는 여자 한 종류 (공통)
+
   const [state, setState] = useState('title');          // title | countdown | playing | result
   const [countdown, setCountdown] = useState(3);
   const [timeline, setTimeline] = useState(null);
@@ -275,8 +280,17 @@ export default function RhythmGame({ points, setPoints, onBack }) {
 
       {/* ===== TITLE ===== */}
       {state === 'title' && (
-        <div className="flex-1 flex flex-col items-center justify-center gap-4">
-          <div className="text-5xl">🎤</div>
+        <div className="flex-1 flex flex-col items-center justify-center gap-3 relative">
+          <img
+            src="/icons/rhythm.png"
+            alt=""
+            className="w-24 h-24 object-contain"
+            style={{
+              imageRendering: 'pixelated',
+              filter: 'drop-shadow(0 4px 8px rgba(255,107,157,0.4))',
+              animation: 'cdPulse 0.8s ease-out',
+            }}
+          />
           <div className="text-3xl font-black text-oshi-main tracking-wide">
             推しコール
           </div>
@@ -285,7 +299,7 @@ export default function RhythmGame({ points, setPoints, onBack }) {
             タイミングを合わせてタップ！<br />
             <span className="text-oshi-main font-bold">PERFECT × 10</span> でフィーバー突入
           </div>
-          <div className="mt-3 bg-white/70 rounded-2xl px-4 py-2 text-[11px] text-oshi-dark/70 space-y-0.5 border border-oshi-sub">
+          <div className="mt-2 bg-white/70 rounded-2xl px-4 py-2 text-[11px] text-oshi-dark/70 space-y-0.5 border border-oshi-sub">
             <div>🔴 PERFECT: +30pt × 희귀도</div>
             <div>🟡 GOOD: +10pt</div>
             <div>❌ MISS: コンボリセット</div>
@@ -297,7 +311,7 @@ export default function RhythmGame({ points, setPoints, onBack }) {
           )}
           <button
             onClick={startGame}
-            className="mt-4 px-8 py-3 rounded-full bg-oshi-main text-white font-black text-base shadow-lg active:scale-95 transition-transform"
+            className="mt-3 px-8 py-3 rounded-full bg-oshi-main text-white font-black text-base shadow-lg active:scale-95 transition-transform"
           >
             ▶ START
           </button>
@@ -330,6 +344,8 @@ export default function RhythmGame({ points, setPoints, onBack }) {
           judgmentFx={judgmentFx}
           hearts={hearts}
           onHit={handleHit}
+          charNormal={CHAR_NORMAL}
+          charFever={CHAR_FEVER}
         />
       )}
 
@@ -374,6 +390,11 @@ export default function RhythmGame({ points, setPoints, onBack }) {
           0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
           50%      { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
         }
+        @keyframes sparkleBurst {
+          0%   { transform: translate(-50%, -50%) scale(0.2) rotate(0); opacity: 0; }
+          30%  { transform: translate(-50%, -50%) scale(1.15) rotate(15deg); opacity: 1; }
+          100% { transform: translate(-50%, -50%) scale(1.8) rotate(30deg); opacity: 0; }
+        }
       `}</style>
     </div>
   );
@@ -382,11 +403,15 @@ export default function RhythmGame({ points, setPoints, onBack }) {
 // ===== PlayField (게임 중) =====
 function PlayField({
   elapsed, activeNotes, score, combo, fever, feverEndsAt,
-  stats, judgmentFx, hearts, onHit,
+  stats, judgmentFx, hearts, onHit, charNormal, charFever,
 }) {
   const timeLeft = Math.max(0, SESSION_DURATION_MS - elapsed);
   const progress = Math.min(1, elapsed / SESSION_DURATION_MS);
   const feverLeft = fever ? Math.max(0, feverEndsAt - performance.now()) / FEVER_DURATION_MS : 0;
+
+  // 캐릭터 스케일/애니메이션은 콤보에 따라 변화
+  const charScale = fever ? 1.15 : combo >= 30 ? 1.08 : combo >= 10 ? 1.04 : 1;
+  const charImage = fever ? charFever : charNormal;
 
   return (
     <div className="flex-1 flex flex-col mt-2">
@@ -431,60 +456,75 @@ function PlayField({
         </div>
       )}
 
-      {/* 플레이 스테이지 (노트 비행 영역) */}
+      {/* 플레이 스테이지 */}
       <div
         className="relative flex-1 mt-3 rounded-3xl overflow-hidden border-2 border-oshi-sub"
-        style={{
-          background:
-            fever
-              ? 'linear-gradient(135deg, #FFE5EC, #FFF3D0, #E5D4F5, #D4EBFB, #FFE5EC)'
-              : 'linear-gradient(180deg, #FFE5EC 0%, #FFD5E3 55%, #F0B8D0 100%)',
-          backgroundSize: fever ? '200% 100%' : undefined,
-          animation: fever ? 'feverPulse 2s ease infinite' : undefined,
-        }}
         onClick={onHit}
         onTouchStart={(e) => { e.preventDefault(); onHit(); }}
       >
-        {/* 캐릭터 플레이스홀더 (에셋 교체 예정) */}
-        <div
+        {/* 스테이지 배경 이미지 */}
+        <img
+          src="/rhythm/stage_bg.png"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+          style={{
+            imageRendering: 'pixelated',
+            filter: fever ? 'saturate(1.4) brightness(1.08)' : undefined,
+            transition: 'filter 0.3s ease',
+          }}
+          draggable={false}
+        />
+
+        {/* 페버 시 배경 글로우 오버레이 */}
+        {fever && (
+          <div
+            className="absolute inset-0 pointer-events-none mix-blend-overlay"
+            style={{
+              background:
+                'linear-gradient(135deg, rgba(255,107,157,0.3), rgba(255,184,0,0.2), rgba(183,126,224,0.3))',
+              backgroundSize: '200% 100%',
+              animation: 'feverPulse 2s ease infinite',
+            }}
+          />
+        )}
+
+        {/* 추し 캐릭터 */}
+        <img
+          src={charImage}
+          alt=""
           className="absolute pointer-events-none select-none"
           style={{
             left: '50%',
-            top: '18%',
-            transform: `translateX(-50%) scale(${fever ? 1.12 : 1})`,
-            fontSize: 72,
-            filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))',
-            transition: 'transform 0.3s ease',
+            top: fever ? '8%' : '10%',
+            transform: `translateX(-50%) scale(${charScale})`,
+            height: fever ? '45%' : '42%',
+            width: 'auto',
+            imageRendering: 'pixelated',
+            filter: fever
+              ? 'drop-shadow(0 0 20px rgba(255,184,0,0.8)) drop-shadow(0 6px 10px rgba(0,0,0,0.25))'
+              : 'drop-shadow(0 6px 10px rgba(0,0,0,0.25))',
+            transition: 'transform 0.3s ease, height 0.3s ease, top 0.3s ease',
           }}
-        >
-          {combo >= 50 ? '🌟' : combo >= 20 ? '💖' : '🎤'}
-        </div>
-
-        {/* 관객 실루엣 (플레이스홀더) */}
-        <div
-          className="absolute left-0 right-0 bottom-0 pointer-events-none"
-          style={{
-            height: '18%',
-            background:
-              'linear-gradient(180deg, transparent, rgba(50,30,60,0.55) 40%, rgba(30,15,40,0.85))',
-          }}
+          draggable={false}
         />
-        {/* 관객 머리 실루엣 도트들 */}
-        <div className="absolute left-0 right-0 bottom-3 flex justify-around pointer-events-none">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div
-              key={i}
-              className="bg-[#2a1a3a] rounded-full"
-              style={{
-                width: 14 + (i % 3) * 4,
-                height: 18 + (i % 2) * 4,
-                transform: fever
-                  ? `translateY(${Math.sin(Date.now() / 200 + i) * 4}px)`
-                  : undefined,
-              }}
-            />
-          ))}
-        </div>
+
+        {/* 관객 실루엣 (하단) */}
+        <img
+          src="/rhythm/audience_silhouette.png"
+          alt=""
+          className="absolute left-0 right-0 bottom-0 w-full pointer-events-none select-none"
+          style={{
+            height: '22%',
+            objectFit: 'cover',
+            objectPosition: 'bottom',
+            imageRendering: 'pixelated',
+            transform: fever
+              ? `translateY(${Math.sin(Date.now() / 180) * 3}px)`
+              : undefined,
+            filter: fever ? 'drop-shadow(0 -4px 12px rgba(255,107,157,0.5))' : undefined,
+          }}
+          draggable={false}
+        />
 
         {/* 히트 존 링 */}
         <div
@@ -495,20 +535,22 @@ function PlayField({
             width: 100,
             height: 100,
             borderColor: fever ? '#FFB800' : '#FF6B9D',
-            background: 'rgba(255,255,255,0.3)',
+            background: 'rgba(255,255,255,0.25)',
             transform: 'translate(-50%, -50%)',
             animation: 'ringPulse 1s ease-in-out infinite',
             boxShadow: fever
-              ? '0 0 24px rgba(255,184,0,0.7), inset 0 0 20px rgba(255,255,255,0.5)'
-              : '0 0 16px rgba(255,107,157,0.5), inset 0 0 20px rgba(255,255,255,0.5)',
+              ? '0 0 24px rgba(255,184,0,0.8), inset 0 0 20px rgba(255,255,255,0.5)'
+              : '0 0 16px rgba(255,107,157,0.6), inset 0 0 20px rgba(255,255,255,0.5)',
+            zIndex: 5,
           }}
         />
         <div
-          className="absolute text-xs font-black text-oshi-dark/70 pointer-events-none"
+          className="absolute text-[11px] font-black text-oshi-dark/80 pointer-events-none"
           style={{
             left: `${HIT_CENTER.x}%`,
             top: `${HIT_CENTER.y}%`,
             transform: 'translate(-50%, -50%)',
+            zIndex: 6,
           }}
         >
           HIT!
@@ -519,28 +561,49 @@ function PlayField({
           <FlyingNote key={n.id} note={n} elapsed={elapsed} />
         ))}
 
-        {/* 판정 피드백 */}
+        {/* 판정 피드백 + PERFECT 스파클 버스트 */}
         {judgmentFx && (
-          <div
-            key={judgmentFx.id}
-            className="absolute font-black pointer-events-none"
-            style={{
-              left: `${HIT_CENTER.x}%`,
-              top: `${HIT_CENTER.y}%`,
-              fontSize: judgmentFx.label === 'PERFECT' ? 36 : 28,
-              color:
-                judgmentFx.label === 'PERFECT'
-                  ? RARITY_INFO[judgmentFx.rarity]?.color || '#FF6B9D'
-                  : judgmentFx.label === 'GOOD'
-                    ? '#FFB800'
-                    : '#888',
-              textShadow: '0 2px 6px rgba(0,0,0,0.3)',
-              animation: 'judgmentPop 0.5s ease-out forwards',
-              zIndex: 20,
-            }}
-          >
-            {judgmentFx.label}
-          </div>
+          <>
+            {judgmentFx.label === 'PERFECT' && (
+              <img
+                key={`burst-${judgmentFx.id}`}
+                src="/rhythm/sparkle_burst.png"
+                alt=""
+                className="absolute pointer-events-none select-none"
+                style={{
+                  left: `${HIT_CENTER.x}%`,
+                  top: `${HIT_CENTER.y}%`,
+                  width: 200,
+                  height: 'auto',
+                  transform: 'translate(-50%, -50%)',
+                  imageRendering: 'pixelated',
+                  animation: 'sparkleBurst 0.55s ease-out forwards',
+                  zIndex: 7,
+                }}
+                draggable={false}
+              />
+            )}
+            <div
+              key={judgmentFx.id}
+              className="absolute font-black pointer-events-none"
+              style={{
+                left: `${HIT_CENTER.x}%`,
+                top: `${HIT_CENTER.y}%`,
+                fontSize: judgmentFx.label === 'PERFECT' ? 36 : 28,
+                color:
+                  judgmentFx.label === 'PERFECT'
+                    ? RARITY_INFO[judgmentFx.rarity]?.color || '#FF6B9D'
+                    : judgmentFx.label === 'GOOD'
+                      ? '#FFB800'
+                      : '#888',
+                textShadow: '0 2px 6px rgba(0,0,0,0.4), 0 0 12px rgba(255,255,255,0.6)',
+                animation: 'judgmentPop 0.5s ease-out forwards',
+                zIndex: 20,
+              }}
+            >
+              {judgmentFx.label}
+            </div>
+          </>
         )}
 
         {/* 하트 파티클 */}
@@ -554,6 +617,7 @@ function PlayField({
               animation: `heartBurst 1.2s ease-out ${h.delay}ms forwards`,
               '--dx': `${h.dx}px`,
               '--dy': `${h.dy}px`,
+              zIndex: 8,
             }}
           >
             💖
@@ -577,7 +641,15 @@ function FlyingNote({ note, elapsed }) {
   const y = origin.y + (HIT_CENTER.y - origin.y) * progress;
   const info = RARITY_INFO[note.rarity] || RARITY_INFO.N;
   // 히트 시각에 가까울수록 커지는 느낌
-  const scale = 0.6 + progress * 0.5;
+  const scale = 0.55 + progress * 0.5;
+
+  // N/R/SR/SSR 별 말풍선 틴트 (CSS filter로)
+  const tintFilter = {
+    N:   'hue-rotate(0deg)',                                  // 원본 핑크
+    R:   'hue-rotate(190deg) saturate(1.1)',                  // 블루
+    SR:  'hue-rotate(260deg) saturate(1.2)',                  // 퍼플
+    SSR: 'hue-rotate(35deg) saturate(1.5) brightness(1.1)',   // 골드
+  }[note.rarity] || 'none';
 
   return (
     <div
@@ -589,25 +661,57 @@ function FlyingNote({ note, elapsed }) {
         zIndex: 10,
       }}
     >
-      <div
-        className="px-3 py-1.5 rounded-full font-black text-white text-sm whitespace-nowrap border-2"
-        style={{
-          background: info.color,
-          borderColor: note.rarity === 'SSR' ? '#fff' : 'rgba(255,255,255,0.6)',
-          boxShadow: info.glow !== 'none' ? info.glow : '0 2px 4px rgba(0,0,0,0.2)',
-        }}
-      >
-        {note.phrase}
-      </div>
+      {/* SSR은 골드 프레임을 말풍선 뒤에 깔기 */}
       {note.rarity === 'SSR' && (
-        <div
-          className="absolute inset-0 rounded-full"
+        <img
+          src="/rhythm/ssr_note_frame.png"
+          alt=""
+          className="absolute pointer-events-none"
           style={{
-            boxShadow: '0 0 20px rgba(255,184,0,0.9), 0 0 40px rgba(255,184,0,0.5)',
-            animation: 'ringPulse 0.6s ease-in-out infinite',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 150,
+            height: 'auto',
+            imageRendering: 'pixelated',
+            animation: 'ringPulse 0.7s ease-in-out infinite',
           }}
+          draggable={false}
         />
       )}
+
+      {/* 말풍선 베이스 + 중앙에 텍스트 오버레이 */}
+      <div className="relative" style={{ width: 112, height: 104 }}>
+        <img
+          src="/rhythm/note_base.png"
+          alt=""
+          className="absolute inset-0 w-full h-full pointer-events-none select-none"
+          style={{
+            imageRendering: 'pixelated',
+            filter: `${tintFilter} drop-shadow(${info.glow !== 'none' ? info.glow : '0 2px 4px rgba(0,0,0,0.25)'})`,
+          }}
+          draggable={false}
+        />
+        <div
+          className="absolute inset-0 flex items-center justify-center px-2"
+          style={{
+            paddingTop: '4px',
+            paddingBottom: '14px',  // 말풍선 꼬리 영역 보정
+          }}
+        >
+          <span
+            className="font-black text-center leading-tight"
+            style={{
+              fontSize: note.phrase.length > 5 ? 11 : 14,
+              color: info.color,
+              textShadow: '0 1px 2px rgba(255,255,255,0.8)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {note.phrase}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
@@ -625,10 +729,19 @@ function ResultScreen({ score, stats, bestScore, isNewBest, onRestart, onHome })
     accuracy >= 50 ? 'B' : 'C';
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center gap-4 py-6">
-      <div className="text-4xl font-black text-oshi-main" style={{ animation: 'cdPulse 0.6s ease-out' }}>
-        アンコール！
-      </div>
+    <div className="flex-1 flex flex-col items-center justify-center gap-3 py-4">
+      {/* 엔코어 배너 (컷인 연출) */}
+      <img
+        src="/rhythm/encore_banner.png"
+        alt="アンコール"
+        className="w-full max-w-sm object-contain"
+        style={{
+          imageRendering: 'pixelated',
+          animation: 'cdPulse 0.7s ease-out',
+          filter: 'drop-shadow(0 6px 12px rgba(255,107,157,0.3))',
+        }}
+        draggable={false}
+      />
       <div className="text-xs text-oshi-dark/70">ありがとう、推し最高！</div>
 
       <div className="w-full max-w-xs bg-white rounded-3xl p-5 shadow-lg border-2 border-oshi-sub">

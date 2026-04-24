@@ -92,7 +92,12 @@ export default function Home({
           onClick={onOpenRhythmGame}
           className="card w-full flex items-center gap-4 px-5 py-4 bg-gradient-to-r from-purple-100 via-pink-50 to-orange-50 hover:scale-[1.01] transition-transform border-purple-200"
         >
-          <div className="text-4xl w-16 h-16 flex items-center justify-center">🎤</div>
+          <img
+            src="/icons/rhythm.png"
+            alt=""
+            className="w-16 h-16 object-contain"
+            style={{ imageRendering: 'pixelated' }}
+          />
           <div className="flex-1 text-left">
             <div className="text-sm font-bold text-oshi-dark flex items-center gap-1.5">
               推しコール
