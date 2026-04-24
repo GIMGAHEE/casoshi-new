@@ -255,13 +255,14 @@ export default function Home({
 /**
  * 아바타 썸네일 타일 — 전신 sprite 에서 상반신만 보이게 크롭.
  *
- * 이전 시도들 (objectFit:cover / height:170% / backgroundSize:170%) 이
- * Tailwind preflight 또는 브라우저 CSS 해석 차이로 일관되지 않아서,
- * 가장 확실한 방식으로 구현: <img> 를 정상 크기로 렌더한 뒤
- * CSS transform scale(1.7) 로 확대 + origin 'center top' 으로 상단 앵커.
- * overflow-hidden 이 오버플로한 하반신을 잘라낸다.
+ * <img> 정상 렌더 → CSS transform scale 로 확대 + transformOrigin 'center top'.
+ * overflow-hidden 이 하반신을 잘라냄. Tailwind preflight 영향 없음.
+ *
+ * 주의: hairTransform 은 전신 뷰 (MiniHome / CharacterCard) 기준 fine-tune
+ * 값이라 썸네일에서 그대로 적용하면 정렬이 어긋남. sprite 와 hairOverlay 는
+ * 원본 canvas 에서 이미 서로 정렬돼있으므로, 둘 다 동일한 scale 만 주면 OK.
  */
-function AvatarTile({ sprite, hairOverlay, hairTransform, fallbackEmoji }) {
+function AvatarTile({ sprite, hairOverlay, fallbackEmoji }) {
   if (!sprite) {
     return (
       <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden flex items-center justify-center">
@@ -269,39 +270,25 @@ function AvatarTile({ sprite, hairOverlay, hairTransform, fallbackEmoji }) {
       </div>
     );
   }
-  const SCALE = 1.7;
-  // hairOverlay 는 sprite 와 같은 canvas 기준이라 동일한 base transform 을 받아야
-  // 정렬이 유지됨. hairTransform 은 그 위에 추가로 적용.
-  const baseTransform = `translateX(-50%) scale(${SCALE})`;
-  const hairExtra = hairTransform
-    ? ` translate(${hairTransform.x}%, ${hairTransform.y}%) scale(${hairTransform.scale})`
-    : '';
-  const imgBase = {
+  const SCALE = 1.3;
+  const imgStyle = {
     position: 'absolute',
     top: 0,
     left: '50%',
     width: '100%',
+    transform: `translateX(-50%) scale(${SCALE})`,
     transformOrigin: 'center top',
     imageRendering: 'pixelated',
   };
   return (
     <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden relative">
-      <img
-        src={sprite}
-        alt=""
-        draggable={false}
-        style={{ ...imgBase, transform: baseTransform }}
-      />
+      <img src={sprite} alt="" draggable={false} style={imgStyle} />
       {hairOverlay && (
         <img
           src={hairOverlay}
           alt=""
           draggable={false}
-          style={{
-            ...imgBase,
-            transform: baseTransform + hairExtra,
-            pointerEvents: 'none',
-          }}
+          style={{ ...imgStyle, pointerEvents: 'none' }}
         />
       )}
     </div>
