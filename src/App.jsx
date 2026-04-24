@@ -167,6 +167,7 @@ export default function App() {
         <CharacterDetail
           characterId={screen.params.id}
           myOshi={myOshi}
+          liverSession={liverSession}
           points={points} setPoints={setPoints}
           supports={supports} setSupports={setSupports}
           onBack={() => setScreen({ name: 'minihome', params: screen.params })}
