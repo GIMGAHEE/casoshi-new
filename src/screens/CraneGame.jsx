@@ -38,7 +38,6 @@ export default function CraneGame({ points, setPoints, onBack }) {
   const [dolls, setDolls] = useState(() => generateDolls());
   const [state, setState] = useState('idle');
   const [cranePos, setCranePos] = useState(50); // % 0~100
-  const [craneDir, setCraneDir] = useState(1);   // 1 = 오른쪽, -1 = 왼쪽
   const [grabbedDoll, setGrabbedDoll] = useState(null); // 성공 시 잡힌 인형
   const [lastResult, setLastResult] = useState(null); // {doll, reward, success}
   const [lastFreeAt, setLastFreeAt] = useLocalStorage('casoshi:craneFreeAt', 0);
@@ -46,26 +45,33 @@ export default function CraneGame({ points, setPoints, onBack }) {
 
   const animationRef = useRef(null);
   const boardRef = useRef(null);
+  const phaseRef = useRef(-Math.PI / 2); // 사인파 위상 (-π/2 = 왼쪽 끝)
   const [craneDropY, setCraneDropY] = useState(0); // 0~1 (0 = 윗쪽, 1 = 바닥)
 
   const canFree = Date.now() - lastFreeAt > CRANE_FREE_INTERVAL_MS;
   const canPlay = canFree || points >= CRANE_COST;
 
-  // 크레인 좌우 움직임 애니메이션
+  // 크레인 좌우 움직임 (사인파 기반 자연 감속/관성)
+  // pos(t) = CENTER + AMPLITUDE * sin(phase)
+  // 모서리에서 자연히 감속, 중앙에서 최고 속도
   useEffect(() => {
     if (state !== 'moving') return;
+    const CENTER = 50;
+    const AMPLITUDE = 40;          // 10% ~ 90% 사이
+    const ANGULAR_SPEED = 2.3;     // rad/sec → 한 사이클 약 2.7초
+    let lastT = performance.now();
     const loop = () => {
-      setCranePos(p => {
-        let next = p + craneDir * 1.8;
-        if (next >= 90) { setCraneDir(-1); next = 90; }
-        else if (next <= 10) { setCraneDir(1); next = 10; }
-        return next;
-      });
+      const now = performance.now();
+      const dt = (now - lastT) / 1000;
+      lastT = now;
+      phaseRef.current += dt * ANGULAR_SPEED;
+      const pos = CENTER + AMPLITUDE * Math.sin(phaseRef.current);
+      setCranePos(pos);
       animationRef.current = requestAnimationFrame(loop);
     };
     animationRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(animationRef.current);
-  }, [state, craneDir]);
+  }, [state]);
 
   // 게임판 실제 width 측정 (거리 판정용)
   const getActualWidth = () => boardRef.current?.offsetWidth || MACHINE_WIDTH_PX;
@@ -82,8 +88,8 @@ export default function CraneGame({ points, setPoints, onBack }) {
     setGrabbedDoll(null);
     setLastResult(null);
     setCraneDropY(0);
+    phaseRef.current = -Math.PI / 2;   // 왼쪽 끝에서 시작 (사인파 -π/2)
     setCranePos(10);
-    setCraneDir(1);
     setState('moving');
   };
 
