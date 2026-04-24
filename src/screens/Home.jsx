@@ -96,49 +96,12 @@ export default function Home({
                 <span className="absolute top-1 right-1 text-[8px] font-black bg-oshi-main text-white px-1.5 py-0.5 rounded-full">
                   LIVER
                 </span>
-                <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden relative">
-                  {liverChar?.sprite ? (
-                    <>
-                      <img
-                        src={liverChar.sprite}
-                        alt=""
-                        draggable={false}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          objectPosition: 'top',
-                          imageRendering: 'pixelated',
-                        }}
-                      />
-                      {liverChar.hairOverlay && (
-                        <img
-                          src={liverChar.hairOverlay}
-                          alt=""
-                          draggable={false}
-                          style={{
-                            position: 'absolute',
-                            inset: 0,
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            objectPosition: 'top',
-                            transform: liverChar.hairTransform
-                              ? `translate(${liverChar.hairTransform.x}%, ${liverChar.hairTransform.y}%) scale(${liverChar.hairTransform.scale})`
-                              : undefined,
-                            transformOrigin: 'center top',
-                            imageRendering: 'pixelated',
-                            pointerEvents: 'none',
-                          }}
-                        />
-                      )}
-                    </>
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-3xl">
-                      {selfLiver.profile.gender === 'boy' ? '🎤' : '💖'}
-                    </div>
-                  )}
-                </div>
+                <AvatarTile
+                  sprite={liverChar?.sprite}
+                  hairOverlay={liverChar?.hairOverlay}
+                  hairTransform={liverChar?.hairTransform}
+                  fallbackEmoji={selfLiver.profile.gender === 'boy' ? '🎤' : '💖'}
+                />
                 <div className="text-[11px] font-bold text-oshi-dark leading-tight text-center truncate w-full">
                   {selfLiver.profile.name}
                 </div>
@@ -154,47 +117,12 @@ export default function Home({
                 borderColor: myOshiChar.themeColor + '60',
               }}
             >
-              <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden relative">
-                {myOshiChar.sprite ? (
-                  <>
-                    <img
-                      src={myOshiChar.sprite}
-                      alt=""
-                      draggable={false}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        objectPosition: 'top',
-                        imageRendering: 'pixelated',
-                      }}
-                    />
-                    {myOshiChar.hairOverlay && (
-                      <img
-                        src={myOshiChar.hairOverlay}
-                        alt=""
-                        draggable={false}
-                        style={{
-                          position: 'absolute',
-                          inset: 0,
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          objectPosition: 'top',
-                          transform: myOshiChar.hairTransform
-                            ? `translate(${myOshiChar.hairTransform.x}%, ${myOshiChar.hairTransform.y}%) scale(${myOshiChar.hairTransform.scale})`
-                            : undefined,
-                          transformOrigin: 'center top',
-                          imageRendering: 'pixelated',
-                          pointerEvents: 'none',
-                        }}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-3xl">💖</div>
-                )}
-              </div>
+              <AvatarTile
+                sprite={myOshiChar.sprite}
+                hairOverlay={myOshiChar.hairOverlay}
+                hairTransform={myOshiChar.hairTransform}
+                fallbackEmoji="💖"
+              />
               <div className="text-[11px] font-bold text-oshi-dark leading-tight text-center truncate w-full">
                 {myOshiChar.name}
               </div>
@@ -320,6 +248,50 @@ export default function Home({
         )}
         <div>Phase 2 · ローカル保存 · 無課金</div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * 아바타 썸네일 타일 — 전신 sprite 를 상반신만 보이게 크롭한다.
+ * 이미지를 타일 높이보다 크게(170%) 렌더하고 top 기준으로 absolute 배치해서
+ * objectFit: cover 보다 더 안정적으로 반신 샷이 되도록.
+ */
+function AvatarTile({ sprite, hairOverlay, hairTransform, fallbackEmoji }) {
+  if (!sprite) {
+    return (
+      <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden relative flex items-center justify-center">
+        <div className="text-3xl">{fallbackEmoji}</div>
+      </div>
+    );
+  }
+  const imgStyle = {
+    height: '170%',
+    width: 'auto',
+    maxWidth: 'none',
+    imageRendering: 'pixelated',
+  };
+  return (
+    <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden relative">
+      <div className="absolute inset-0 flex justify-center items-start">
+        <img src={sprite} alt="" draggable={false} style={imgStyle} />
+      </div>
+      {hairOverlay && (
+        <div className="absolute inset-0 flex justify-center items-start pointer-events-none">
+          <img
+            src={hairOverlay}
+            alt=""
+            draggable={false}
+            style={{
+              ...imgStyle,
+              transform: hairTransform
+                ? `translate(${hairTransform.x}%, ${hairTransform.y}%) scale(${hairTransform.scale})`
+                : undefined,
+              transformOrigin: 'center top',
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
