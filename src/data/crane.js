@@ -1,25 +1,28 @@
 // クレーンゲーム (인형뽑기) 데이터
-// 추후 인형 그래픽 업로드되면 emoji 필드를 image: '/dolls/...' 로 교체
+// 인형 이미지는 public/crane/doll_*.png
 
 // 인형 풀 (등급별)
 export const DOLL_POOL = [
-  // N (일반) - 50%
-  { id: 'n_heart',   name: 'ハート',   rarity: 'N', emoji: '💖' },
-  { id: 'n_star',    name: 'スター',   rarity: 'N', emoji: '⭐' },
-  { id: 'n_cloud',   name: 'くも',     rarity: 'N', emoji: '☁️' },
-  { id: 'n_flower',  name: 'おはな',   rarity: 'N', emoji: '🌸' },
+  // N (일반) - 50% — 단순 모양
+  { id: 'n_heart',   name: 'ハート',     rarity: 'N', image: '/crane/doll_n_heart.png' },
+  { id: 'n_star',    name: 'スター',     rarity: 'N', image: '/crane/doll_n_star.png' },
+  { id: 'n_cloud',   name: 'くも',       rarity: 'N', image: '/crane/doll_n_cloud.png' },
+  { id: 'n_flower',  name: 'おはな',     rarity: 'N', image: '/crane/doll_n_flower.png' },
+  { id: 'n_drop',    name: 'しずく',     rarity: 'N', image: '/crane/doll_n_drop.png' },
 
-  // R (레어) - 30%
-  { id: 'r_bear',    name: 'くまちゃん', rarity: 'R', emoji: '🐻' },
-  { id: 'r_bunny',   name: 'うさちゃん', rarity: 'R', emoji: '🐰' },
-  { id: 'r_cat',     name: 'ねこちゃん', rarity: 'R', emoji: '🐱' },
+  // R (레어) - 30% — 기본 동물
+  { id: 'r_bunny_pink',  name: 'ピンクうさちゃん', rarity: 'R', image: '/crane/doll_r_bunny_pink.png' },
+  { id: 'r_bunny_white', name: 'しろうさちゃん',   rarity: 'R', image: '/crane/doll_r_bunny_white.png' },
+  { id: 'r_bear',        name: 'くまちゃん',       rarity: 'R', image: '/crane/doll_r_bear.png' },
+  { id: 'r_cat',         name: 'ねこちゃん',       rarity: 'R', image: '/crane/doll_r_cat.png' },
 
-  // SR (슈퍼레어) - 15%
-  { id: 'sr_panda',  name: 'パンダ',   rarity: 'SR', emoji: '🐼' },
-  { id: 'sr_unicorn',name: 'ユニコーン', rarity: 'SR', emoji: '🦄' },
+  // SR (슈퍼레어) - 15% — 디테일 있는 동물
+  { id: 'sr_shiba',       name: '柴犬',           rarity: 'SR', image: '/crane/doll_sr_shiba.png' },
+  { id: 'sr_sheep',       name: 'ひつじちゃん',     rarity: 'SR', image: '/crane/doll_sr_sheep.png' },
+  { id: 'sr_bunny_heart', name: 'ハートうさちゃん', rarity: 'SR', image: '/crane/doll_sr_bunny_heart.png' },
 
-  // SSR (울트라레어) - 5%
-  { id: 'ssr_dragon',name: 'ドラゴン', rarity: 'SSR', emoji: '🐉' },
+  // SSR (울트라레어) - 5% — 특별
+  { id: 'ssr_otter', name: 'カワウソ', rarity: 'SSR', image: '/crane/doll_ssr_otter.png' },
 ];
 
 // 등급별 속성

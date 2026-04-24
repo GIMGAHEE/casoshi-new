@@ -247,18 +247,20 @@ export default function CraneGame({ points, setPoints, onBack }) {
             />
             {/* 잡힌 인형 (집게 아래에서 살짝 위로 lift) */}
             {grabbedDoll && state === 'result' && (
-              <div
-                className="absolute left-1/2 -translate-x-1/2"
+              <img
+                src={grabbedDoll.image}
+                alt={grabbedDoll.name}
+                className="absolute left-1/2 -translate-x-1/2 select-none pointer-events-none"
                 style={{
                   top: `calc(${craneDropY * DROP_MAX_PCT}% + 40px)`,
-                  fontSize: 36,
-                  lineHeight: 1,
+                  width: 44,
+                  height: 'auto',
+                  imageRendering: 'pixelated',
                   animation: 'lift 0.8s ease-out forwards',
                   filter: `drop-shadow(0 3px 4px rgba(0,0,0,0.25))`,
                 }}
-              >
-                {grabbedDoll.emoji}
-              </div>
+                draggable={false}
+              />
             )}
           </div>
 
@@ -271,14 +273,22 @@ export default function CraneGame({ points, setPoints, onBack }) {
                 left: `${d.x}%`,
                 bottom: 2,
                 transform: 'translateX(-50%)',
-                fontSize: DOLL_SIZE * 0.65,
-                lineHeight: 1,
-                filter: `drop-shadow(0 2px 2px rgba(0,0,0,0.2))`,
                 zIndex: 2,
+                filter: `drop-shadow(0 2px 2px rgba(0,0,0,0.2))`,
               }}
             >
               <div className="relative">
-                {d.emoji}
+                <img
+                  src={d.image}
+                  alt={d.name}
+                  className="select-none pointer-events-none block"
+                  style={{
+                    width: DOLL_SIZE,
+                    height: 'auto',
+                    imageRendering: 'pixelated',
+                  }}
+                  draggable={false}
+                />
                 {d.rarity !== 'N' && (
                   <span
                     className="absolute -top-1 -right-1 font-black text-white rounded-full"
@@ -367,12 +377,20 @@ export default function CraneGame({ points, setPoints, onBack }) {
             {history.slice(0, 12).map((h, i) => (
               <div
                 key={i}
-                className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center text-xl ${
-                  h.success ? 'bg-white border border-oshi-sub' : 'bg-gray-100 opacity-50'
+                className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center ${
+                  h.success ? 'bg-white border border-oshi-sub' : 'bg-gray-100 opacity-50 text-xl'
                 }`}
                 title={h.success ? `${h.doll?.name} ×1` : 'miss'}
               >
-                {h.success ? h.doll?.emoji : '❌'}
+                {h.success && h.doll?.image ? (
+                  <img
+                    src={h.doll.image}
+                    alt={h.doll.name}
+                    className="select-none pointer-events-none"
+                    style={{ width: 28, height: 'auto', imageRendering: 'pixelated' }}
+                    draggable={false}
+                  />
+                ) : '❌'}
               </div>
             ))}
           </div>
@@ -455,14 +473,20 @@ function ResultOverlay({ result, onClose }) {
           <div className="text-xs font-black tracking-widest" style={{ color: info.color }}>
             ★ {info.label} ★
           </div>
-          <div
-            className="text-7xl my-3"
-            style={{
-              filter: info.glow !== 'none' ? `drop-shadow(${info.glow})` : undefined,
-              animation: 'winPop 0.5s ease-out',
-            }}
-          >
-            {doll.emoji}
+          <div className="relative flex justify-center my-3">
+            <img
+              src={doll.image}
+              alt={doll.name}
+              className="select-none pointer-events-none"
+              style={{
+                width: 140,
+                height: 'auto',
+                imageRendering: 'pixelated',
+                filter: info.glow !== 'none' ? `drop-shadow(${info.glow})` : undefined,
+                animation: 'winPop 0.5s ease-out',
+              }}
+              draggable={false}
+            />
           </div>
           <div className="text-lg font-black text-oshi-dark">{doll.name}</div>
           <div className="text-xs text-oshi-dark/60 mt-1">GET！</div>
