@@ -96,7 +96,7 @@ export default function Home({
                 <span className="absolute top-1 right-1 text-[8px] font-black bg-oshi-main text-white px-1.5 py-0.5 rounded-full">
                   LIVER
                 </span>
-                <div className="w-16 h-16 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden relative">
+                <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden relative">
                   {liverChar?.sprite ? (
                     <>
                       <img
@@ -154,7 +154,7 @@ export default function Home({
                 borderColor: myOshiChar.themeColor + '60',
               }}
             >
-              <div className="w-16 h-16 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden relative">
+              <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden relative">
                 {myOshiChar.sprite ? (
                   <>
                     <img
