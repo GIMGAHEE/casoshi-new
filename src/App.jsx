@@ -109,6 +109,7 @@ export default function App() {
         <RoomEditor
           character={findCharacterForRoom(screen.params.id, myOshi)}
           initialRoom={rooms[screen.params.id]}
+          supportPoints={supports[screen.params.id] || 0}
           onSave={(roomData) => handleSaveRoom(screen.params.id, roomData)}
           onCancel={() => setScreen({ name: 'minihome', params: screen.params })}
         />

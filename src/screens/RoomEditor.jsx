@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { FURNITURE_CATALOG, FURNITURE_CATEGORIES, findFurniture, createRoomItem } from '../data/furniture';
+import { FURNITURE_CATALOG, FURNITURE_CATEGORIES, findFurniture, createRoomItem, getFurnitureUnlockLevel, isFurnitureUnlocked } from '../data/furniture';
+import { calcLevel } from '../data/characters';
 import IsometricRoom from '../components/IsometricRoom';
 import PixelAvatar from '../components/PixelAvatar';
 
@@ -14,7 +15,7 @@ const DEFAULT_CHAR_POS = { x: 50, y: 80 }; // 바닥 중앙, 발 기준
  * - 저장 시 room state callback
  */
 export default function RoomEditor({
-  character, initialRoom, onSave, onCancel,
+  character, initialRoom, supportPoints = 0, onSave, onCancel,
 }) {
   const [items, setItems] = useState(initialRoom?.items || []);
   const [characterPos, setCharacterPos] = useState(
@@ -23,6 +24,9 @@ export default function RoomEditor({
   const [selectedId, setSelectedId] = useState(null);
   const [showCatalog, setShowCatalog] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
+  const [lockedToast, setLockedToast] = useState(null); // { msg, timeout }
+
+  const currentLevel = calcLevel(supportPoints);
 
   const roomRef = useRef(null);
   const dragStateRef = useRef(null);
@@ -104,6 +108,12 @@ export default function RoomEditor({
 
   return (
     <div className="max-w-md mx-auto px-4 py-3 pb-32">
+      {/* 잠금 가구 터치 토스트 */}
+      {lockedToast && (
+        <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-oshi-dark/90 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg pointer-events-none">
+          🔒 {lockedToast}
+        </div>
+      )}
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-3">
         <button onClick={onCancel} className="text-sm text-oshi-dark/70">
@@ -270,8 +280,13 @@ export default function RoomEditor({
       {/* 가구 카탈로그 (열림 상태) */}
       {showCatalog && (
         <div className="mt-3 bg-white rounded-2xl border-2 border-oshi-sub p-3">
-          <div className="text-xs font-bold text-oshi-dark/60 mb-2">
-            家具をえらぶ
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-xs font-bold text-oshi-dark/60">
+              家具をえらぶ
+            </div>
+            <div className="text-[10px] font-bold text-oshi-main bg-oshi-bg/60 px-2 py-0.5 rounded-full">
+              Lv.{currentLevel}
+            </div>
           </div>
           {/* 카테고리 탭 */}
           <div className="flex gap-1 mb-2 overflow-x-auto no-scrollbar">
@@ -296,28 +311,44 @@ export default function RoomEditor({
           <div className="grid grid-cols-6 gap-1.5">
             {FURNITURE_CATALOG
               .filter(f => activeCategory === 'all' || f.category === activeCategory)
-              .map(f => (
-              <button
-                key={f.id}
-                onClick={() => addFurniture(f.id)}
-                className="rounded-lg border border-oshi-sub bg-oshi-bg/40 p-1 hover:bg-oshi-bg active:scale-95 transition"
-              >
-                <div className="h-10 flex items-center justify-center">
-                  <img
-                    src={f.image}
-                    alt=""
-                    style={{
-                      maxWidth: '100%',
-                      maxHeight: '100%',
-                      imageRendering: 'pixelated',
-                    }}
-                  />
-                </div>
-                <div className="text-[9px] text-center font-bold text-oshi-dark/80 mt-0.5 truncate leading-tight">
-                  {f.label}
-                </div>
-              </button>
-            ))}
+              .map(f => {
+              const unlocked = isFurnitureUnlocked(f.id, currentLevel);
+              const requiredLv = getFurnitureUnlockLevel(f.id);
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => {
+                    if (unlocked) {
+                      addFurniture(f.id);
+                    } else {
+                      setLockedToast(`Lv.${requiredLv} で解放`);
+                      setTimeout(() => setLockedToast(null), 1600);
+                    }
+                  }}
+                  className={`relative rounded-lg border border-oshi-sub p-1 active:scale-95 transition ${
+                    unlocked ? 'bg-oshi-bg/40 hover:bg-oshi-bg' : 'bg-gray-100'
+                  }`}
+                >
+                  <div className="h-10 flex items-center justify-center">
+                    <img
+                      src={f.image}
+                      alt=""
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        imageRendering: 'pixelated',
+                        filter: unlocked ? 'none' : 'grayscale(1) opacity(0.35)',
+                      }}
+                    />
+                  </div>
+                  <div className={`text-[9px] text-center font-bold mt-0.5 truncate leading-tight ${
+                    unlocked ? 'text-oshi-dark/80' : 'text-gray-400'
+                  }`}>
+                    {unlocked ? f.label : `🔒 Lv.${requiredLv}`}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
       )}

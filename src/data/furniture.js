@@ -419,6 +419,35 @@ export const FURNITURE_CATALOG = [
 export const findFurniture = (id) =>
   FURNITURE_CATALOG.find(f => f.id === id);
 
+// ===== 가구 해금 시스템 =====
+// 카테고리 내 순서대로 첫 2개는 Lv.1, 3번째부터 매 레벨마다 +1개씩 해금.
+// 예) seat 카테고리에 가구가 6개 있으면:
+//   index 0,1 -> Lv.1 / index 2 -> Lv.2 / index 3 -> Lv.3 / ...
+const FREE_COUNT_PER_CATEGORY = 2;
+
+// 카테고리별 가구 순서 인덱스를 캐시
+const _categoryIndexCache = (() => {
+  const map = {};
+  const counters = {};
+  for (const f of FURNITURE_CATALOG) {
+    counters[f.category] = counters[f.category] ?? 0;
+    map[f.id] = counters[f.category];
+    counters[f.category]++;
+  }
+  return map;
+})();
+
+// 특정 가구의 해금 레벨
+export const getFurnitureUnlockLevel = (furnitureId) => {
+  const idx = _categoryIndexCache[furnitureId] ?? 0;
+  if (idx < FREE_COUNT_PER_CATEGORY) return 1;
+  return idx - FREE_COUNT_PER_CATEGORY + 2; // 2번째 index → Lv.2, 3번째 → Lv.3
+};
+
+// 현재 레벨에서 사용 가능한지
+export const isFurnitureUnlocked = (furnitureId, level) =>
+  getFurnitureUnlockLevel(furnitureId) <= level;
+
 // 방 아이템 기본값 (새로 추가할 때)
 export const createRoomItem = (furnitureId) => {
   const now = Date.now();
