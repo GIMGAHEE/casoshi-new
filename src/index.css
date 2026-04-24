@@ -5,9 +5,13 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    /* fallback 색은 html 에만. body 에 두면 body::before(z-index:-1) 를 가림. */
+    background-color: #FFE5EC;
+    min-height: 100vh;
+  }
   html, body {
     font-family: 'Noto Sans JP', system-ui, sans-serif;
-    background-color: #FFE5EC;
     color: #2D1B2E;
   }
   body {
@@ -20,10 +24,10 @@
     position: fixed;
     inset: 0;
     background-image:
-      linear-gradient(rgba(255, 229, 236, 0.20), rgba(255, 229, 236, 0.25)),
+      linear-gradient(rgba(255, 229, 236, 0.20), rgba(255, 229, 236, 0.30)),
       url('/background.png');
     background-size: cover;
-    background-position: center top;
+    background-position: center center;
     background-repeat: no-repeat;
     z-index: -1;
     image-rendering: pixelated;
