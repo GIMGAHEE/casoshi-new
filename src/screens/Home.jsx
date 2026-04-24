@@ -82,29 +82,48 @@ export default function Home({
           </button>
 
           {/* 마이홈 (라이버 마이페이지 / 마이 추시 / 작성 CTA) */}
-          {liverSession && selfLiver ? (
-            <button
-              onClick={onOpenLiverDashboard}
-              className="card relative flex flex-col items-center justify-center py-4 px-2 hover:scale-[1.03] transition-transform"
-              style={{
-                background: `linear-gradient(135deg, ${selfLiver.profile.themeColor}22, ${selfLiver.profile.bgColor})`,
-                borderColor: selfLiver.profile.themeColor + '60',
-              }}
-            >
-              <span className="absolute top-1 right-1 text-[8px] font-black bg-oshi-main text-white px-1.5 py-0.5 rounded-full">
-                LIVER
-              </span>
-              <div className="w-12 h-12 mb-1 rounded-xl bg-white/80 flex items-center justify-center shadow-inner">
-                <div className="text-2xl">
-                  {selfLiver.profile.gender === 'boy' ? '🎤' : '💖'}
+          {liverSession && selfLiver ? (() => {
+            const liverChar = asLiverCharacter(selfLiver);
+            return (
+              <button
+                onClick={onOpenLiverDashboard}
+                className="card relative flex flex-col items-center justify-center py-4 px-2 hover:scale-[1.03] transition-transform"
+                style={{
+                  background: `linear-gradient(135deg, ${selfLiver.profile.themeColor}22, ${selfLiver.profile.bgColor})`,
+                  borderColor: selfLiver.profile.themeColor + '60',
+                }}
+              >
+                <span className="absolute top-1 right-1 text-[8px] font-black bg-oshi-main text-white px-1.5 py-0.5 rounded-full">
+                  LIVER
+                </span>
+                <div className="w-12 h-12 mb-1 rounded-xl bg-white/80 flex items-center justify-center shadow-inner overflow-hidden">
+                  {liverChar?.sprite && liverChar.spriteSize && !liverChar.hairOverlay ? (
+                    <img
+                      src={liverChar.sprite}
+                      alt=""
+                      draggable={false}
+                      style={{ height: '95%', width: 'auto', imageRendering: 'pixelated' }}
+                    />
+                  ) : liverChar?.sprite ? (
+                    <PixelAvatar
+                      sprite={liverChar.sprite}
+                      size={44}
+                      hairOverlay={liverChar.hairOverlay}
+                      hairTransform={liverChar.hairTransform}
+                    />
+                  ) : (
+                    <div className="text-2xl">
+                      {selfLiver.profile.gender === 'boy' ? '🎤' : '💖'}
+                    </div>
+                  )}
                 </div>
-              </div>
-              <div className="text-[11px] font-bold text-oshi-dark leading-tight text-center truncate w-full">
-                {selfLiver.profile.name}
-              </div>
-              <div className="text-[9px] text-oshi-dark/55 mt-0.5">マイページ</div>
-            </button>
-          ) : myOshiChar ? (
+                <div className="text-[11px] font-bold text-oshi-dark leading-tight text-center truncate w-full">
+                  {selfLiver.profile.name}
+                </div>
+                <div className="text-[9px] text-oshi-dark/55 mt-0.5">マイページ</div>
+              </button>
+            );
+          })() : myOshiChar ? (
             <button
               onClick={() => onSelectCharacter(MY_OSHI_ID)}
               className="card flex flex-col items-center justify-center py-4 px-2 hover:scale-[1.03] transition-transform"
@@ -114,15 +133,19 @@ export default function Home({
               }}
             >
               <div className="w-12 h-12 mb-1 rounded-xl bg-white/80 flex items-center justify-center shadow-inner overflow-hidden">
-                {myOshiChar.sprite ? (
+                {myOshiChar.sprite && myOshiChar.spriteSize && !myOshiChar.hairOverlay ? (
                   <img
                     src={myOshiChar.sprite}
                     alt=""
-                    style={{
-                      height: '95%',
-                      width: 'auto',
-                      imageRendering: 'pixelated',
-                    }}
+                    draggable={false}
+                    style={{ height: '95%', width: 'auto', imageRendering: 'pixelated' }}
+                  />
+                ) : myOshiChar.sprite ? (
+                  <PixelAvatar
+                    sprite={myOshiChar.sprite}
+                    size={44}
+                    hairOverlay={myOshiChar.hairOverlay}
+                    hairTransform={myOshiChar.hairTransform}
                   />
                 ) : (
                   <div className="text-2xl">💖</div>
