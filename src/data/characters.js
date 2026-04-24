@@ -194,7 +194,7 @@ export const HAIRSTYLES = [
   { id: 'hair_long_full',     gender: 'girl', label: 'ロング',     overlay: '/sprites/hair_long_full.png',     defaultTransform: { x: 2, y:  -7, scale: 0.78 } },
   { id: 'hair_long_bangs',    gender: 'girl', label: 'ロングバング', overlay: '/sprites/hair_long_bangs.png',    defaultTransform: { x: 3, y: -10, scale: 0.74 } },
   { id: 'hair_medium_wavy',   gender: 'girl', label: 'ミディウェーブ', overlay: '/sprites/hair_medium_wavy.png',   defaultTransform: { x: 4, y:  -7, scale: 0.84 } },
-  { id: 'hair_shoulder_wavy', gender: 'girl', label: 'セミロング', overlay: '/sprites/hair_shoulder_wavy.png', defaultTransform: { x: 2, y: -11, scale: 0.70 } },
+  { id: 'hair_shoulder_wavy', gender: 'girl', label: 'セミロング', overlay: '/sprites/hair_shoulder_wavy.png', defaultTransform: { x: 2, y: -16, scale: 0.70 } },
   { id: 'hair_twin_bangs',    gender: 'girl', label: 'ツイン',     overlay: '/sprites/hair_twin_bangs.png',    defaultTransform: { x: 2, y:  -6, scale: 0.82 } },
   { id: 'hair_side_pony',     gender: 'girl', label: 'サイドまとめ', overlay: '/sprites/hair_side_pony.png',     defaultTransform: { x: 5, y: -13, scale: 0.70 } },
   { id: 'hair_half_braid',    gender: 'girl', label: 'ハーフブレイド', overlay: '/sprites/hair_half_braid.png',    defaultTransform: { x: 2, y: -10, scale: 0.76 } },
