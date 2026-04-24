@@ -110,8 +110,9 @@ export default function RoomEditor({
     <div className="max-w-md mx-auto px-4 py-3 pb-32">
       {/* 잠금 가구 터치 토스트 */}
       {lockedToast && (
-        <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-oshi-dark/90 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg pointer-events-none">
-          🔒 {lockedToast}
+        <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-oshi-dark/90 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg pointer-events-none inline-flex items-center gap-2">
+          <img src="/icons/lock.png" alt="" className="w-4 h-4 object-contain" style={{ imageRendering: 'pixelated' }} />
+          {lockedToast}
         </div>
       )}
       {/* 헤더 */}
@@ -354,7 +355,12 @@ export default function RoomEditor({
                   <div className={`text-[9px] text-center font-bold mt-0.5 truncate leading-tight ${
                     unlocked ? 'text-oshi-dark/80' : 'text-gray-400'
                   }`}>
-                    {unlocked ? f.label : `🔒 Lv.${requiredLv}`}
+                    {unlocked ? f.label : (
+                      <span className="inline-flex items-center gap-0.5">
+                        <img src="/icons/lock.png" alt="" className="w-2.5 h-2.5 object-contain" style={{ imageRendering: 'pixelated' }} />
+                        Lv.{requiredLv}
+                      </span>
+                    )}
                   </div>
                 </button>
               );

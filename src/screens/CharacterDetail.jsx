@@ -231,7 +231,10 @@ export default function CharacterDetail({
                       Lv.{d.unlockLevel}
                     </span>
                     {!unlocked && (
-                      <span className="text-[10px] text-gray-400">🔒 未解放</span>
+                      <span className="text-[10px] text-gray-400 inline-flex items-center gap-1">
+                        <img src="/icons/lock.png" alt="" className="w-3 h-3 object-contain" style={{ imageRendering: 'pixelated' }} />
+                        未解放
+                      </span>
                     )}
                   </div>
                   <div className={`text-sm ${unlocked ? 'text-oshi-dark' : 'text-gray-400 italic'}`}>

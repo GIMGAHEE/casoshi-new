@@ -288,9 +288,9 @@ export default function LiverDashboard({ liverId, onBack, onLogout }) {
         </button>
         <button
           onClick={() => setPwMode(true)}
-          className="bg-white rounded-2xl border-2 border-oshi-sub py-3 px-2 text-center active:scale-95 transition hover:border-oshi-main"
+          className="bg-white rounded-2xl border-2 border-oshi-sub py-3 px-2 text-center active:scale-95 transition hover:border-oshi-main flex flex-col items-center"
         >
-          <div className="text-xl mb-0.5">🔐</div>
+          <img src="/icons/lock.png" alt="" className="w-6 h-6 mb-0.5 object-contain" style={{ imageRendering: 'pixelated' }} />
           <div className="text-[11px] font-bold text-oshi-dark">パスワード</div>
         </button>
       </div>
