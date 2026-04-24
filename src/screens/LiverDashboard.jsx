@@ -265,7 +265,7 @@ export default function LiverDashboard({ liverId, onBack, onLogout }) {
           />
           <div className="relative flex flex-col items-center justify-center h-full p-3 text-center">
             <div className="w-14 h-14 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center border border-white/40 mb-2">
-              <div className="text-3xl">🏠</div>
+              <img src="/icons/home.png" alt="" className="w-9 h-9 object-contain" style={{ imageRendering: 'pixelated' }} />
             </div>
             <div className="text-white text-base font-black drop-shadow-sm">
               お部屋を飾る
@@ -281,9 +281,9 @@ export default function LiverDashboard({ liverId, onBack, onLogout }) {
       <div className="grid grid-cols-2 gap-2">
         <button
           onClick={() => setEditMode(true)}
-          className="bg-white rounded-2xl border-2 border-oshi-sub py-3 px-2 text-center active:scale-95 transition hover:border-oshi-main"
+          className="bg-white rounded-2xl border-2 border-oshi-sub py-3 px-2 text-center active:scale-95 transition hover:border-oshi-main flex flex-col items-center"
         >
-          <div className="text-xl mb-0.5">✏️</div>
+          <img src="/icons/note.png" alt="" className="w-6 h-6 mb-0.5 object-contain" style={{ imageRendering: 'pixelated' }} />
           <div className="text-[11px] font-bold text-oshi-dark">プロフィール</div>
         </button>
         <button
