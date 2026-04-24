@@ -88,7 +88,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-oshi-bg">
+    <div className="min-h-screen">
       {!hidePointsBar && <PointsBar points={points} onReset={handleReset} />}
 
       {screen.name === 'home' && (

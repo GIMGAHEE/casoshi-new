@@ -12,6 +12,21 @@
   }
   body {
     min-height: 100vh;
+    position: relative;
+  }
+  /* 고정 배경 — iOS 에서 fixed attachment 이슈를 피하려고 pseudo element 사용 */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 229, 236, 0.55), rgba(255, 229, 236, 0.70)),
+      url('/background.png');
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    z-index: -1;
+    image-rendering: pixelated;
   }
   button {
     -webkit-tap-highlight-color: transparent;
