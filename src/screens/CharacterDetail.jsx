@@ -2,6 +2,7 @@ import { useState } from 'react';
 import {
   calcLevel, calcExp,
   getUnlockedDialogues, findCharacter,
+  MY_OSHI_ID,
 } from '../data/characters';
 import { SUPPORT_COST } from '../data/gameRules';
 import { addLiverSupport } from '../auth/liverRepository';
@@ -47,11 +48,25 @@ export default function CharacterDetail({
     const nextSupport = supportPoints + SUPPORT_COST;
     const nextLevel = calcLevel(nextSupport);
 
+    // 라이버 응원 시 내 MyOshi 도 같이 EXP 획득 (앱 컨셉: ゲームで推しを育てる)
+    // → "내 오시랑 같이 라이버 응원 다니는" 느낌
+    const isLiverSupport = character.isLiver && myOshi;
+    const prevMyOshiSupport = supports[MY_OSHI_ID] || 0;
+    const nextMyOshiSupport = prevMyOshiSupport + SUPPORT_COST;
+    const myOshiLeveledUp =
+      isLiverSupport && calcLevel(nextMyOshiSupport) > calcLevel(prevMyOshiSupport);
+
     setPoints(p => p - SUPPORT_COST);
-    setSupports(s => ({
-      ...s,
-      [character.id]: (s[character.id] || 0) + SUPPORT_COST,
-    }));
+    setSupports(s => {
+      const next = {
+        ...s,
+        [character.id]: (s[character.id] || 0) + SUPPORT_COST,
+      };
+      if (isLiverSupport) {
+        next[MY_OSHI_ID] = (s[MY_OSHI_ID] || 0) + SUPPORT_COST;
+      }
+      return next;
+    });
 
     // 라이버면 라이버 stats 도 동기화 (라이버 대시보드에 반영되도록)
     if (character.isLiver && character.liverId) {
@@ -59,8 +74,21 @@ export default function CharacterDetail({
     }
 
     if (nextLevel > prevLevel) {
-      // 레벨업! 모달 띄우기
+      // 응원한 라이버가 레벨업!
       setLevelUpTo(nextLevel);
+    } else if (myOshiLeveledUp) {
+      // 라이버는 그대로지만 내 MyOshi 가 레벨업
+      setFeedback({
+        type: 'ok',
+        text: `+${SUPPORT_COST} 応援！ マイ推しもレベルアップ🎉`,
+      });
+      setTimeout(() => setFeedback(null), 1500);
+    } else if (isLiverSupport) {
+      setFeedback({
+        type: 'ok',
+        text: `+${SUPPORT_COST} 応援！ マイ推しも +${SUPPORT_COST} EXP`,
+      });
+      setTimeout(() => setFeedback(null), 1200);
     } else {
       setFeedback({ type: 'ok', text: `+${SUPPORT_COST} 応援！` });
       setTimeout(() => setFeedback(null), 800);
@@ -237,6 +265,12 @@ export default function CharacterDetail({
               />
               応援する（-{SUPPORT_COST} ポイント）
             </button>
+
+            {myOshi && !feedback && (
+              <div className="mt-2 text-center text-[10px] text-oshi-main/70">
+                ✨ 応援するとマイ推しも +{SUPPORT_COST} EXP
+              </div>
+            )}
 
             {feedback && (
               <div
