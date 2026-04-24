@@ -255,7 +255,7 @@ const GENERIC_DIALOGUES = [
 // myOshi(로컬스토리지 저장 데이터)를 표준 캐릭터 객체로 변환
 // 신형: { name, presetId }
 // 구형(마이그레이션): { name, parts, colors } — presetId 없으면 기본 프리셋 사용
-export const asCharacter = (myOshi) => {
+export const asCharacter = (myOshi, opts = {}) => {
   if (!myOshi) return null;
   const preset =
     MY_OSHI_PRESETS.find(p => p.id === myOshi.presetId) ||
@@ -265,9 +265,10 @@ export const asCharacter = (myOshi) => {
     HAIRSTYLES.find(h => h.id === myOshi.hairstyleId) ||
     HAIRSTYLES.find(h => h.id === DEFAULT_HAIRSTYLE_ID);
 
+  const isOwn = !opts.id; // id override 가 없으면 본인 MyOshi
   return {
-    id: MY_OSHI_ID,
-    creatorId: 'user_self',
+    id: opts.id || MY_OSHI_ID,
+    creatorId: opts.creatorId || 'user_self',
     name: myOshi.name,
     nameRomaji: '',
     type: 'マイ推し',
@@ -280,14 +281,20 @@ export const asCharacter = (myOshi) => {
     spriteSize: preset.hairBaked ? 39 : 90,
     hairOverlay: preset.hairBaked ? null : hairstyle.overlay,
     hairTransform: preset.hairBaked ? null : computeHairTransform(myOshi.hairstyleId, myOshi.hairOffset),
-    catchphrase: 'あなたが作った、あなただけの推し。',
-    bio: `${myOshi.name}は、あなただけのために生まれた推しです。一緒に育てていこう！`,
+    catchphrase: isOwn
+      ? 'あなたが作った、あなただけの推し。'
+      : '誰かが作った推しキャラ。',
+    bio: isOwn
+      ? `${myOshi.name}は、あなただけのために生まれた推しです。一緒に育てていこう！`
+      : `${myOshi.name}は、他のユーザーが作った推しキャラです。`,
     dialogues: GENERIC_DIALOGUES.map(d => ({
       ...d,
       text: d.text.replace('{name}', myOshi.name),
     })),
-    isMyOshi: true,
+    isMyOshi: isOwn,
+    isOtherUserOshi: !isOwn,
     presetId: preset.id,
+    updatedAt: opts.updatedAt || null,
   };
 };
 

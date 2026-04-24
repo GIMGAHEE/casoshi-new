@@ -3,6 +3,8 @@ import {
   asCharacter, asLiverCharacter, calcLevel, SEED_CHARACTERS,
 } from '../data/characters';
 import { useLivers } from '../hooks/useLivers';
+import { useMyOshis } from '../hooks/useMyOshis';
+import { getUserId } from '../auth/userIdentity';
 import PixelAvatar from '../components/PixelAvatar';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
@@ -44,6 +46,8 @@ function Avatar({ character, size }) {
 
 export default function Ranking({ myOshi, supports, onBack, onSelectCharacter }) {
   const livers = useLivers();
+  const allMyOshis = useMyOshis();
+  const myUserId = getUserId();
   const [tab, setTab] = useState('liver'); // 'liver' | 'character'
 
   // 라이버 랭킹 — Firestore 에 쌓인 전체 유저 누적 pt (stats.totalSupport) 기준.
@@ -54,14 +58,30 @@ export default function Ranking({ myOshi, supports, onBack, onSelectCharacter })
     .map(c => ({ ...c, supportPoints: c.stats?.totalSupport || 0 }))
     .sort((a, b) => b.supportPoints - a.supportPoints);
 
-  // 캐릭터 랭킹 (MyOshi + 시드)
+  // 캐릭터 랭킹 — 본인 MyOshi + 다른 유저 MyOshi (Firestore) + 시드 캐릭터.
+  // 정렬: 최근 업데이트순 (응원 기능이 라이버 전용이라 활동성 기반).
   const myOshiChar = asCharacter(myOshi);
+  const otherOshis = allMyOshis
+    .filter(m => m.userId !== myUserId && m.oshi)
+    .map(m => asCharacter(m.oshi, {
+      id: `myoshi_${m.userId}`,
+      creatorId: m.userId,
+      updatedAt: m.meta?.updatedAt || null,
+    }))
+    .filter(Boolean);
+
   const characterRanked = [
     ...(myOshiChar ? [myOshiChar] : []),
+    ...otherOshis,
     ...SEED_CHARACTERS,
   ]
     .map(c => ({ ...c, supportPoints: supports[c.id] || 0 }))
-    .sort((a, b) => b.supportPoints - a.supportPoints);
+    .sort((a, b) => {
+      // 본인 / 다른 유저 MyOshi 는 updatedAt 내림차순, 없으면 뒤로
+      const aT = a.updatedAt?.seconds || (a.isMyOshi ? Date.now() / 1000 : 0);
+      const bT = b.updatedAt?.seconds || (b.isMyOshi ? Date.now() / 1000 : 0);
+      return bT - aT;
+    });
 
   const ranked = tab === 'liver' ? liverRanked : characterRanked;
   const top = ranked[0] || null;
@@ -173,7 +193,13 @@ export default function Ranking({ myOshi, supports, onBack, onSelectCharacter })
               return (
                 <button
                   key={c.id}
-                  onClick={() => onSelectCharacter(c.id)}
+                  onClick={() => {
+                    if (c.isOtherUserOshi) {
+                      alert(`${c.name}\n他のユーザーが作った推しキャラです 👀`);
+                      return;
+                    }
+                    onSelectCharacter(c.id);
+                  }}
                   className="w-full card text-left flex items-center gap-3 active:scale-[0.98] transition-transform"
                   style={{ padding: '12px' }}
                 >
@@ -206,6 +232,9 @@ export default function Ranking({ myOshi, supports, onBack, onSelectCharacter })
                       )}
                       {c.isMyOshi && (
                         <span className="text-[9px] font-black bg-yellow-400 text-white px-1.5 rounded-full">MY</span>
+                      )}
+                      {c.isOtherUserOshi && (
+                        <span className="text-[9px] font-black bg-purple-400 text-white px-1.5 rounded-full">USER</span>
                       )}
                     </div>
                     <div className="h-2 bg-oshi-bg rounded-full overflow-hidden mt-1">

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useLivers } from './hooks/useLivers';
 import PointsBar from './components/PointsBar';
@@ -16,6 +16,8 @@ import AdminDashboard from './screens/AdminDashboard';
 import LiverLogin from './screens/LiverLogin';
 import LiverDashboard from './screens/LiverDashboard';
 import { getSession } from './auth/session';
+import { getUserId } from './auth/userIdentity';
+import { saveMyOshi as saveMyOshiRemote } from './data/myOshiRepository';
 
 export default function App() {
   const [points, setPoints] = useLocalStorage('casoshi:points', 0);
@@ -27,6 +29,15 @@ export default function App() {
 
   // Firestore 라이버 실시간 구독 (RoomEditor 의 character 결정에 필요)
   const livers = useLivers();
+
+  // MyOshi 가 변할 때마다 Firestore 에도 sync (랭킹에서 다른 유저들이 볼 수 있게)
+  useEffect(() => {
+    if (myOshi) {
+      saveMyOshiRemote(getUserId(), myOshi).catch(err => {
+        console.warn('[myOshi sync] failed', err);
+      });
+    }
+  }, [myOshi]);
 
   // 라이버 세션 (null 또는 { liverId, username, ... })
   const [liverSession, setLiverSession] = useState(() => {

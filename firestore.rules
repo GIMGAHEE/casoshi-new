@@ -31,6 +31,16 @@ service cloud.firestore {
       allow write: if true;
     }
 
+    // MyOshi (유저 추시 캐릭터) 컬렉션
+    //   - 모든 유저의 MyOshi 가 랭킹에 표시되므로 읽기는 공개
+    //   - 익명 userId (localStorage) 로 구분되는 단계
+    //   - Phase 3b 에서 Firebase Auth uid 로 전환하면
+    //     allow write: if request.auth.uid == userId;
+    match /casoshi_myoshi/{userId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
     // 다른 컬렉션은 기본 차단
     match /{document=**} {
       allow read, write: if false;
