@@ -4,6 +4,7 @@ import {
   DOLL_POOL, RARITY_INFO, CRANE_COST, CRANE_FREE_INTERVAL_MS,
   calcSuccessProb, rollRarity, rollDoll,
 } from '../data/crane';
+import { sfx, setSoundEnabled } from '../utils/sound';
 
 // 기계 이미지 에셋 (public/crane/)
 const MACHINE_IMG = '/crane/machine.png';
@@ -42,6 +43,10 @@ export default function CraneGame({ points, setPoints, onBack }) {
   const [lastResult, setLastResult] = useState(null); // {doll, reward, success}
   const [lastFreeAt, setLastFreeAt] = useLocalStorage('casoshi:craneFreeAt', 0);
   const [history, setHistory] = useLocalStorage('casoshi:craneHistory', []);
+  const [soundOn, setSoundOn] = useLocalStorage('casoshi:craneSound', true);
+
+  // soundOn 변경을 sound util에 동기화
+  useEffect(() => { setSoundEnabled(soundOn); }, [soundOn]);
 
   const animationRef = useRef(null);
   const boardRef = useRef(null);
@@ -119,6 +124,7 @@ export default function CraneGame({ points, setPoints, onBack }) {
       if (points < CRANE_COST) return;
       setPoints(p => p - CRANE_COST);
     }
+    sfx.coin();
     setGrabbedDoll(null);
     setLastResult(null);
     setCraneDropY(0);
@@ -130,6 +136,8 @@ export default function CraneGame({ points, setPoints, onBack }) {
   const stopAndGrab = () => {
     if (state !== 'moving') return;
     cancelAnimationFrame(animationRef.current);
+    sfx.click();
+    sfx.whir();
     setState('dropping');
 
     // 크레인 내려가기 애니메이션 (1초)
@@ -187,12 +195,16 @@ export default function CraneGame({ points, setPoints, onBack }) {
       const confettiCount = { N: 20, R: 28, SR: 40, SSR: 55 }[closest.rarity] || 24;
       spawnConfetti(closest.x, 70, confettiCount, closest.rarity);
 
+      // 효과음
+      sfx.success();
+
       // 이력 저장
       setHistory(h => [
         { ts: Date.now(), doll: closest, success: true, reward },
         ...h.slice(0, 49),
       ]);
     } else {
+      sfx.miss();
       setLastResult({ doll: closest, reward: 0, success: false });
       setHistory(h => [
         { ts: Date.now(), doll: closest, success: false, reward: 0 },
@@ -218,12 +230,22 @@ export default function CraneGame({ points, setPoints, onBack }) {
 
   return (
     <div className="max-w-md mx-auto px-4 py-3 min-h-[calc(100vh-64px)] flex flex-col">
-      <button
-        onClick={onBack}
-        className="text-sm text-oshi-dark/70 hover:text-oshi-dark self-start mb-2"
-      >
-        ← 戻る
-      </button>
+      <div className="flex items-center justify-between mb-2">
+        <button
+          onClick={onBack}
+          className="text-sm text-oshi-dark/70 hover:text-oshi-dark"
+        >
+          ← 戻る
+        </button>
+        <button
+          onClick={() => setSoundOn(v => !v)}
+          aria-label={soundOn ? 'サウンドをオフ' : 'サウンドをオン'}
+          className="w-8 h-8 rounded-full bg-white/70 border border-oshi-sub/50 flex items-center justify-center text-base active:scale-95 transition-transform"
+          title={soundOn ? 'サウンド ON' : 'サウンド OFF'}
+        >
+          {soundOn ? '🔊' : '🔇'}
+        </button>
+      </div>
 
       <h2 className="text-lg font-black text-oshi-dark text-center mb-2">
         🪝 クレーンゲーム
