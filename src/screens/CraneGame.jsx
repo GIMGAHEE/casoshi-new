@@ -429,7 +429,8 @@ export default function CraneGame({ points, setPoints, onBack }) {
             }}
           />
 
-          {/* 집게 이미지 (clawPhase에 따라 open/closed 전환) */}
+          {/* 집게 이미지 (clawPhase에 따라 open/closed 전환)
+              - 높이 고정, 너비 auto: open/closed 이미지 종횡비가 달라도 body 크기 일정 */}
           <img
             src={clawPhase === 'closed' ? CLAW_CLOSED : CLAW_OPEN}
             alt=""
@@ -438,7 +439,8 @@ export default function CraneGame({ points, setPoints, onBack }) {
               left: `${cranePos}%`,
               top: `calc(${RAIL_TOP_PCT + CLAW_IDLE_OFFSET}% + ${craneDropY * DROP_MAX_PCT}%)`,
               transform: 'translateX(-50%)',
-              width: 46,
+              height: 52,
+              width: 'auto',
               imageRendering: 'pixelated',
               zIndex: 5,
             }}
