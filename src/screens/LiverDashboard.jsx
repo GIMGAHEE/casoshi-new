@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { getLiverById, updateLiver, changeLiverPassword } from '../auth/liverRepository';
+import { updateLiver, changeLiverPassword } from '../auth/liverRepository';
+import { useLivers } from '../hooks/useLivers';
 import { logout } from '../auth/session';
 
 export default function LiverDashboard({ liverId, onBack, onLogout }) {
-  const [liver, setLiver] = useState(() => getLiverById(liverId));
+  const livers = useLivers();
+  const liver = livers.find(l => l.id === liverId) || null;
   const [editMode, setEditMode] = useState(false);
   const [pwMode, setPwMode] = useState(false);
 
@@ -31,8 +33,8 @@ export default function LiverDashboard({ liverId, onBack, onLogout }) {
       <EditProfileForm
         liver={liver}
         onCancel={() => setEditMode(false)}
-        onSaved={(updated) => {
-          setLiver(updated);
+        onSaved={() => {
+          // Firestore onSnapshot 이 자동으로 liver 를 업데이트함
           setEditMode(false);
         }}
       />
@@ -152,12 +154,17 @@ function EditProfileForm({ liver, onCancel, onSaved }) {
   const [form, setForm] = useState({ ...liver.profile });
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const updated = updateLiver(liver.id, { profile: form });
-    setLoading(false);
-    if (updated) onSaved(updated);
+    try {
+      const updated = await updateLiver(liver.id, { profile: form });
+      setLoading(false);
+      if (updated) onSaved(updated);
+    } catch (err) {
+      setLoading(false);
+      alert('保存に失敗しました: ' + err.message);
+    }
   };
 
   return (

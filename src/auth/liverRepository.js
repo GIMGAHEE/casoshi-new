@@ -1,59 +1,115 @@
-// 등록된 라이버 저장소 (localStorage)
+// 등록된 라이버 저장소 (Firestore)
 //
-// 추후 백엔드 연동 시 여기만 API 호출로 교체하면 됨.
+// 구조:
+//   - module-level cache: sync readers 용 (listLivers, getLiverById, ...)
+//   - onSnapshot 으로 Firestore 에서 실시간 구독 → cache 자동 업데이트
+//   - useSyncExternalStore 용 subscribe() 제공 → React 와 연결됨
+//   - writes 는 async Firestore 호출
+//
+// 기존 인터페이스 호환:
+//   - listLivers(), getLiverById(), getLiverByUsername() 는 여전히 sync (cache 반환)
+//   - registerLiver, updateLiver, deleteLiver, addLiverSupport, changeLiverPassword 는 async
+//
+// cache 초기 로딩 전에 호출되는 경우에 대비한 async 버전:
+//   - fetchLiverByUsername(u) — Firestore 직접 조회 (로그인 시 사용)
 
+import {
+  collection, doc, setDoc, updateDoc, deleteDoc,
+  getDocs, query, where, onSnapshot,
+} from 'firebase/firestore';
+import { db } from '../firebase/config';
 import { hashPassword } from './hash';
 import { generateTempPassword, generateLiverUsername } from './passwordGen';
 
-const STORAGE_KEY = 'casoshi:livers';
+const COL = 'casoshi_livers';
 
-function readAll() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
+// ============ module cache ============
+let cache = [];
+let initialized = false;
+const subscribers = new Set();
+
+function notify() {
+  for (const cb of subscribers) {
+    try { cb(); } catch (e) { console.error(e); }
   }
 }
 
-function writeAll(livers) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(livers));
+/**
+ * 앱 로드 시 1회 호출 — Firestore 실시간 구독 시작.
+ * main.jsx 에서 호출합니다.
+ */
+export function initLiverSubscription() {
+  if (initialized) return;
+  initialized = true;
+
+  onSnapshot(
+    collection(db, COL),
+    (snap) => {
+      cache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      notify();
+    },
+    (err) => {
+      console.error('[liverRepo] onSnapshot error:', err);
+    }
+  );
 }
 
-// 전체 조회
+/**
+ * useSyncExternalStore 에서 사용.
+ */
+export function subscribeLivers(cb) {
+  subscribers.add(cb);
+  return () => subscribers.delete(cb);
+}
+
+// ============ Sync readers (cache) ============
 export function listLivers() {
-  return readAll();
+  return cache;
 }
 
-// 단건 조회 (id 로)
 export function getLiverById(id) {
-  return readAll().find(l => l.id === id) || null;
+  return cache.find(l => l.id === id) || null;
 }
 
-// username 으로 조회 (로그인용)
 export function getLiverByUsername(username) {
-  return readAll().find(l => l.username === username) || null;
+  return cache.find(l => l.username === username) || null;
 }
 
-// 신규 등록 — 운영자가 호출
-// input: { name, bio, casLiveHandle, streamSchedule, gender, themeColor, bgColor }
-// returns: { liver, tempPassword }   // tempPassword를 운영자가 라이버에게 전달
+// ============ Async fetchers (Firestore 직접) ============
+/** 로그인 시 cache 가 비어있을 수 있으므로 직접 조회 */
+export async function fetchLiverByUsername(username) {
+  const q = query(collection(db, COL), where('username', '==', username));
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+  const d = snap.docs[0];
+  return { id: d.id, ...d.data() };
+}
+
+// ============ Writes (async) ============
+
+/**
+ * 신규 등록 — 운영자가 호출
+ * input: { name, bio, casLiveHandle, streamSchedule, gender, themeColor, bgColor }
+ * returns: { liver, tempPassword }
+ */
 export async function registerLiver(profile) {
-  const livers = readAll();
-  const id = `liver_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+  // username 고유성 검사 — cache 기준
+  const existing = cache;
   let username = generateLiverUsername(profile.name);
-  // username 중복 방지
-  while (livers.some(l => l.username === username)) {
+  let tries = 0;
+  while (tries < 20 && existing.some(l => l.username === username)) {
     username = generateLiverUsername(profile.name);
+    tries += 1;
   }
+
   const tempPassword = generateTempPassword();
   const passwordHash = await hashPassword(tempPassword);
 
-  const liver = {
-    id,
+  const id = `liver_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+  const liverDoc = {
     username,
     passwordHash,
-    mustChangePassword: true,    // 첫 로그인 시 강제 변경 플래그
+    mustChangePassword: true,
     profile: {
       name: profile.name,
       bio: profile.bio || '',
@@ -72,57 +128,58 @@ export async function registerLiver(profile) {
     updatedAt: new Date().toISOString(),
   };
 
-  livers.push(liver);
-  writeAll(livers);
-  return { liver, tempPassword };
+  await setDoc(doc(db, COL, id), liverDoc);
+  return { liver: { id, ...liverDoc }, tempPassword };
 }
 
-// 업데이트 (운영자 또는 본인)
-export function updateLiver(id, patch) {
-  const livers = readAll();
-  const idx = livers.findIndex(l => l.id === id);
-  if (idx === -1) return null;
-  livers[idx] = {
-    ...livers[idx],
+/**
+ * 업데이트 (운영자 또는 본인)
+ * patch 는 top-level 키 또는 { profile: {...} }
+ */
+export async function updateLiver(id, patch) {
+  const current = getLiverById(id);
+  if (!current) return null;
+
+  const updated = {
+    ...current,
     ...patch,
-    profile: { ...livers[idx].profile, ...(patch.profile || {}) },
+    profile: { ...current.profile, ...(patch.profile || {}) },
     updatedAt: new Date().toISOString(),
   };
-  writeAll(livers);
-  return livers[idx];
+  const { id: _omit, ...payload } = updated;
+  await setDoc(doc(db, COL, id), payload);
+  return updated;
 }
 
-// 비밀번호 변경 (본인이 호출)
+/** 비밀번호 변경 (본인) */
 export async function changeLiverPassword(id, newPassword) {
-  const livers = readAll();
-  const idx = livers.findIndex(l => l.id === id);
-  if (idx === -1) return false;
-  livers[idx].passwordHash = await hashPassword(newPassword);
-  livers[idx].mustChangePassword = false;
-  livers[idx].updatedAt = new Date().toISOString();
-  writeAll(livers);
+  const passwordHash = await hashPassword(newPassword);
+  await updateDoc(doc(db, COL, id), {
+    passwordHash,
+    mustChangePassword: false,
+    updatedAt: new Date().toISOString(),
+  });
   return true;
 }
 
-// 삭제 (운영자)
-export function deleteLiver(id) {
-  const livers = readAll().filter(l => l.id !== id);
-  writeAll(livers);
+/** 삭제 (운영자) */
+export async function deleteLiver(id) {
+  await deleteDoc(doc(db, COL, id));
 }
 
-// 응원 포인트 누적 (팬이 응원 시 호출)
-export function addLiverSupport(liverId, points) {
-  const livers = readAll();
-  const idx = livers.findIndex(l => l.id === liverId);
-  if (idx === -1) return false;
-  const liver = livers[idx];
-  const prevTotal = liver.stats?.totalSupport || 0;
-  liver.stats = {
-    ...liver.stats,
-    totalSupport: prevTotal + points,
-    supporterCount: liver.stats?.supporterCount || 0,
-  };
-  liver.updatedAt = new Date().toISOString();
-  writeAll(livers);
+/**
+ * 응원 포인트 누적 (팬이 응원 시 호출)
+ * 동시 쓰기 시 lost-update 가능성이 있지만 CasOshi 초기 단계에선 허용.
+ * 이후 FieldValue.increment 로 교체 가능.
+ */
+export async function addLiverSupport(liverId, points) {
+  const current = getLiverById(liverId);
+  if (!current) return false;
+  const prev = current.stats?.totalSupport || 0;
+  await updateDoc(doc(db, COL, liverId), {
+    'stats.totalSupport': prev + points,
+    'stats.supporterCount': current.stats?.supporterCount || 0,
+    updatedAt: new Date().toISOString(),
+  });
   return true;
 }

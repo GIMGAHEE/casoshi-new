@@ -7,7 +7,7 @@
 
 import { ADMIN_USERNAME, ADMIN_PASSWORD_HASH } from './adminConfig';
 import { verifyPassword } from './hash';
-import { getLiverByUsername } from './liverRepository';
+import { fetchLiverByUsername } from './liverRepository';
 
 const SESSION_KEY = 'casoshi:session';
 const SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24시간
@@ -52,7 +52,7 @@ export async function loginAdmin(username, password) {
 
 // 라이버 로그인
 export async function loginLiver(username, password) {
-  const liver = getLiverByUsername(username);
+  const liver = await fetchLiverByUsername(username);
   if (!liver) return { ok: false, error: 'ID가 일치하지 않습니다' };
   const ok = await verifyPassword(password, liver.passwordHash);
   if (!ok) return { ok: false, error: '비밀번호가 일치하지 않습니다' };

@@ -1,23 +1,22 @@
 import { useState } from 'react';
-import { listLivers, registerLiver, deleteLiver } from '../auth/liverRepository';
+import { registerLiver, deleteLiver } from '../auth/liverRepository';
+import { useLivers } from '../hooks/useLivers';
 import { logout } from '../auth/session';
 
 export default function AdminDashboard({ onLogout }) {
-  const [livers, setLivers] = useState(() => listLivers());
+  const livers = useLivers();
   const [mode, setMode] = useState('list'); // 'list' | 'register' | 'credentials'
   const [issuedCreds, setIssuedCreds] = useState(null);
-
-  const refresh = () => setLivers(listLivers());
 
   const handleLogout = () => {
     logout();
     onLogout();
   };
 
-  const handleDelete = (liver) => {
+  const handleDelete = async (liver) => {
     if (!window.confirm(`「${liver.profile.name}」を削除しますか？\nこの操作は取り消せません。`)) return;
-    deleteLiver(liver.id);
-    refresh();
+    await deleteLiver(liver.id);
+    // Firestore onSnapshot 이 자동으로 리스트를 업데이트함 — refresh 불필요
   };
 
   if (mode === 'register') {
@@ -25,7 +24,6 @@ export default function AdminDashboard({ onLogout }) {
       <RegisterLiverForm
         onCancel={() => setMode('list')}
         onRegistered={(result) => {
-          refresh();
           setIssuedCreds(result);
           setMode('credentials');
         }}

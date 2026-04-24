@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useLocalStorage } from './hooks/useLocalStorage';
+import { useLivers } from './hooks/useLivers';
 import PointsBar from './components/PointsBar';
 import Home from './screens/Home';
 import CharacterDetail from './screens/CharacterDetail';
@@ -23,6 +24,9 @@ export default function App() {
   const [myOshi, setMyOshi] = useLocalStorage('casoshi:myOshi', null);
   // rooms: { [characterId]: { items: [...] } }
   const [rooms, setRooms] = useLocalStorage('casoshi:rooms', {});
+
+  // Firestore 라이버 실시간 구독 (RoomEditor 의 character 결정에 필요)
+  const livers = useLivers();
 
   // 라이버 세션 (null 또는 { liverId, username, ... })
   const [liverSession, setLiverSession] = useState(() => {
@@ -156,7 +160,7 @@ export default function App() {
 
       {screen.name === 'roomEditor' && (
         <RoomEditor
-          character={findCharacterForRoom(screen.params.id, myOshi)}
+          character={findCharacterForRoom(screen.params.id, myOshi, livers)}
           initialRoom={rooms[screen.params.id]}
           supportPoints={supports[screen.params.id] || 0}
           onSave={(roomData) => handleSaveRoom(screen.params.id, roomData)}
@@ -211,7 +215,6 @@ export default function App() {
 
 // RoomEditor에 character 정보 넘기는 헬퍼 (배경 결정용)
 import { findCharacter } from './data/characters';
-import { listLivers } from './auth/liverRepository';
-function findCharacterForRoom(id, myOshi) {
-  return findCharacter(myOshi, id, listLivers());
+function findCharacterForRoom(id, myOshi, livers) {
+  return findCharacter(myOshi, id, livers);
 }

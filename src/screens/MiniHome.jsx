@@ -1,5 +1,5 @@
 import { findCharacter, calcLevel } from '../data/characters';
-import { listLivers } from '../auth/liverRepository';
+import { useLivers } from '../hooks/useLivers';
 import { findFurniture } from '../data/furniture';
 import IsometricRoom from '../components/IsometricRoom';
 import PixelAvatar from '../components/PixelAvatar';
@@ -8,7 +8,8 @@ export default function MiniHome({
   characterId, myOshi, supports, room,
   onBack, onOpenDetail, onEditRoom,
 }) {
-  const character = findCharacter(myOshi, characterId, listLivers());
+  const livers = useLivers();
+  const character = findCharacter(myOshi, characterId, livers);
   if (!character) {
     return (
       <div className="max-w-md mx-auto px-4 py-8">

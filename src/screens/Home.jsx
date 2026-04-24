@@ -1,6 +1,6 @@
 import { SEED_CHARACTERS, asCharacter, asLiverCharacter, MY_OSHI_ID, MY_OSHI_PRESETS } from '../data/characters';
 import { todayKey, DAILY_BONUS } from '../data/gameRules';
-import { listLivers } from '../auth/liverRepository';
+import { useLivers } from '../hooks/useLivers';
 import CharacterCard from '../components/CharacterCard';
 import PixelAvatar from '../components/PixelAvatar';
 
@@ -17,7 +17,7 @@ export default function Home({
   const myOshiChar = asCharacter(myOshi);
 
   // 운영자가 등록한 라이버들 (로그인한 라이버 본인은 제외)
-  const allLivers = listLivers();
+  const allLivers = useLivers();
   const selfLiver = liverSession ? allLivers.find(l => l.id === liverSession.liverId) : null;
   const registeredLivers = allLivers
     .filter(l => !liverSession || l.id !== liverSession.liverId)

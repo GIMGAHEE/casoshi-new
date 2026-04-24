@@ -4,7 +4,8 @@ import {
   getUnlockedDialogues, findCharacter,
 } from '../data/characters';
 import { SUPPORT_COST } from '../data/gameRules';
-import { listLivers, addLiverSupport } from '../auth/liverRepository';
+import { addLiverSupport } from '../auth/liverRepository';
+import { useLivers } from '../hooks/useLivers';
 import LevelUpModal from '../components/LevelUpModal';
 import PixelAvatar from '../components/PixelAvatar';
 
@@ -15,7 +16,8 @@ export default function CharacterDetail({
   supports, setSupports,
   onBack, onEditMyOshi, onOpenMiniHome,
 }) {
-  const character = findCharacter(myOshi, characterId, listLivers());
+  const livers = useLivers();
+  const character = findCharacter(myOshi, characterId, livers);
   const [feedback, setFeedback] = useState(null);
   const [levelUpTo, setLevelUpTo] = useState(null);
 
