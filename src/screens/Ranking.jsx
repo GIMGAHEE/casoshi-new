@@ -58,8 +58,9 @@ export default function Ranking({ myOshi, supports, onBack, onSelectCharacter })
     .map(c => ({ ...c, supportPoints: c.stats?.totalSupport || 0 }))
     .sort((a, b) => b.supportPoints - a.supportPoints);
 
-  // 캐릭터 랭킹 — 본인 MyOshi + 다른 유저 MyOshi (Firestore) + 시드 캐릭터.
+  // 캐릭터 랭킹 — 본인 MyOshi + 다른 유저 MyOshi (Firestore).
   // 정렬: 최근 업데이트순 (응원 기능이 라이버 전용이라 활동성 기반).
+  // 시드 캐릭터는 비공개 상태 (데모용이었음).
   const myOshiChar = asCharacter(myOshi);
   const otherOshis = allMyOshis
     .filter(m => m.userId !== myUserId && m.oshi)
@@ -73,7 +74,6 @@ export default function Ranking({ myOshi, supports, onBack, onSelectCharacter })
   const characterRanked = [
     ...(myOshiChar ? [myOshiChar] : []),
     ...otherOshis,
-    ...SEED_CHARACTERS,
   ]
     .map(c => ({ ...c, supportPoints: supports[c.id] || 0 }))
     .sort((a, b) => {

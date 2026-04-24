@@ -214,7 +214,7 @@ export default function Home({
         )}
       </section>
 
-      {/* 시드 캐릭터 (샘플) */}
+      {/* 시드 캐릭터 (샘플) — 비공개. 나중에 콜라보/피처드 용도로 부활 가능.
       <section>
         <div className="flex items-center justify-between mb-3 px-1">
           <h2 className="text-lg font-black text-oshi-dark">サンプル推し</h2>
@@ -231,6 +231,7 @@ export default function Home({
           ))}
         </div>
       </section>
+      */}
 
       <div className="text-center text-[10px] text-oshi-dark/40 pt-4 pb-8 space-y-1.5">
         {!liverSession && (
