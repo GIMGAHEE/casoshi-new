@@ -71,6 +71,7 @@ export default function App() {
     'builder', 'roomEditor',
     'tapGame', 'craneGame', 'rhythmGame',
     'myOshiProfileEditor', 'liverProfileEditor',
+    'character',
   ].includes(screen.name);
 
   // 현재 화면으로부터 활성 탭 결정
