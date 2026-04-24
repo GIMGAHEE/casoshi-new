@@ -150,13 +150,15 @@ export default function Ranking({ myOshi, supports, onBack, onSelectCharacter })
                 Lv.{calcLevel(top.supportPoints)} · 応援 {top.supportPoints} pt
               </div>
 
-              <button
-                onClick={() => onSelectCharacter(top.id)}
-                className="btn-primary inline-block"
-                style={{ backgroundColor: top.themeColor }}
-              >
-                もっと応援する
-              </button>
+              {tab === 'liver' && (
+                <button
+                  onClick={() => onSelectCharacter(top.id)}
+                  className="btn-primary inline-block"
+                  style={{ backgroundColor: top.themeColor }}
+                >
+                  もっと応援する
+                </button>
+              )}
             </section>
           )}
 
