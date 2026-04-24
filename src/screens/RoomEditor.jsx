@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { FURNITURE_CATALOG, findFurniture, createRoomItem } from '../data/furniture';
+import { FURNITURE_CATALOG, FURNITURE_CATEGORIES, findFurniture, createRoomItem } from '../data/furniture';
 import IsometricRoom from '../components/IsometricRoom';
 import PixelAvatar from '../components/PixelAvatar';
 
@@ -22,6 +22,7 @@ export default function RoomEditor({
   );
   const [selectedId, setSelectedId] = useState(null);
   const [showCatalog, setShowCatalog] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('all');
 
   const roomRef = useRef(null);
   const dragStateRef = useRef(null);
@@ -272,8 +273,30 @@ export default function RoomEditor({
           <div className="text-xs font-bold text-oshi-dark/60 mb-2">
             家具をえらぶ
           </div>
+          {/* 카테고리 탭 */}
+          <div className="flex gap-1 mb-2 overflow-x-auto no-scrollbar">
+            {FURNITURE_CATEGORIES.map(cat => {
+              const active = activeCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold transition whitespace-nowrap ${
+                    active
+                      ? 'bg-oshi-main text-white'
+                      : 'bg-oshi-bg/60 text-oshi-dark/70 hover:bg-oshi-bg'
+                  }`}
+                >
+                  <span className="mr-0.5">{cat.emoji}</span>
+                  {cat.label}
+                </button>
+              );
+            })}
+          </div>
           <div className="grid grid-cols-6 gap-1.5">
-            {FURNITURE_CATALOG.map(f => (
+            {FURNITURE_CATALOG
+              .filter(f => activeCategory === 'all' || f.category === activeCategory)
+              .map(f => (
               <button
                 key={f.id}
                 onClick={() => addFurniture(f.id)}
