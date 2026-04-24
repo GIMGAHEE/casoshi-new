@@ -2,12 +2,18 @@ import { useState } from 'react';
 import { updateLiver, changeLiverPassword } from '../auth/liverRepository';
 import { useLivers } from '../hooks/useLivers';
 import { logout } from '../auth/session';
+import MyOshiBuilder from './MyOshiBuilder';
+import RoomEditor from './RoomEditor';
+import { asLiverCharacter } from '../data/characters';
+import PixelAvatar from '../components/PixelAvatar';
 
 export default function LiverDashboard({ liverId, onBack, onLogout }) {
   const livers = useLivers();
   const liver = livers.find(l => l.id === liverId) || null;
   const [editMode, setEditMode] = useState(false);
   const [pwMode, setPwMode] = useState(false);
+  const [builderMode, setBuilderMode] = useState(false);
+  const [roomMode, setRoomMode] = useState(false);
 
   if (!liver) {
     return (
@@ -51,6 +57,53 @@ export default function LiverDashboard({ liverId, onBack, onLogout }) {
     );
   }
 
+  // 자기 꾸미기 모드 — MyOshiBuilder 재활용
+  if (builderMode) {
+    const initial = {
+      name: liver.profile.name,  // 표시만, 저장 안 함
+      presetId: liver.appearance?.presetId,
+      hairstyleId: liver.appearance?.hairstyleId,
+      hairOffset: liver.appearance?.hairOffset,
+    };
+    return (
+      <MyOshiBuilder
+        initialOshi={initial}
+        onCancel={() => setBuilderMode(false)}
+        onSave={async ({ presetId, hairstyleId, hairOffset }) => {
+          try {
+            await updateLiver(liver.id, {
+              appearance: { presetId, hairstyleId, hairOffset },
+            });
+            setBuilderMode(false);
+          } catch (err) {
+            alert('保存に失敗しました: ' + err.message);
+          }
+        }}
+      />
+    );
+  }
+
+  // 방 꾸미기 모드 — RoomEditor 재활용
+  if (roomMode) {
+    const character = asLiverCharacter(liver);
+    return (
+      <RoomEditor
+        character={character}
+        initialRoom={liver.room}
+        supportPoints={liver.stats?.totalSupport || 0}
+        onCancel={() => setRoomMode(false)}
+        onSave={async (roomData) => {
+          try {
+            await updateLiver(liver.id, { room: roomData });
+            setRoomMode(false);
+          } catch (err) {
+            alert('保存に失敗しました: ' + err.message);
+          }
+        }}
+      />
+    );
+  }
+
   return (
     <div className="max-w-md mx-auto px-4 py-4 min-h-[calc(100vh-64px)]">
       <div className="flex items-center justify-between mb-3">
@@ -85,11 +138,36 @@ export default function LiverDashboard({ liverId, onBack, onLogout }) {
       >
         <div className="flex items-start gap-3">
           <div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 bg-white/70"
+            className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 bg-white/70 overflow-hidden"
           >
-            <div className="text-4xl">
-              {liver.profile.gender === 'boy' ? '👦' : '👧'}
-            </div>
+            {(() => {
+              const liverChar = asLiverCharacter(liver);
+              if (liverChar?.sprite && liverChar.spriteSize && !liverChar.hairOverlay) {
+                return (
+                  <img
+                    src={liverChar.sprite}
+                    alt=""
+                    draggable={false}
+                    style={{ height: '90%', width: 'auto', imageRendering: 'pixelated' }}
+                  />
+                );
+              }
+              if (liverChar?.sprite) {
+                return (
+                  <PixelAvatar
+                    sprite={liverChar.sprite}
+                    size={56}
+                    hairOverlay={liverChar.hairOverlay}
+                    hairTransform={liverChar.hairTransform}
+                  />
+                );
+              }
+              return (
+                <div className="text-4xl">
+                  {liver.profile.gender === 'boy' ? '👦' : '👧'}
+                </div>
+              );
+            })()}
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-lg font-black text-oshi-dark">{liver.profile.name}</div>
@@ -128,6 +206,18 @@ export default function LiverDashboard({ liverId, onBack, onLogout }) {
 
       {/* 액션 */}
       <div className="space-y-2">
+        <button
+          onClick={() => setBuilderMode(true)}
+          className="w-full py-3 rounded-2xl bg-gradient-to-r from-oshi-main to-pink-400 text-white font-black text-sm shadow active:scale-95 transition"
+        >
+          ✨ 自分を飾る
+        </button>
+        <button
+          onClick={() => setRoomMode(true)}
+          className="w-full py-3 rounded-2xl bg-gradient-to-r from-purple-400 to-pink-300 text-white font-black text-sm shadow active:scale-95 transition"
+        >
+          🏠 お部屋を飾る
+        </button>
         <button
           onClick={() => setEditMode(true)}
           className="w-full py-3 rounded-2xl bg-white border-2 border-oshi-sub text-oshi-dark font-bold text-sm active:scale-95 transition"

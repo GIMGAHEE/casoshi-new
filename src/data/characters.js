@@ -313,6 +313,27 @@ export const asLiverCharacter = (liver) => {
   if (!liver) return null;
   const p = liver.profile || {};
   const gender = p.gender === 'boy' ? 'boy' : 'girl';
+
+  // 꾸미기 완료한 라이버는 MyOshi 와 동일한 preset/hairstyle 조합으로 렌더링
+  const ap = liver.appearance;
+  let visualFields = {};
+  if (ap?.presetId) {
+    const preset =
+      MY_OSHI_PRESETS.find(pr => pr.id === ap.presetId) ||
+      MY_OSHI_PRESETS.find(pr => pr.id === DEFAULT_PRESET_ID);
+    const hairstyle =
+      HAIRSTYLES.find(h => h.id === ap.hairstyleId) ||
+      HAIRSTYLES.find(h => h.id === DEFAULT_HAIRSTYLE_ID);
+    if (preset && hairstyle) {
+      visualFields = {
+        sprite: preset.sprite,
+        spriteSize: preset.hairBaked ? 39 : 90,
+        hairOverlay: preset.hairBaked ? null : hairstyle.overlay,
+        hairTransform: preset.hairBaked ? null : computeHairTransform(ap.hairstyleId, ap.hairOffset),
+      };
+    }
+  }
+
   return {
     id: liver.id,
     creatorId: liver.username,
@@ -323,7 +344,11 @@ export const asLiverCharacter = (liver) => {
     emoji: gender === 'boy' ? '🎤' : '💖',
     themeColor: p.themeColor || '#FF6B9D',
     bgColor: p.bgColor || '#FFE5EC',
-    sprite: p.imageUrl || null,
+    // appearance 있으면 preset sprite, 없으면 imageUrl, 그것도 없으면 null (emoji 폴백)
+    sprite: visualFields.sprite || p.imageUrl || null,
+    spriteSize: visualFields.spriteSize,
+    hairOverlay: visualFields.hairOverlay,
+    hairTransform: visualFields.hairTransform,
     catchphrase: p.streamSchedule
       ? `📅 ${p.streamSchedule}`
       : 'よろしくお願いします！',
@@ -338,5 +363,7 @@ export const asLiverCharacter = (liver) => {
     casLiveHandle: p.casLiveHandle || '',
     streamSchedule: p.streamSchedule || '',
     gender,
+    // 방 데이터 (MiniHome 이 사용)
+    liverRoom: liver.room || null,
   };
 };

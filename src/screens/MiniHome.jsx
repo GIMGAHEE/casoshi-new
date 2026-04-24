@@ -21,8 +21,12 @@ export default function MiniHome({
 
   const supportPoints = supports[character.id] || 0;
   const level = calcLevel(supportPoints);
-  const roomItems = room?.items || [];
-  const characterPos = room?.characterPos || { x: 50, y: 80 };
+  // 라이버의 경우 liver 본인이 꾸민 방 (liverRoom) 우선 사용, 없으면 팬의 room 데이터
+  const effectiveRoom = character.isLiver && character.liverRoom
+    ? character.liverRoom
+    : room;
+  const roomItems = effectiveRoom?.items || [];
+  const characterPos = effectiveRoom?.characterPos || { x: 50, y: 80 };
 
   return (
     <div className="max-w-md mx-auto px-4 py-4 pb-24">
@@ -166,8 +170,10 @@ export default function MiniHome({
           />
           <MenuButton
             emoji={<img src="/icons/sofa.png" alt="" className="w-6 h-6" style={{ imageRendering: 'pixelated' }} />}
-            label="家具追加"
-            onClick={onEditRoom}
+            label={character.isLiver ? '本人のみ' : '家具追加'}
+            onClick={character.isLiver
+              ? () => alert('ライバー本人がマイページから飾ります 🎤')
+              : onEditRoom}
           />
           <MenuButton
             emoji={<img src="/icons/heart.png" alt="" className="w-5 h-5" style={{ imageRendering: 'pixelated' }} />}
