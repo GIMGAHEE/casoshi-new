@@ -63,7 +63,7 @@ export default function Ranking({ myOshi, supports, onBack, onSelectCharacter })
           <img
             src="/icons/trophy.png"
             alt=""
-            className="w-10 h-10"
+            className="h-10 w-auto"
             style={{ imageRendering: 'pixelated' }}
           />
           推しランキング

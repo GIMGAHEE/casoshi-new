@@ -94,7 +94,7 @@ export default function Home({
           <img
             src="/icons/trophy.png"
             alt=""
-            className="w-12 h-12"
+            className="h-12 w-auto"
             style={{ imageRendering: 'pixelated' }}
           />
           <div className="flex-1 text-left">
