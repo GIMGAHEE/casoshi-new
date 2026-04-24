@@ -74,7 +74,12 @@ export default function Home({
           onClick={onOpenCraneGame}
           className="card w-full flex items-center gap-4 px-5 py-4 bg-gradient-to-r from-pink-100 via-pink-50 to-pink-100 hover:scale-[1.01] transition-transform border-pink-200"
         >
-          <div className="text-4xl">🪝</div>
+          <img
+            src="/icons/crane.png"
+            alt=""
+            className="w-12 h-12"
+            style={{ imageRendering: 'pixelated' }}
+          />
           <div className="flex-1 text-left">
             <div className="text-sm font-bold text-oshi-dark">クレーンゲーム</div>
             <div className="text-[10px] text-oshi-dark/60">かわいい人形をゲット！ 無料1日1回</div>

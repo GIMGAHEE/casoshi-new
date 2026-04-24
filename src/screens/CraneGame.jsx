@@ -268,8 +268,14 @@ export default function CraneGame({ points, setPoints, onBack }) {
         </button>
       </div>
 
-      <h2 className="text-lg font-black text-oshi-dark text-center mb-2">
-        🪝 クレーンゲーム
+      <h2 className="text-lg font-black text-oshi-dark text-center mb-2 flex items-center justify-center gap-2">
+        <img
+          src="/icons/crane.png"
+          alt=""
+          className="w-6 h-6"
+          style={{ imageRendering: 'pixelated' }}
+        />
+        クレーンゲーム
       </h2>
 
       {/* 기계 본체 */}
