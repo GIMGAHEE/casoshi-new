@@ -4,6 +4,7 @@ import PointsBar from './components/PointsBar';
 import Home from './screens/Home';
 import CharacterDetail from './screens/CharacterDetail';
 import TapGame from './screens/TapGame';
+import RhythmGame from './screens/RhythmGame';
 import CraneGame from './screens/CraneGame';
 import Ranking from './screens/Ranking';
 import MyOshiBuilder from './screens/MyOshiBuilder';
@@ -53,6 +54,7 @@ export default function App() {
           lastCheckin={lastCheckin} setLastCheckin={setLastCheckin}
           onSelectCharacter={(id) => setScreen({ name: 'minihome', params: { id } })}
           onOpenTapGame={() => setScreen({ name: 'tap' })}
+          onOpenRhythmGame={() => setScreen({ name: 'rhythm' })}
           onOpenCraneGame={() => setScreen({ name: 'crane' })}
           onOpenRanking={() => setScreen({ name: 'ranking' })}
           onOpenBuilder={() => setScreen({ name: 'builder' })}
@@ -85,6 +87,13 @@ export default function App() {
 
       {screen.name === 'tap' && (
         <TapGame
+          points={points} setPoints={setPoints}
+          onBack={() => setScreen({ name: 'home' })}
+        />
+      )}
+
+      {screen.name === 'rhythm' && (
+        <RhythmGame
           points={points} setPoints={setPoints}
           onBack={() => setScreen({ name: 'home' })}
         />

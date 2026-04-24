@@ -7,7 +7,7 @@ export default function Home({
   points, setPoints,
   supports, myOshi,
   lastCheckin, setLastCheckin,
-  onSelectCharacter, onOpenTapGame, onOpenCraneGame, onOpenRanking,
+  onSelectCharacter, onOpenTapGame, onOpenRhythmGame, onOpenCraneGame, onOpenRanking,
   onOpenBuilder,
 }) {
   const today = todayKey();
@@ -85,6 +85,22 @@ export default function Home({
             <div className="text-[10px] text-oshi-dark/60">かわいい人形をゲット！ 無料1日1回</div>
           </div>
           <div className="text-pink-400 text-lg">›</div>
+        </button>
+
+        {/* 🎤 리듬 모드 (NEW) */}
+        <button
+          onClick={onOpenRhythmGame}
+          className="card w-full flex items-center gap-4 px-5 py-4 bg-gradient-to-r from-purple-100 via-pink-50 to-orange-50 hover:scale-[1.01] transition-transform border-purple-200"
+        >
+          <div className="text-4xl w-16 h-16 flex items-center justify-center">🎤</div>
+          <div className="flex-1 text-left">
+            <div className="text-sm font-bold text-oshi-dark flex items-center gap-1.5">
+              推しコール
+              <span className="text-[9px] font-black bg-oshi-main text-white px-1.5 py-0.5 rounded-full">NEW</span>
+            </div>
+            <div className="text-[10px] text-oshi-dark/60">リズムに合わせてコール！ 60秒の推し活</div>
+          </div>
+          <div className="text-purple-400 text-lg">›</div>
         </button>
 
         <button

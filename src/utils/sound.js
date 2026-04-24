@@ -87,4 +87,34 @@ export const sfx = {
     // 낙하 끝 thud
     playNote({ freq: 90, duration: 0.2, type: 'sine', gain: 0.18, delay: 0.42 });
   }),
+
+  // ===== 리듬모드 전용 =====
+  // PERFECT — 반짝이는 2음 스파클
+  perfect: gated(() => {
+    playNote({ freq: 1568, duration: 0.08, type: 'sine', gain: 0.16 });
+    playNote({ freq: 2093, duration: 0.15, type: 'sine', gain: 0.14, delay: 0.04 });
+  }),
+  // GOOD — 중간 단음 tick
+  good: gated(() => {
+    playNote({ freq: 988, duration: 0.1, type: 'triangle', gain: 0.13 });
+  }),
+  // 콤보 마일스톤 (10/25/50) — 상승 아르페지오
+  comboMilestone: gated(() => {
+    [659.25, 880, 1175, 1568].forEach((f, i) => {
+      playNote({ freq: f, duration: 0.14, type: 'sine', gain: 0.15, delay: i * 0.06 });
+    });
+  }),
+  // 페버 진입 — 팡파르 (짧고 화려)
+  fever: gated(() => {
+    [523.25, 659.25, 783.99].forEach((f, i) => {
+      playNote({ freq: f, duration: 0.25, type: 'square', gain: 0.12, delay: i * 0.04 });
+    });
+    playNote({ freq: 1046.5, duration: 0.5, type: 'sine', gain: 0.18, delay: 0.14 });
+  }),
+  // 엔코어 컷인 — 길게 빛나는 느낌
+  encore: gated(() => {
+    [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => {
+      playNote({ freq: f, duration: 0.35, type: 'sine', gain: 0.2, delay: i * 0.1 });
+    });
+  }),
 };
