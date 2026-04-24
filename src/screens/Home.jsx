@@ -253,16 +253,21 @@ export default function Home({
 }
 
 /**
- * 아바타 썸네일 타일 — 전신 sprite 에서 상반신만 보이게 크롭.
+ * 아바타 썸네일 타일 — 상반신만 보이는 크롭.
  *
- * <img> 정상 렌더 → CSS transform scale 로 확대 + transformOrigin 'center top'.
- * overflow-hidden 이 하반신을 잘라냄. Tailwind preflight 영향 없음.
+ * 핵심: sprite 와 hairOverlay 는 원본 canvas 에서 hairTransform 으로 정렬됨.
+ * 그래서 그 정렬을 유지한 상태로 "전체를 확대" 하는 방식으로 구현:
  *
- * 주의: hairTransform 은 전신 뷰 (MiniHome / CharacterCard) 기준 fine-tune
- * 값이라 썸네일에서 그대로 적용하면 정렬이 어긋남. sprite 와 hairOverlay 는
- * 원본 canvas 에서 이미 서로 정렬돼있으므로, 둘 다 동일한 scale 만 주면 OK.
+ *   outer (56x56 overflow-hidden)
+ *     └ scale wrapper (transform: scale(1.3), origin 'center top')
+ *         └ composition root (relative)
+ *             ├ sprite (block img)
+ *             └ hair overlay (absolute + hairTransform)
+ *
+ * 이러면 내부에선 MiniHome/CharacterCard 와 동일한 sprite/hair 합성이 일어나고,
+ * 바깥에서만 상반신 보이게 확대/크롭된다.
  */
-function AvatarTile({ sprite, hairOverlay, fallbackEmoji }) {
+function AvatarTile({ sprite, hairOverlay, hairTransform, fallbackEmoji }) {
   if (!sprite) {
     return (
       <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden flex items-center justify-center">
@@ -271,26 +276,47 @@ function AvatarTile({ sprite, hairOverlay, fallbackEmoji }) {
     );
   }
   const SCALE = 1.3;
-  const imgStyle = {
-    position: 'absolute',
-    top: 0,
-    left: '50%',
-    width: '100%',
-    transform: `translateX(-50%) scale(${SCALE})`,
-    transformOrigin: 'center top',
-    imageRendering: 'pixelated',
-  };
   return (
-    <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden relative">
-      <img src={sprite} alt="" draggable={false} style={imgStyle} />
-      {hairOverlay && (
-        <img
-          src={hairOverlay}
-          alt=""
-          draggable={false}
-          style={{ ...imgStyle, pointerEvents: 'none' }}
-        />
-      )}
+    <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden">
+      <div
+        style={{
+          width: '100%',
+          transform: `scale(${SCALE})`,
+          transformOrigin: 'center top',
+        }}
+      >
+        <div style={{ position: 'relative', width: '100%' }}>
+          <img
+            src={sprite}
+            alt=""
+            draggable={false}
+            style={{
+              display: 'block',
+              width: '100%',
+              imageRendering: 'pixelated',
+            }}
+          />
+          {hairOverlay && (
+            <img
+              src={hairOverlay}
+              alt=""
+              draggable={false}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                transform: hairTransform
+                  ? `translate(${hairTransform.x}%, ${hairTransform.y}%) scale(${hairTransform.scale})`
+                  : undefined,
+                transformOrigin: 'center center',
+                imageRendering: 'pixelated',
+                pointerEvents: 'none',
+              }}
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 }
