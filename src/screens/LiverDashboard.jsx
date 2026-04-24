@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { getLiverById, updateLiver, changeLiverPassword } from '../auth/liverRepository';
 import { logout } from '../auth/session';
 
-export default function LiverDashboard({ liverId, onLogout }) {
+export default function LiverDashboard({ liverId, onBack, onLogout }) {
   const [liver, setLiver] = useState(() => getLiverById(liverId));
   const [editMode, setEditMode] = useState(false);
   const [pwMode, setPwMode] = useState(false);
@@ -52,13 +52,22 @@ export default function LiverDashboard({ liverId, onLogout }) {
   return (
     <div className="max-w-md mx-auto px-4 py-4 min-h-[calc(100vh-64px)]">
       <div className="flex items-center justify-between mb-3">
-        <div>
-          <div className="text-lg font-black text-oshi-dark">🎤 マイダッシュボード</div>
-          <div className="text-[11px] text-oshi-dark/60">ID: {liver.username}</div>
+        <button onClick={onBack} className="active:scale-95">
+          <img
+            src="/icons/back.png"
+            alt="戻る"
+            className="w-10 h-10 object-contain"
+            style={{ imageRendering: 'pixelated' }}
+            draggable={false}
+          />
+        </button>
+        <div className="text-center">
+          <div className="text-sm font-black text-oshi-dark">🎤 マイページ</div>
+          <div className="text-[10px] text-oshi-dark/60">ID: {liver.username}</div>
         </div>
         <button
           onClick={handleLogout}
-          className="text-xs text-oshi-dark/60 hover:text-oshi-dark underline"
+          className="text-[11px] text-oshi-dark/60 hover:text-oshi-dark underline"
         >
           ログアウト
         </button>

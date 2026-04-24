@@ -7,15 +7,22 @@ import PixelAvatar from '../components/PixelAvatar';
 export default function Home({
   points, setPoints,
   supports, myOshi,
+  liverSession,
   lastCheckin, setLastCheckin,
   onSelectCharacter, onOpenTapGame, onOpenRhythmGame, onOpenCraneGame, onOpenRanking,
-  onOpenBuilder, onOpenLiverLogin,
+  onOpenBuilder, onOpenLiverLogin, onOpenLiverDashboard,
 }) {
   const today = todayKey();
   const canCheckin = lastCheckin !== today;
   const myOshiChar = asCharacter(myOshi);
-  // 운영자가 등록한 라이버들 → Character 형태로 변환
-  const registeredLivers = listLivers().map(asLiverCharacter).filter(Boolean);
+
+  // 운영자가 등록한 라이버들 (로그인한 라이버 본인은 제외)
+  const allLivers = listLivers();
+  const selfLiver = liverSession ? allLivers.find(l => l.id === liverSession.liverId) : null;
+  const registeredLivers = allLivers
+    .filter(l => !liverSession || l.id !== liverSession.liverId)
+    .map(asLiverCharacter)
+    .filter(Boolean);
 
   const handleCheckin = () => {
     if (!canCheckin) return;
@@ -37,40 +44,105 @@ export default function Home({
 
       {/* 액션 섹션 */}
       <section className="space-y-3">
-        {/* 1열: 출석 + 랭킹 */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* 1열: 출석 / 랭킹 / 마이홈 (3-col) */}
+        <div className="grid grid-cols-3 gap-2">
+          {/* 출석 체크 */}
           <button
             onClick={handleCheckin}
             disabled={!canCheckin}
-            className={`card flex flex-col items-center justify-center py-5 transition ${
+            className={`card flex flex-col items-center justify-center py-4 px-2 transition ${
               canCheckin ? 'hover:bg-oshi-bg cursor-pointer' : 'opacity-50 cursor-not-allowed'
             }`}
           >
             <img
               src="/icons/calendar.png"
               alt=""
-              className="w-16 h-16 mb-1"
+              className="w-12 h-12 mb-1"
               style={{ imageRendering: 'pixelated' }}
             />
-            <div className="text-sm font-bold text-oshi-dark">
-              {canCheckin ? '出席チェック' : '出席済み'}
+            <div className="text-[11px] font-bold text-oshi-dark leading-tight text-center">
+              {canCheckin ? '出席' : '出席済み'}
             </div>
-            <div className="text-[10px] text-oshi-dark/60">+{DAILY_BONUS} ポイント</div>
+            <div className="text-[9px] text-oshi-dark/55 mt-0.5">+{DAILY_BONUS} pt</div>
           </button>
 
+          {/* 랭킹 */}
           <button
             onClick={onOpenRanking}
-            className="card flex flex-col items-center justify-center py-5 bg-gradient-to-br from-yellow-50 via-orange-50 to-pink-50 hover:scale-[1.02] transition-transform"
+            className="card flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-br from-yellow-50 via-orange-50 to-pink-50 hover:scale-[1.03] transition-transform"
           >
             <img
               src="/icons/trophy.png"
               alt=""
-              className="h-16 w-auto mb-1"
+              className="h-12 w-auto mb-1"
               style={{ imageRendering: 'pixelated' }}
             />
-            <div className="text-sm font-bold text-oshi-dark">推しランキング</div>
-            <div className="text-[10px] text-oshi-dark/60">推しをチェック</div>
+            <div className="text-[11px] font-bold text-oshi-dark leading-tight text-center">ランキング</div>
+            <div className="text-[9px] text-oshi-dark/55 mt-0.5">推しをチェック</div>
           </button>
+
+          {/* 마이홈 (라이버 마이페이지 / 마이 추시 / 작성 CTA) */}
+          {liverSession && selfLiver ? (
+            <button
+              onClick={onOpenLiverDashboard}
+              className="card relative flex flex-col items-center justify-center py-4 px-2 hover:scale-[1.03] transition-transform"
+              style={{
+                background: `linear-gradient(135deg, ${selfLiver.profile.themeColor}22, ${selfLiver.profile.bgColor})`,
+                borderColor: selfLiver.profile.themeColor + '60',
+              }}
+            >
+              <span className="absolute top-1 right-1 text-[8px] font-black bg-oshi-main text-white px-1.5 py-0.5 rounded-full">
+                LIVER
+              </span>
+              <div className="w-12 h-12 mb-1 rounded-xl bg-white/80 flex items-center justify-center shadow-inner">
+                <div className="text-2xl">
+                  {selfLiver.profile.gender === 'boy' ? '🎤' : '💖'}
+                </div>
+              </div>
+              <div className="text-[11px] font-bold text-oshi-dark leading-tight text-center truncate w-full">
+                {selfLiver.profile.name}
+              </div>
+              <div className="text-[9px] text-oshi-dark/55 mt-0.5">マイページ</div>
+            </button>
+          ) : myOshiChar ? (
+            <button
+              onClick={() => onSelectCharacter(MY_OSHI_ID)}
+              className="card flex flex-col items-center justify-center py-4 px-2 hover:scale-[1.03] transition-transform"
+              style={{
+                background: `linear-gradient(135deg, ${myOshiChar.themeColor}22, ${myOshiChar.bgColor})`,
+                borderColor: myOshiChar.themeColor + '60',
+              }}
+            >
+              <div className="w-12 h-12 mb-1 rounded-xl bg-white/80 flex items-center justify-center shadow-inner overflow-hidden">
+                {myOshiChar.sprite ? (
+                  <img
+                    src={myOshiChar.sprite}
+                    alt=""
+                    style={{
+                      height: '95%',
+                      width: 'auto',
+                      imageRendering: 'pixelated',
+                    }}
+                  />
+                ) : (
+                  <div className="text-2xl">💖</div>
+                )}
+              </div>
+              <div className="text-[11px] font-bold text-oshi-dark leading-tight text-center truncate w-full">
+                {myOshiChar.name}
+              </div>
+              <div className="text-[9px] text-oshi-dark/55 mt-0.5">マイホーム</div>
+            </button>
+          ) : (
+            <button
+              onClick={onOpenBuilder}
+              className="card flex flex-col items-center justify-center py-4 px-2 border-dashed border-2 border-oshi-main/40 bg-gradient-to-br from-oshi-sub/40 via-white to-oshi-bg hover:scale-[1.03] transition-transform"
+            >
+              <div className="w-12 h-12 mb-1 flex items-center justify-center text-3xl">➕</div>
+              <div className="text-[11px] font-bold text-oshi-main leading-tight text-center">マイ推し</div>
+              <div className="text-[9px] text-oshi-dark/55 mt-0.5">作成する</div>
+            </button>
+          )}
         </div>
 
         {/* 2열: 게임 3개 */}
@@ -120,49 +192,6 @@ export default function Home({
         </div>
       </section>
 
-      {/* 마이 추시 섹션 */}
-      <section>
-        <h2 className="text-lg font-black text-oshi-dark mb-3 px-1">
-          マイ推し
-        </h2>
-
-        {myOshiChar ? (
-          <CharacterCard
-            character={myOshiChar}
-            supportPoints={supports[MY_OSHI_ID] || 0}
-            onClick={() => onSelectCharacter(MY_OSHI_ID)}
-            highlight
-          />
-        ) : (
-          <button
-            onClick={onOpenBuilder}
-            className="w-full card flex items-center gap-4 py-5 px-5 bg-gradient-to-br from-oshi-sub/50 via-white to-oshi-bg active:scale-[0.98] transition-transform border-dashed border-2 border-oshi-main/40"
-          >
-            {/* 미니 프리뷰 — basic_bob.png(447:854)는 세로로 길어서 프레임 높이 기준으로 sizing */}
-            <div className="flex-shrink-0 w-16 h-16 rounded-xl bg-white flex items-center justify-center overflow-hidden shadow-inner border border-oshi-sub">
-              <img
-                src={MY_OSHI_PRESETS[0].sprite}
-                alt=""
-                style={{
-                  height: '90%',
-                  width: 'auto',
-                  imageRendering: 'pixelated',
-                  objectFit: 'contain',
-                }}
-                draggable={false}
-              />
-            </div>
-            <div className="flex-1 text-left">
-              <div className="text-sm font-black text-oshi-main">✨ マイ推しを作る</div>
-              <div className="text-[11px] text-oshi-dark/60 mt-0.5">
-                ヘア・服・顔を選んで、あなただけの推しを作ろう！
-              </div>
-            </div>
-            <div className="text-oshi-main text-lg">›</div>
-          </button>
-        )}
-      </section>
-
       {/* 등록된 라이버 */}
       <section>
         <div className="flex items-center justify-between mb-3 px-1">
@@ -209,13 +238,20 @@ export default function Home({
       </section>
 
       <div className="text-center text-[10px] text-oshi-dark/40 pt-4 pb-8 space-y-1.5">
-        <button
-          onClick={onOpenLiverLogin}
-          className="text-oshi-dark/60 hover:text-oshi-main underline underline-offset-2"
-        >
-          🎤 ライバーログイン
-        </button>
-        <div>Phase 1 MVP · ローカル保存 · 無課金</div>
+        {!liverSession && (
+          <button
+            onClick={onOpenLiverLogin}
+            className="text-oshi-dark/60 hover:text-oshi-main underline underline-offset-2"
+          >
+            🎤 ライバーログイン
+          </button>
+        )}
+        {liverSession && selfLiver && (
+          <div className="text-oshi-main/80">
+            🎤 ログイン中: <span className="font-bold">{selfLiver.profile.name}</span>
+          </div>
+        )}
+        <div>Phase 2 · ローカル保存 · 無課金</div>
       </div>
     </div>
   );

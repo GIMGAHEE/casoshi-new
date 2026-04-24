@@ -24,26 +24,27 @@ export default function App() {
   // rooms: { [characterId]: { items: [...] } }
   const [rooms, setRooms] = useLocalStorage('casoshi:rooms', {});
 
+  // 라이버 세션 (null 또는 { liverId, username, ... })
+  const [liverSession, setLiverSession] = useState(() => {
+    const s = getSession();
+    return s?.type === 'liver' ? s : null;
+  });
+
   // screen: home | character | tap | rhythm | crane | ranking | builder | minihome | roomEditor
   //         | adminLogin | adminDashboard | liverLogin | liverDashboard
   const [screen, setScreen] = useState(() => {
-    // ① URL ?admin=1 → 운영자 플로우 진입점
+    // URL ?admin=1 → 운영자 플로우
     const params = new URLSearchParams(window.location.search);
     if (params.get('admin') === '1') {
       const s = getSession();
       if (s?.type === 'admin') return { name: 'adminDashboard' };
       return { name: 'adminLogin' };
     }
-    // ② 기존 라이버 세션 있으면 대시보드로 직행
-    const s = getSession();
-    if (s?.type === 'liver' && s.liverId) {
-      return { name: 'liverDashboard', params: { liverId: s.liverId } };
-    }
-    // ③ 기본: 홈
+    // 라이버 세션이 있어도 홈으로 진입 (대시보드는 버튼으로 접근)
     return { name: 'home' };
   });
 
-  // 운영/라이버 화면에선 PointsBar 숨김
+  // 운영/로그인 화면에선 PointsBar 숨김 (홈은 라이버 로그인 상태여도 표시)
   const hidePointsBar = ['adminLogin', 'adminDashboard', 'liverLogin', 'liverDashboard'].includes(screen.name);
 
   const handleReset = () => {
@@ -75,6 +76,7 @@ export default function App() {
           points={points} setPoints={setPoints}
           supports={supports}
           myOshi={myOshi}
+          liverSession={liverSession}
           lastCheckin={lastCheckin} setLastCheckin={setLastCheckin}
           onSelectCharacter={(id) => setScreen({ name: 'minihome', params: { id } })}
           onOpenTapGame={() => setScreen({ name: 'tap' })}
@@ -83,6 +85,9 @@ export default function App() {
           onOpenRanking={() => setScreen({ name: 'ranking' })}
           onOpenBuilder={() => setScreen({ name: 'builder' })}
           onOpenLiverLogin={() => setScreen({ name: 'liverLogin' })}
+          onOpenLiverDashboard={() =>
+            setScreen({ name: 'liverDashboard', params: { liverId: liverSession?.liverId } })
+          }
         />
       )}
 
@@ -182,9 +187,10 @@ export default function App() {
 
       {screen.name === 'liverLogin' && (
         <LiverLogin
-          onSuccess={(_session, liver) =>
-            setScreen({ name: 'liverDashboard', params: { liverId: liver.id } })
-          }
+          onSuccess={(session) => {
+            setLiverSession(session);
+            setScreen({ name: 'home' });   // 로그인 후 홈으로
+          }}
           onCancel={() => setScreen({ name: 'home' })}
         />
       )}
@@ -192,7 +198,11 @@ export default function App() {
       {screen.name === 'liverDashboard' && (
         <LiverDashboard
           liverId={screen.params.liverId}
-          onLogout={() => setScreen({ name: 'home' })}
+          onBack={() => setScreen({ name: 'home' })}
+          onLogout={() => {
+            setLiverSession(null);
+            setScreen({ name: 'home' });
+          }}
         />
       )}
     </div>
