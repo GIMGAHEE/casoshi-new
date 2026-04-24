@@ -46,8 +46,17 @@ export const NOTE_TRAVEL_MS = 1400;  // 1.4초 동안 날아옴
 
 // 세션 시간/노트 수
 export const SESSION_DURATION_MS = 30_000;  // 30초 플레이
-export const TOTAL_NOTES = 24;              // 총 노트 수
-// = 평균 1.07초에 하나 → 살짝 변동 추가
+export const TOTAL_NOTES = 28;              // 총 노트 수 (사비에서 몰아치므로 기존보다 살짝 증가)
+
+// ===== サビ (클라이맥스) 구간 =====
+// 세션 30초의 중간 부분 = 한바탕 몰아치는 5초 구간
+export const SABI_START_MS = 13_000;  // 13s
+export const SABI_END_MS   = 18_000;  // 18s (5초간)
+export const SABI_BANNER_LEAD_MS = 1_500;  // 사비 시작 1.5s 전 배너 등장
+export const SABI_SCORE_MULT = 1.5;        // 사비 중 점수 배수
+// 사비 구간 노트 수 (나머지는 pre/post에 분배)
+export const SABI_NOTES = 11;           // 5초 동안 11개 = 0.45s 간격 (러시)
+// 남은 17개 = 17s (0~13s pre, 18~28s post, 제외 버퍼 포함)
 
 // 희귀도 뽑기
 export function rollNoteRarity() {
@@ -71,29 +80,48 @@ export function rollDirection() {
   return DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
 }
 
-// 세션 타임라인 생성 — [{ id, hitTime, rarity, phrase, direction }]
-// hitTime은 0 ~ SESSION_DURATION_MS 사이
-// (NOTE_TRAVEL_MS 이전에 스폰되어야 함)
+// 세션 타임라인 생성 — [{ id, hitTime, rarity, phrase, direction, isSabi }]
+// 3구간 분배: pre(0~SABI_START) · sabi(SABI_START~SABI_END, 밀도↑) · post(SABI_END~)
 export function generateTimeline() {
   const notes = [];
-  const startBuffer = NOTE_TRAVEL_MS + 500;             // 시작 후 첫 노트까지 여유
-  const endBuffer = 2500;                                // 마지막 노트 이후 여유
-  const activeRange = SESSION_DURATION_MS - startBuffer - endBuffer;
-  const avgInterval = activeRange / TOTAL_NOTES;
-  // 약간의 지터 (±30%)
-  for (let i = 0; i < TOTAL_NOTES; i++) {
-    const base = startBuffer + i * avgInterval;
-    const jitter = (Math.random() - 0.5) * avgInterval * 0.6;
-    const hitTime = Math.round(base + jitter);
-    notes.push({
-      id: `note_${i}`,
-      hitTime,
-      spawnTime: hitTime - NOTE_TRAVEL_MS,
-      rarity: rollNoteRarity(),
-      phrase: null,   // lazy fill
-      direction: rollDirection(),
-    });
-  }
+  const startBuffer = NOTE_TRAVEL_MS + 500;   // 첫 노트 등장 여유
+  const endBuffer = 2000;                      // 마지막 노트 이후 여유
+
+  // 전체 28 중 11개는 사비. 나머지 17개를 pre/post에 적절 분배
+  const preRange = SABI_START_MS - startBuffer;                     // 약 10.1s
+  const postRange = SESSION_DURATION_MS - SABI_END_MS - endBuffer;  // 약 10s
+  const totalNonSabiRange = preRange + postRange;
+  const nonSabiCount = TOTAL_NOTES - SABI_NOTES;
+  const preCount = Math.round(nonSabiCount * (preRange / totalNonSabiRange));
+  const postCount = nonSabiCount - preCount;
+
+  // Helper: 구간 내 균등 분배 + 지터
+  const spread = (count, rangeStart, rangeEnd, jitterRatio = 0.5, isSabi = false) => {
+    const span = rangeEnd - rangeStart;
+    const step = span / count;
+    for (let i = 0; i < count; i++) {
+      const base = rangeStart + (i + 0.5) * step;
+      const jitter = (Math.random() - 0.5) * step * jitterRatio;
+      const hitTime = Math.max(startBuffer, Math.round(base + jitter));
+      notes.push({
+        id: `note_${notes.length}`,
+        hitTime,
+        spawnTime: hitTime - NOTE_TRAVEL_MS,
+        rarity: rollNoteRarity(),
+        phrase: null,
+        direction: rollDirection(),
+        isSabi,
+      });
+    }
+  };
+
+  // 1) Pre (0 ~ 13s)
+  spread(preCount, startBuffer, SABI_START_MS - 200, 0.55, false);
+  // 2) Sabi (13 ~ 18s) — 밀도↑, 지터 낮춰서 박자감 강조
+  spread(SABI_NOTES, SABI_START_MS, SABI_END_MS, 0.25, true);
+  // 3) Post (18 ~ 28s)
+  spread(postCount, SABI_END_MS + 200, SESSION_DURATION_MS - endBuffer, 0.55, false);
+
   // 문구 채우기
   notes.forEach(n => { n.phrase = rollPhrase(n.rarity); });
   // 시간 순 정렬

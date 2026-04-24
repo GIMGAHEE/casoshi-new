@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { sfx } from '../utils/sound';
+import { createBgmEngine } from '../utils/rhythmBgm';
 import {
   generateTimeline,
   RARITY_INFO,
@@ -8,6 +9,10 @@ import {
   JUDGMENT_SCORE,
   NOTE_TRAVEL_MS,
   SESSION_DURATION_MS,
+  SABI_START_MS,
+  SABI_END_MS,
+  SABI_BANNER_LEAD_MS,
+  SABI_SCORE_MULT,
 } from '../data/rhythm';
 
 // ===== 페버 조건 =====
@@ -26,6 +31,22 @@ const LANE_ORIGIN = {
 
 // 히트 존 중심 (%)
 const HIT_CENTER = { x: 50, y: 55 };
+
+// ===== 💬 캐릭터 말풍선 멘트 =====
+const SPEECH_MAP = {
+  combo5:     ['いいよ〜！', 'うんうん〜♪', 'のってきた！'],
+  combo10:    ['ノリノリ〜！', 'もっとー！', 'キタコレ〜！'],
+  combo20:    ['スゴイ！！', '神！！', 'サイコー！！'],
+  combo50:    ['伝説！！！', 'LEGEND！', '世界一！！'],
+  ssrHit:     ['スゴイ！', 'やったー！', 'レア〜！'],
+  feverStart: ['キャーーー！', 'フィーバー！！', 'アゲてこ〜！'],
+  sabiStart:  ['サビ来るよ〜！', 'ここから！！', 'いくよーー！'],
+  miss:       ['えっ...', 'おっと〜', 'ドンマイ！'],
+};
+const pickSpeech = (key) => {
+  const arr = SPEECH_MAP[key] || ['💖'];
+  return arr[Math.floor(Math.random() * arr.length)];
+};
 
 export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
   // 캐릭터 에셋 결정 (내 오시 성별 기반, 기본은 여자)
@@ -47,11 +68,58 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
   const [feverEndsAt, setFeverEndsAt] = useState(0);
   const [judgmentFx, setJudgmentFx] = useState(null);    // 최근 판정 이펙트
   const [hearts, setHearts] = useState([]);              // 성공 시 터지는 하트 파티클
+  const [sabiActive, setSabiActive] = useState(false);   // 현재 사비 구간인지
+  const [sabiBanner, setSabiBanner] = useState(false);   // 사비 배너 표시 중인지
+  const [speech, setSpeech] = useState(null);            // 캐릭터 말풍선
 
   const startTimeRef = useRef(0);
   const notesIndexRef = useRef(0);                       // 다음 스폰할 노트 인덱스
   const rafRef = useRef(null);
   const judgmentFxTimerRef = useRef(null);
+  const speechTimerRef = useRef(null);
+  const sabiBannerFiredRef = useRef(false);              // 배너 중복 트리거 방지
+  const prevComboRef = useRef(0);                        // 콤보 마일스톤 말풍선 트리거용
+  const bgmRef = useRef(null);                           // BGM 엔진
+
+  // 말풍선 표시 (1.2s 자동 소멸)
+  const showSpeech = (key) => {
+    clearTimeout(speechTimerRef.current);
+    const text = pickSpeech(key);
+    setSpeech({ text, id: Date.now() + Math.random() });
+    speechTimerRef.current = setTimeout(() => setSpeech(null), 1200);
+  };
+
+  // BGM 엔진 lazy init + unmount cleanup
+  useEffect(() => {
+    if (!bgmRef.current) bgmRef.current = createBgmEngine();
+    return () => {
+      if (bgmRef.current) bgmRef.current.stop();
+    };
+  }, []);
+
+  // 콤보에 따라 BGM 레이어 레벨 조절
+  useEffect(() => {
+    if (!bgmRef.current) return;
+    const level = combo >= 25 ? 2 : combo >= 10 ? 1 : 0;
+    bgmRef.current.setLevel(level);
+  }, [combo]);
+
+  // 페버 상태 BGM에 전달
+  useEffect(() => {
+    if (!bgmRef.current) return;
+    bgmRef.current.setFever(fever);
+  }, [fever]);
+
+  // 콤보 마일스톤 말풍선
+  useEffect(() => {
+    const prev = prevComboRef.current;
+    if (combo === prev) return;
+    if (prev < 5  && combo >= 5)  showSpeech('combo5');
+    if (prev < 10 && combo >= 10) showSpeech('combo10');
+    if (prev < 20 && combo >= 20) showSpeech('combo20');
+    if (prev < 50 && combo >= 50) showSpeech('combo50');
+    prevComboRef.current = combo;
+  }, [combo]);
 
   // 타임라인 생성 (게임 시작 시)
   const startGame = () => {
@@ -65,6 +133,11 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
     setPerfectStreak(0);
     setStats({ perfect: 0, good: 0, miss: 0 });
     setFever(false);
+    setSabiActive(false);
+    setSabiBanner(false);
+    sabiBannerFiredRef.current = false;
+    prevComboRef.current = 0;
+    setSpeech(null);
     setState('countdown');
     setCountdown(3);
   };
@@ -75,6 +148,12 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
     if (countdown === 0) {
       startTimeRef.current = performance.now();
       setState('playing');
+      // BGM 시작 (카운트다운 끝난 직후)
+      if (bgmRef.current) {
+        bgmRef.current.setLevel(0);
+        bgmRef.current.setFever(false);
+        bgmRef.current.start();
+      }
       return;
     }
     sfx.click();
@@ -90,6 +169,20 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
       const now = performance.now();
       const t = now - startTimeRef.current;
       setElapsed(t);
+
+      // === 사비 트리거 ===
+      // 사비 1.5s 전: 배너 + 말풍선
+      if (!sabiBannerFiredRef.current && t >= SABI_START_MS - SABI_BANNER_LEAD_MS) {
+        sabiBannerFiredRef.current = true;
+        setSabiBanner(true);
+        showSpeech('sabiStart');
+        setTimeout(() => setSabiBanner(false), SABI_BANNER_LEAD_MS + 1000);
+      }
+      // 사비 active 상태 (점수 배수 적용용)
+      const nowInSabi = t >= SABI_START_MS && t < SABI_END_MS;
+      if (nowInSabi !== sabiActive) {
+        setSabiActive(nowInSabi);
+      }
 
       // 1. 스폰할 노트 체크
       const tl = timeline || [];
@@ -120,6 +213,8 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
             setStats(s => ({ ...s, miss: s.miss + 1 }));
           });
           showJudgment('MISS');
+          // 가끔 말풍선 (15% 확률)
+          if (Math.random() < 0.15) showSpeech('miss');
         }
         return remain;
       });
@@ -140,7 +235,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
     rafRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state, fever, feverEndsAt, timeline]);
+  }, [state, fever, feverEndsAt, timeline, sabiActive]);
 
   const showJudgment = (label, rarity = 'N') => {
     clearTimeout(judgmentFxTimerRef.current);
@@ -186,7 +281,8 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
       const rarityMult = RARITY_INFO[n.rarity]?.scoreMult || 1;
       const base = JUDGMENT_SCORE[judgment];
       const feverMult = fever ? 2 : 1;
-      const gained = Math.round(base * rarityMult * feverMult);
+      const sabiMult = sabiActive ? SABI_SCORE_MULT : 1;
+      const gained = Math.round(base * rarityMult * feverMult * sabiMult);
 
       setScore(s => s + gained);
       setPoints(p => p + gained);
@@ -206,9 +302,12 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
             sfx.fever();
             setFever(true);
             setFeverEndsAt(performance.now() + FEVER_DURATION_MS);
+            showSpeech('feverStart');
           }
           return next;
         });
+        // SSR PERFECT 캐치 → 말풍선
+        if (n.rarity === 'SSR') showSpeech('ssrHit');
         // 하트 파티클
         spawnHearts(n.direction, 3);
       } else {
@@ -244,6 +343,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
 
   const endGame = () => {
     cancelAnimationFrame(rafRef.current);
+    if (bgmRef.current) bgmRef.current.stop();
     if (score > bestScore) setBestScore(score);
     sfx.encore();
     setState('result');
@@ -260,7 +360,10 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
     <div className="max-w-md mx-auto px-4 py-4 min-h-[calc(100vh-64px)] flex flex-col relative">
       {/* 상단 바 */}
       <div className="flex items-center justify-between">
-        <button onClick={onBack} className="active:scale-95">
+        <button onClick={() => {
+          if (bgmRef.current) bgmRef.current.stop();
+          onBack();
+        }} className="active:scale-95">
           <img
             src="/icons/back.png"
             alt="戻る"
@@ -346,6 +449,9 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
           onHit={handleHit}
           charNormal={CHAR_NORMAL}
           charFever={CHAR_FEVER}
+          sabiActive={sabiActive}
+          sabiBanner={sabiBanner}
+          speech={speech}
         />
       )}
 
@@ -395,6 +501,20 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
           30%  { transform: translate(-50%, -50%) scale(1.15) rotate(15deg); opacity: 1; }
           100% { transform: translate(-50%, -50%) scale(1.8) rotate(30deg); opacity: 0; }
         }
+        @keyframes sabiBannerPop {
+          0%   { transform: translate(-50%, -120%) scale(0.6); opacity: 0; }
+          15%  { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+          30%  { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+          80%  { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+          100% { transform: translate(-50%, -80%) scale(0.9); opacity: 0; }
+        }
+        @keyframes speechPop {
+          0%   { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+          20%  { transform: scale(1.15) rotate(2deg); opacity: 1; }
+          35%  { transform: scale(1) rotate(0); opacity: 1; }
+          85%  { transform: scale(1) rotate(0); opacity: 1; }
+          100% { transform: scale(0.8) translateY(-8px); opacity: 0; }
+        }
       `}</style>
     </div>
   );
@@ -404,14 +524,16 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
 function PlayField({
   elapsed, activeNotes, score, combo, fever, feverEndsAt,
   stats, judgmentFx, hearts, onHit, charNormal, charFever,
+  sabiActive, sabiBanner, speech,
 }) {
   const timeLeft = Math.max(0, SESSION_DURATION_MS - elapsed);
   const progress = Math.min(1, elapsed / SESSION_DURATION_MS);
   const feverLeft = fever ? Math.max(0, feverEndsAt - performance.now()) / FEVER_DURATION_MS : 0;
 
   // 캐릭터 스케일/애니메이션은 콤보에 따라 변화
-  const charScale = fever ? 1.15 : combo >= 30 ? 1.08 : combo >= 10 ? 1.04 : 1;
+  const charScale = fever ? 1.18 : sabiActive ? 1.1 : combo >= 30 ? 1.08 : combo >= 10 ? 1.04 : 1;
   const charImage = fever ? charFever : charNormal;
+  const highlightMode = fever || sabiActive;
 
   return (
     <div className="flex-1 flex flex-col mt-2">
@@ -456,6 +578,24 @@ function PlayField({
         </div>
       )}
 
+      {/* 사비 배너 (사비 시작 ~1.5초 전부터 잠깐 뜸) */}
+      {sabiBanner && (
+        <div
+          className="absolute left-1/2 top-1/3 -translate-x-1/2 z-30 pointer-events-none font-black text-center"
+          style={{
+            animation: 'sabiBannerPop 2.5s ease-out forwards',
+          }}
+        >
+          <div className="inline-block px-5 py-2 rounded-full shadow-2xl text-white text-2xl"
+               style={{
+                 background: 'linear-gradient(90deg, #FFB800, #FF6B9D, #B77EE0)',
+                 textShadow: '0 2px 8px rgba(0,0,0,0.4)',
+               }}>
+            ✨ サビ来るよ〜！
+          </div>
+        </div>
+      )}
+
       {/* 플레이 스테이지 */}
       <div
         className="relative flex-1 mt-3 rounded-3xl overflow-hidden border-2 border-oshi-sub"
@@ -469,8 +609,12 @@ function PlayField({
           className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
           style={{
             imageRendering: 'pixelated',
-            filter: fever ? 'saturate(1.4) brightness(1.08)' : undefined,
-            transition: 'filter 0.3s ease',
+            filter: fever
+              ? 'saturate(1.5) brightness(1.1) hue-rotate(8deg)'
+              : sabiActive
+                ? 'saturate(1.3) brightness(1.08)'
+                : undefined,
+            transition: 'filter 0.4s ease',
           }}
           draggable={false}
         />
@@ -486,6 +630,22 @@ function PlayField({
               animation: 'feverPulse 2s ease infinite',
             }}
           />
+        )}
+
+        {/* 사비 active 시 테두리 글로우 + 상단 배지 */}
+        {sabiActive && !fever && (
+          <>
+            <div
+              className="absolute inset-0 pointer-events-none rounded-3xl"
+              style={{
+                boxShadow: 'inset 0 0 28px rgba(255,184,0,0.55), inset 0 0 60px rgba(255,107,157,0.3)',
+                animation: 'feverPulse 1.5s ease infinite',
+              }}
+            />
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 text-white font-black text-xs shadow-lg z-10">
+              ✨ サビ ×1.5
+            </div>
+          </>
         )}
 
         {/* 추し 캐릭터 */}
@@ -507,6 +667,51 @@ function PlayField({
           }}
           draggable={false}
         />
+
+        {/* 💬 캐릭터 말풍선 */}
+        {speech && (
+          <div
+            key={speech.id}
+            className="absolute z-20 pointer-events-none"
+            style={{
+              left: '66%',
+              top: '14%',
+              animation: 'speechPop 1.2s ease-out forwards',
+            }}
+          >
+            <div
+              className="relative bg-white border-2 border-oshi-main rounded-2xl px-3 py-1.5 shadow-lg whitespace-nowrap"
+              style={{
+                fontFamily: 'system-ui',
+              }}
+            >
+              <span className="text-[13px] font-black text-oshi-main">{speech.text}</span>
+              {/* 말풍선 꼬리 */}
+              <div
+                className="absolute w-0 h-0"
+                style={{
+                  left: '-9px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  borderTop: '6px solid transparent',
+                  borderBottom: '6px solid transparent',
+                  borderRight: '9px solid #FF6B9D',
+                }}
+              />
+              <div
+                className="absolute w-0 h-0"
+                style={{
+                  left: '-6px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  borderTop: '5px solid transparent',
+                  borderBottom: '5px solid transparent',
+                  borderRight: '7px solid white',
+                }}
+              />
+            </div>
+          </div>
+        )}
 
         {/* 관객 실루엣 (하단) */}
         <img
