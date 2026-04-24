@@ -32,14 +32,15 @@ export default function Home({
 
   return (
     <div className="max-w-md mx-auto px-4 py-6 space-y-6">
-      {/* 히어로 */}
-      <section className="text-center py-4">
-        <div className="text-4xl font-black text-oshi-main mb-1">
-          Casオシ
-        </div>
-        <div className="text-xs text-oshi-dark/60">
-          ゲームで推しを育てる、新しい推し活。
-        </div>
+      {/* 히어로 — 로고 이미지 (ゲームで推しを育てる 부제목도 이미지에 포함됨) */}
+      <section className="text-center pt-2 pb-1">
+        <img
+          src="/logo.png"
+          alt="Casオシ — ゲームで推しを育てる、新しい推し活。"
+          className="mx-auto w-full max-w-xs"
+          style={{ imageRendering: 'pixelated' }}
+          draggable={false}
+        />
       </section>
 
       {/* 액션 섹션 */}
