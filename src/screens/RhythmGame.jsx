@@ -76,18 +76,22 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
   const notesIndexRef = useRef(0);                       // 다음 스폰할 노트 인덱스
   const rafRef = useRef(null);
   const judgmentFxTimerRef = useRef(null);
-  const speechTimerRef = useRef(null);
   const sabiBannerFiredRef = useRef(false);              // 배너 중복 트리거 방지
   const prevComboRef = useRef(0);                        // 콤보 마일스톤 말풍선 트리거용
   const bgmRef = useRef(null);                           // BGM 엔진
 
-  // 말풍선 표시 (1.2s 자동 소멸)
+  // 말풍선 표시 (id 바뀔 때마다 useEffect 가 auto-cleanup)
   const showSpeech = (key) => {
-    clearTimeout(speechTimerRef.current);
     const text = pickSpeech(key);
     setSpeech({ text, id: Date.now() + Math.random() });
-    speechTimerRef.current = setTimeout(() => setSpeech(null), 1200);
   };
+
+  // 말풍선 자동 제거 (id 변경 시 이전 타이머 cleanup — race 없음)
+  useEffect(() => {
+    if (!speech) return;
+    const t = setTimeout(() => setSpeech(null), 1250);
+    return () => clearTimeout(t);
+  }, [speech?.id]);
 
   // BGM 엔진 lazy init + unmount cleanup
   useEffect(() => {
@@ -512,8 +516,8 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
           0%   { transform: scale(0.3) rotate(-10deg); opacity: 0; }
           20%  { transform: scale(1.15) rotate(2deg); opacity: 1; }
           35%  { transform: scale(1) rotate(0); opacity: 1; }
-          85%  { transform: scale(1) rotate(0); opacity: 1; }
-          100% { transform: scale(0.8) translateY(-8px); opacity: 0; }
+          75%  { transform: scale(1) rotate(0); opacity: 1; }
+          100% { transform: scale(0.85) translateY(-12px); opacity: 0; visibility: hidden; }
         }
       `}</style>
     </div>
@@ -677,13 +681,11 @@ function PlayField({
               left: '66%',
               top: '14%',
               animation: 'speechPop 1.2s ease-out forwards',
+              willChange: 'transform, opacity',
             }}
           >
             <div
               className="relative bg-white border-2 border-oshi-main rounded-2xl px-3 py-1.5 shadow-lg whitespace-nowrap"
-              style={{
-                fontFamily: 'system-ui',
-              }}
             >
               <span className="text-[13px] font-black text-oshi-main">{speech.text}</span>
               {/* 말풍선 꼬리 */}
