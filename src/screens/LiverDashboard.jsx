@@ -239,7 +239,7 @@ export default function LiverDashboard({ liverId, onBack, onLogout }) {
           />
           <div className="relative flex flex-col items-center justify-center h-full p-3 text-center">
             <div className="w-14 h-14 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center border border-white/40 mb-2">
-              <div className="text-3xl">✨</div>
+              <img src="/icons/wand.png" alt="" className="w-9 h-9 object-contain" style={{ imageRendering: 'pixelated' }} />
             </div>
             <div className="text-white text-base font-black drop-shadow-sm">
               自分を飾る
