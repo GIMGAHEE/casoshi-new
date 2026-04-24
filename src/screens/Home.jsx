@@ -25,7 +25,7 @@ export default function Home({
       {/* 히어로 */}
       <section className="text-center py-4">
         <div className="text-4xl font-black text-oshi-main mb-1">
-          キャスオシ
+          Casオシ
         </div>
         <div className="text-xs text-oshi-dark/60">
           ゲームで推しを育てる、新しい推し活。
