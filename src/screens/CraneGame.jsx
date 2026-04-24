@@ -322,17 +322,20 @@ export default function CraneGame({ points, setPoints, onBack }) {
             />
           )}
 
-          {/* 인형들 (glass_bg 하단 shelf 위) */}
+          {/* 인형들 (glass_bg 하단 shelf 위, 2줄 쌓기) */}
           {dolls.map(d => (
             <div
               key={d.id}
               className="absolute"
               style={{
                 left: `${d.x}%`,
-                bottom: '14%',  // shelf 위에 앉게
-                transform: 'translateX(-50%)',
-                zIndex: 2,
-                filter: `drop-shadow(0 2px 2px rgba(0,0,0,0.2))`,
+                bottom: `calc(14% + ${d.yOffset || 0}px)`,
+                transform: `translateX(-50%) rotate(${d.rotation || 0}deg) scale(${d.scale || 1})`,
+                transformOrigin: 'center bottom',
+                zIndex: d.row === 'front' ? 3 : 2,
+                filter: d.row === 'back'
+                  ? 'drop-shadow(0 2px 2px rgba(0,0,0,0.15)) brightness(0.94)'
+                  : 'drop-shadow(0 2px 2px rgba(0,0,0,0.22))',
               }}
             >
               <div className="relative">
@@ -518,17 +521,46 @@ function easeInOut(t) {
 }
 
 function generateDolls() {
-  // 3마리 인형 생성 (x: 15~85% 범위에서 겹치지 않게)
-  const slots = [20, 50, 80];
-  return slots.map((x, i) => {
+  // 5~6마리 인형을 2줄 (뒤/앞) 로 쌓아 배치
+  // 뒤줄: 살짝 위로 (y offset), 약간 작게, zIndex 낮음
+  // 앞줄: 기본 위치, 정상 크기, zIndex 높음 → 뒤줄을 일부 가림
+  const dolls = [];
+  const baseTime = Date.now();
+
+  const backCount = 2 + Math.floor(Math.random() * 2);   // 2~3
+  const frontCount = 3;                                   // 3
+
+  // 뒤줄
+  for (let i = 0; i < backCount; i++) {
+    const baseX = 18 + (i + 0.5) * (64 / backCount);  // 18~82% 고르게
     const rarity = rollRarity();
     const template = rollDoll(rarity);
-    return {
+    dolls.push({
       ...template,
-      id: `doll_${Date.now()}_${i}`,
-      x: x + (Math.random() * 8 - 4), // 약간 흔들기
-    };
-  });
+      id: `doll_${baseTime}_b${i}`,
+      x: baseX + (Math.random() - 0.5) * 6,
+      yOffset: 14 + Math.random() * 6,      // 14~20px 위로
+      scale: 0.85 + Math.random() * 0.06,   // 0.85~0.91
+      rotation: (Math.random() - 0.5) * 14, // ±7°
+      row: 'back',
+    });
+  }
+  // 앞줄 (뒤줄과 교차되도록 offset)
+  for (let i = 0; i < frontCount; i++) {
+    const baseX = 15 + (i + 0.5) * (70 / frontCount);
+    const rarity = rollRarity();
+    const template = rollDoll(rarity);
+    dolls.push({
+      ...template,
+      id: `doll_${baseTime}_f${i}`,
+      x: baseX + (Math.random() - 0.5) * 5,
+      yOffset: Math.random() * 3,           // 거의 바닥
+      scale: 1.0,
+      rotation: (Math.random() - 0.5) * 18, // ±9°
+      row: 'front',
+    });
+  }
+  return dolls;
 }
 
 // ===== 결과 오버레이 =====
