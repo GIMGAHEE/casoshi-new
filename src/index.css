@@ -20,7 +20,7 @@
     position: fixed;
     inset: 0;
     background-image:
-      linear-gradient(rgba(255, 229, 236, 0.55), rgba(255, 229, 236, 0.70)),
+      linear-gradient(rgba(255, 229, 236, 0.20), rgba(255, 229, 236, 0.25)),
       url('/background.png');
     background-size: cover;
     background-position: center top;
