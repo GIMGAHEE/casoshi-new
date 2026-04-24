@@ -20,8 +20,10 @@ const GLASS = {
   right:  '17%',
 };
 
-// 크레인 드롭 범위 (playfield 높이 % 기준, 집게 상단 기준)
-const DROP_MAX_PCT = 62;
+// 크레인 드롭 범위 (playfield 높이 % 기준)
+// 시작: 14% (상단 라이트 아래 레일)
+// 끝: 14% + 51% = 65% (shelf 위 인형에 닿는 위치)
+const DROP_MAX_PCT = 51;
 
 const MACHINE_WIDTH_PX = 320;
 const DOLL_SIZE = 56;
@@ -212,66 +214,78 @@ export default function CraneGame({ points, setPoints, onBack }) {
             right: GLASS.right,
           }}
         >
-          {/* 크레인 레일 */}
-          <div className="absolute left-0 right-0 top-0 h-[2px] bg-gray-500/60 rounded-full" />
+          {/* 배경: 유리 내부 이미지 (gradient + 반사 + 상단 라이트 + 하단 선반) */}
+          <img
+            src="/crane/glass_bg.png"
+            alt=""
+            className="absolute inset-0 w-full h-full pointer-events-none select-none"
+            draggable={false}
+          />
 
-          {/* 크레인 (레일 → 집게) */}
+          {/* 크레인 레일 (glass_bg 상단 라이트 바로 아래에 얇게) */}
           <div
-            className="absolute top-0"
+            className="absolute left-[3%] right-[3%] top-[14%] h-[2px] bg-gray-500/40 rounded-full"
+            style={{ zIndex: 3 }}
+          />
+
+          {/* 케이블 (레일 → 집게 상단까지 직선) */}
+          <div
+            className="absolute bg-gray-400/90"
             style={{
               left: `${cranePos}%`,
+              top: '14%',
+              width: 2,
+              height: `calc(${craneDropY * DROP_MAX_PCT}% + 4px)`,
+              transform: 'translateX(-1px)',
+              zIndex: 4,
+            }}
+          />
+
+          {/* 집게 이미지 */}
+          <img
+            src={state === 'dropping' && craneDropY > 0.85 ? CLAW_CLOSED : CLAW_OPEN}
+            alt=""
+            className="absolute select-none pointer-events-none"
+            style={{
+              left: `${cranePos}%`,
+              top: `calc(14% + ${craneDropY * DROP_MAX_PCT}%)`,
               transform: 'translateX(-50%)',
+              width: 46,
+              imageRendering: 'pixelated',
               zIndex: 5,
             }}
-          >
-            {/* 케이블 */}
-            <div
-              className="absolute left-1/2 -translate-x-1/2 bg-gray-400"
-              style={{
-                top: 0,
-                width: 2,
-                height: `calc(${craneDropY * DROP_MAX_PCT}% + 2px)`,
-              }}
-            />
-            {/* 집게 이미지 */}
+            draggable={false}
+          />
+
+          {/* 잡힌 인형 (집게 아래에서 살짝 위로 lift) */}
+          {grabbedDoll && state === 'result' && (
             <img
-              src={state === 'dropping' && craneDropY > 0.85 ? CLAW_CLOSED : CLAW_OPEN}
-              alt=""
-              className="absolute left-1/2 -translate-x-1/2 select-none pointer-events-none"
+              src={grabbedDoll.image}
+              alt={grabbedDoll.name}
+              className="absolute select-none pointer-events-none"
               style={{
-                top: `${craneDropY * DROP_MAX_PCT}%`,
-                width: 46,
+                left: `${cranePos}%`,
+                top: `calc(14% + ${craneDropY * DROP_MAX_PCT}% + 48px)`,
+                transform: 'translateX(-50%)',
+                width: 44,
+                height: 'auto',
                 imageRendering: 'pixelated',
+                animation: 'lift 0.8s ease-out forwards',
+                filter: `drop-shadow(0 3px 4px rgba(0,0,0,0.25))`,
+                zIndex: 6,
               }}
               draggable={false}
             />
-            {/* 잡힌 인형 (집게 아래에서 살짝 위로 lift) */}
-            {grabbedDoll && state === 'result' && (
-              <img
-                src={grabbedDoll.image}
-                alt={grabbedDoll.name}
-                className="absolute left-1/2 -translate-x-1/2 select-none pointer-events-none"
-                style={{
-                  top: `calc(${craneDropY * DROP_MAX_PCT}% + 40px)`,
-                  width: 44,
-                  height: 'auto',
-                  imageRendering: 'pixelated',
-                  animation: 'lift 0.8s ease-out forwards',
-                  filter: `drop-shadow(0 3px 4px rgba(0,0,0,0.25))`,
-                }}
-                draggable={false}
-              />
-            )}
-          </div>
+          )}
 
-          {/* 인형들 (핑크 바닥 위) */}
+          {/* 인형들 (glass_bg 하단 shelf 위) */}
           {dolls.map(d => (
             <div
               key={d.id}
               className="absolute"
               style={{
                 left: `${d.x}%`,
-                bottom: 2,
+                bottom: '14%',  // shelf 위에 앉게
                 transform: 'translateX(-50%)',
                 zIndex: 2,
                 filter: `drop-shadow(0 2px 2px rgba(0,0,0,0.2))`,
