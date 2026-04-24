@@ -96,9 +96,6 @@ export default function App() {
           setScreen({ name: 'builder' });
         }
         break;
-      case 'menu':
-        alert('メニューは準備中です ☰');
-        break;
     }
   };
 
