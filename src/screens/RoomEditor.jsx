@@ -311,6 +311,16 @@ export default function RoomEditor({
           <div className="grid grid-cols-6 gap-1.5">
             {FURNITURE_CATALOG
               .filter(f => activeCategory === 'all' || f.category === activeCategory)
+              .slice()
+              .sort((a, b) => {
+                // 공개 가구를 앞으로, 잠긴 건 뒤로 (안정정렬)
+                const au = isFurnitureUnlocked(a.id, currentLevel) ? 0 : 1;
+                const bu = isFurnitureUnlocked(b.id, currentLevel) ? 0 : 1;
+                if (au !== bu) return au - bu;
+                // 잠긴 것들끼리는 요구 레벨 오름차순
+                if (au === 1) return getFurnitureUnlockLevel(a.id) - getFurnitureUnlockLevel(b.id);
+                return 0;
+              })
               .map(f => {
               const unlocked = isFurnitureUnlocked(f.id, currentLevel);
               const requiredLv = getFurnitureUnlockLevel(f.id);
