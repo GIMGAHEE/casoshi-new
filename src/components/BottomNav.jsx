@@ -26,13 +26,13 @@ export default function BottomNav({ active, onNavigate }) {
               key={t.id}
               onClick={() => onNavigate(t.id)}
               className={`py-2 flex flex-col items-center gap-0.5 transition ${
-                isActive ? 'text-oshi-main' : 'text-oshi-dark/50'
+                isActive ? 'text-oshi-main' : 'text-oshi-dark/60'
               }`}
             >
               <img
                 src={t.icon}
                 alt=""
-                className={`w-7 h-7 object-contain ${isActive ? '' : 'opacity-60 grayscale-[25%]'}`}
+                className="w-7 h-7 object-contain"
                 style={{ imageRendering: 'pixelated' }}
                 draggable={false}
               />
