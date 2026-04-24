@@ -344,13 +344,13 @@ export default function CraneGame({ points, setPoints, onBack }) {
         <button
           onClick={() => setSoundOn(v => !v)}
           aria-label={soundOn ? 'サウンドをオフ' : 'サウンドをオン'}
-          className="w-9 h-9 rounded-full bg-white/70 border border-oshi-sub/50 flex items-center justify-center active:scale-95 transition-transform"
+          className="active:scale-95 transition-transform"
           title={soundOn ? 'サウンド ON' : 'サウンド OFF'}
         >
           <img
             src="/icons/sound.png"
             alt=""
-            className="w-6 h-6 object-contain"
+            className="w-10 h-10 object-contain"
             style={{
               imageRendering: 'pixelated',
               filter: soundOn ? 'none' : 'grayscale(1)',
