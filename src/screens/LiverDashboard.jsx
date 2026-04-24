@@ -1,0 +1,304 @@
+import { useState } from 'react';
+import { getLiverById, updateLiver, changeLiverPassword } from '../auth/liverRepository';
+import { logout } from '../auth/session';
+
+export default function LiverDashboard({ liverId, onLogout }) {
+  const [liver, setLiver] = useState(() => getLiverById(liverId));
+  const [editMode, setEditMode] = useState(false);
+  const [pwMode, setPwMode] = useState(false);
+
+  if (!liver) {
+    return (
+      <div className="max-w-md mx-auto px-4 py-8 text-center">
+        <div className="text-sm text-oshi-dark/60 mb-4">アカウント情報が見つかりません</div>
+        <button
+          onClick={() => { logout(); onLogout(); }}
+          className="px-4 py-2 rounded-full bg-oshi-main text-white text-sm"
+        >
+          再ログイン
+        </button>
+      </div>
+    );
+  }
+
+  const handleLogout = () => {
+    logout();
+    onLogout();
+  };
+
+  if (editMode) {
+    return (
+      <EditProfileForm
+        liver={liver}
+        onCancel={() => setEditMode(false)}
+        onSaved={(updated) => {
+          setLiver(updated);
+          setEditMode(false);
+        }}
+      />
+    );
+  }
+
+  if (pwMode) {
+    return (
+      <ChangePasswordForm
+        liver={liver}
+        onCancel={() => setPwMode(false)}
+        onDone={() => setPwMode(false)}
+      />
+    );
+  }
+
+  return (
+    <div className="max-w-md mx-auto px-4 py-4 min-h-[calc(100vh-64px)]">
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <div className="text-lg font-black text-oshi-dark">🎤 マイダッシュボード</div>
+          <div className="text-[11px] text-oshi-dark/60">ID: {liver.username}</div>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="text-xs text-oshi-dark/60 hover:text-oshi-dark underline"
+        >
+          ログアウト
+        </button>
+      </div>
+
+      {/* 프로필 카드 */}
+      <div
+        className="rounded-3xl p-5 border-2 shadow-md mb-3"
+        style={{
+          background: `linear-gradient(135deg, ${liver.profile.themeColor}22, ${liver.profile.bgColor})`,
+          borderColor: liver.profile.themeColor + '60',
+        }}
+      >
+        <div className="flex items-start gap-3">
+          <div
+            className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 bg-white/70"
+          >
+            <div className="text-4xl">
+              {liver.profile.gender === 'boy' ? '👦' : '👧'}
+            </div>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-lg font-black text-oshi-dark">{liver.profile.name}</div>
+            {liver.profile.bio && (
+              <div className="text-xs text-oshi-dark/70 mt-1">{liver.profile.bio}</div>
+            )}
+            {liver.profile.casLiveHandle && (
+              <div className="text-[11px] font-bold mt-1" style={{ color: liver.profile.themeColor }}>
+                🎥 {liver.profile.casLiveHandle}
+              </div>
+            )}
+            {liver.profile.streamSchedule && (
+              <div className="text-[10px] text-oshi-dark/60 mt-0.5">
+                📅 {liver.profile.streamSchedule}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 통계 */}
+      <div className="grid grid-cols-2 gap-2 mb-3">
+        <div className="bg-white rounded-2xl border-2 border-oshi-sub p-3 text-center">
+          <div className="text-[10px] text-oshi-dark/60">累計応援pt</div>
+          <div className="text-2xl font-black text-oshi-main">
+            {liver.stats?.totalSupport || 0}
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl border-2 border-oshi-sub p-3 text-center">
+          <div className="text-[10px] text-oshi-dark/60">応援者数</div>
+          <div className="text-2xl font-black text-oshi-dark">
+            {liver.stats?.supporterCount || 0}
+          </div>
+        </div>
+      </div>
+
+      {/* 액션 */}
+      <div className="space-y-2">
+        <button
+          onClick={() => setEditMode(true)}
+          className="w-full py-3 rounded-2xl bg-white border-2 border-oshi-sub text-oshi-dark font-bold text-sm active:scale-95 transition"
+        >
+          ✏️ プロフィールを編集
+        </button>
+        <button
+          onClick={() => setPwMode(true)}
+          className="w-full py-3 rounded-2xl bg-white border-2 border-oshi-sub text-oshi-dark font-bold text-sm active:scale-95 transition"
+        >
+          🔐 パスワードを変更
+        </button>
+      </div>
+
+      <div className="mt-4 text-center text-[10px] text-oshi-dark/50">
+        登録日: {new Date(liver.createdAt).toLocaleDateString('ja-JP')}
+      </div>
+    </div>
+  );
+}
+
+// ===== 프로필 편집 폼 =====
+function EditProfileForm({ liver, onCancel, onSaved }) {
+  const [form, setForm] = useState({ ...liver.profile });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const updated = updateLiver(liver.id, { profile: form });
+    setLoading(false);
+    if (updated) onSaved(updated);
+  };
+
+  return (
+    <div className="max-w-md mx-auto px-4 py-4">
+      <div className="flex items-center justify-between mb-4">
+        <button onClick={onCancel} className="text-sm text-oshi-dark/60">
+          ← キャンセル
+        </button>
+        <div className="text-sm font-black text-oshi-dark">プロフィール編集</div>
+        <div className="w-12" />
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <Field label="名前">
+          <input
+            type="text"
+            value={form.name}
+            onChange={e => setForm({ ...form, name: e.target.value })}
+            className="w-full px-3 py-2 rounded-xl border-2 border-oshi-sub text-sm"
+            required
+          />
+        </Field>
+        <Field label="自己紹介">
+          <textarea
+            value={form.bio}
+            onChange={e => setForm({ ...form, bio: e.target.value })}
+            rows={3}
+            className="w-full px-3 py-2 rounded-xl border-2 border-oshi-sub text-sm resize-none"
+          />
+        </Field>
+        <Field label="CasLive ハンドル">
+          <input
+            type="text"
+            value={form.casLiveHandle || ''}
+            onChange={e => setForm({ ...form, casLiveHandle: e.target.value })}
+            className="w-full px-3 py-2 rounded-xl border-2 border-oshi-sub text-sm"
+            placeholder="@nana_live"
+          />
+        </Field>
+        <Field label="配信スケジュール">
+          <input
+            type="text"
+            value={form.streamSchedule || ''}
+            onChange={e => setForm({ ...form, streamSchedule: e.target.value })}
+            className="w-full px-3 py-2 rounded-xl border-2 border-oshi-sub text-sm"
+            placeholder="金 22:00〜"
+          />
+        </Field>
+        <Field label="テーマカラー">
+          <div className="flex gap-2 items-center">
+            <input
+              type="color"
+              value={form.themeColor}
+              onChange={e => setForm({ ...form, themeColor: e.target.value })}
+              className="w-12 h-10 rounded-lg border-2 border-oshi-sub cursor-pointer"
+            />
+            <input
+              type="color"
+              value={form.bgColor}
+              onChange={e => setForm({ ...form, bgColor: e.target.value })}
+              className="w-12 h-10 rounded-lg border-2 border-oshi-sub cursor-pointer"
+            />
+            <span className="text-[10px] text-oshi-dark/60">メイン / 背景</span>
+          </div>
+        </Field>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-3 rounded-full bg-oshi-main text-white font-black text-sm shadow mt-4 active:scale-95 disabled:opacity-50"
+        >
+          {loading ? '...' : '保存'}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+// ===== 비번 변경 폼 =====
+function ChangePasswordForm({ liver, onCancel, onDone }) {
+  const [newPw, setNewPw] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    if (newPw.length < 6) return setError('6文字以上で入力してください');
+    if (newPw !== confirm) return setError('パスワードが一致しません');
+    setLoading(true);
+    await changeLiverPassword(liver.id, newPw);
+    setLoading(false);
+    alert('パスワードを変更しました');
+    onDone();
+  };
+
+  return (
+    <div className="max-w-md mx-auto px-4 py-4">
+      <div className="flex items-center justify-between mb-4">
+        <button onClick={onCancel} className="text-sm text-oshi-dark/60">← キャンセル</button>
+        <div className="text-sm font-black text-oshi-dark">パスワード変更</div>
+        <div className="w-12" />
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <Field label="新しいパスワード (6文字以上)">
+          <input
+            type="password"
+            value={newPw}
+            onChange={e => setNewPw(e.target.value)}
+            className="w-full px-3 py-2 rounded-xl border-2 border-oshi-sub text-sm"
+            minLength={6}
+            required
+          />
+        </Field>
+        <Field label="もう一度入力">
+          <input
+            type="password"
+            value={confirm}
+            onChange={e => setConfirm(e.target.value)}
+            className="w-full px-3 py-2 rounded-xl border-2 border-oshi-sub text-sm"
+            minLength={6}
+            required
+          />
+        </Field>
+
+        {error && (
+          <div className="text-xs text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-3 rounded-full bg-oshi-main text-white font-black text-sm shadow mt-4 active:scale-95 disabled:opacity-50"
+        >
+          {loading ? '...' : '変更'}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function Field({ label, children }) {
+  return (
+    <div>
+      <label className="text-xs font-bold text-oshi-dark/70 mb-1 block">{label}</label>
+      {children}
+    </div>
+  );
+}

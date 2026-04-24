@@ -10,6 +10,11 @@ import Ranking from './screens/Ranking';
 import MyOshiBuilder from './screens/MyOshiBuilder';
 import MiniHome from './screens/MiniHome';
 import RoomEditor from './screens/RoomEditor';
+import AdminLogin from './screens/AdminLogin';
+import AdminDashboard from './screens/AdminDashboard';
+import LiverLogin from './screens/LiverLogin';
+import LiverDashboard from './screens/LiverDashboard';
+import { getSession } from './auth/session';
 
 export default function App() {
   const [points, setPoints] = useLocalStorage('casoshi:points', 0);
@@ -19,8 +24,27 @@ export default function App() {
   // rooms: { [characterId]: { items: [...] } }
   const [rooms, setRooms] = useLocalStorage('casoshi:rooms', {});
 
-  // screen: home | character | tap | ranking | builder | minihome | roomEditor
-  const [screen, setScreen] = useState({ name: 'home' });
+  // screen: home | character | tap | rhythm | crane | ranking | builder | minihome | roomEditor
+  //         | adminLogin | adminDashboard | liverLogin | liverDashboard
+  const [screen, setScreen] = useState(() => {
+    // ① URL ?admin=1 → 운영자 플로우 진입점
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('admin') === '1') {
+      const s = getSession();
+      if (s?.type === 'admin') return { name: 'adminDashboard' };
+      return { name: 'adminLogin' };
+    }
+    // ② 기존 라이버 세션 있으면 대시보드로 직행
+    const s = getSession();
+    if (s?.type === 'liver' && s.liverId) {
+      return { name: 'liverDashboard', params: { liverId: s.liverId } };
+    }
+    // ③ 기본: 홈
+    return { name: 'home' };
+  });
+
+  // 운영/라이버 화면에선 PointsBar 숨김
+  const hidePointsBar = ['adminLogin', 'adminDashboard', 'liverLogin', 'liverDashboard'].includes(screen.name);
 
   const handleReset = () => {
     if (!window.confirm('全データをリセットしますか？\nマイ推しも削除されます。この操作は取り消せません。')) return;
@@ -44,7 +68,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-oshi-bg">
-      <PointsBar points={points} onReset={handleReset} />
+      {!hidePointsBar && <PointsBar points={points} onReset={handleReset} />}
 
       {screen.name === 'home' && (
         <Home
@@ -58,6 +82,7 @@ export default function App() {
           onOpenCraneGame={() => setScreen({ name: 'crane' })}
           onOpenRanking={() => setScreen({ name: 'ranking' })}
           onOpenBuilder={() => setScreen({ name: 'builder' })}
+          onOpenLiverLogin={() => setScreen({ name: 'liverLogin' })}
         />
       )}
 
@@ -131,6 +156,43 @@ export default function App() {
           supportPoints={supports[screen.params.id] || 0}
           onSave={(roomData) => handleSaveRoom(screen.params.id, roomData)}
           onCancel={() => setScreen({ name: 'minihome', params: screen.params })}
+        />
+      )}
+
+      {/* ===== 인증/관리 화면 ===== */}
+      {screen.name === 'adminLogin' && (
+        <AdminLogin
+          onSuccess={() => setScreen({ name: 'adminDashboard' })}
+          onCancel={() => {
+            // URL 파라미터 제거하면서 홈으로
+            window.history.replaceState({}, '', window.location.pathname);
+            setScreen({ name: 'home' });
+          }}
+        />
+      )}
+
+      {screen.name === 'adminDashboard' && (
+        <AdminDashboard
+          onLogout={() => {
+            window.history.replaceState({}, '', window.location.pathname);
+            setScreen({ name: 'home' });
+          }}
+        />
+      )}
+
+      {screen.name === 'liverLogin' && (
+        <LiverLogin
+          onSuccess={(_session, liver) =>
+            setScreen({ name: 'liverDashboard', params: { liverId: liver.id } })
+          }
+          onCancel={() => setScreen({ name: 'home' })}
+        />
+      )}
+
+      {screen.name === 'liverDashboard' && (
+        <LiverDashboard
+          liverId={screen.params.liverId}
+          onLogout={() => setScreen({ name: 'home' })}
         />
       )}
     </div>

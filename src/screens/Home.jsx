@@ -8,7 +8,7 @@ export default function Home({
   supports, myOshi,
   lastCheckin, setLastCheckin,
   onSelectCharacter, onOpenTapGame, onOpenRhythmGame, onOpenCraneGame, onOpenRanking,
-  onOpenBuilder,
+  onOpenBuilder, onOpenLiverLogin,
 }) {
   const today = todayKey();
   const canCheckin = lastCheckin !== today;
@@ -178,8 +178,14 @@ export default function Home({
         </div>
       </section>
 
-      <div className="text-center text-[10px] text-oshi-dark/40 pt-4 pb-8">
-        Phase 1 MVP · ローカル保存 · 無課金
+      <div className="text-center text-[10px] text-oshi-dark/40 pt-4 pb-8 space-y-1.5">
+        <button
+          onClick={onOpenLiverLogin}
+          className="text-oshi-dark/60 hover:text-oshi-main underline underline-offset-2"
+        >
+          🎤 ライバーログイン
+        </button>
+        <div>Phase 1 MVP · ローカル保存 · 無課金</div>
       </div>
     </div>
   );
