@@ -130,16 +130,22 @@ export default function LiverDashboard({ liverId, onBack, onLogout }) {
 
       {/* 프로필 카드 */}
       <div
-        className="rounded-3xl p-5 border-2 shadow-md mb-3"
+        className="relative rounded-3xl p-5 border-2 shadow-md mb-4 overflow-hidden"
         style={{
           background: `linear-gradient(135deg, ${liver.profile.themeColor}22, ${liver.profile.bgColor})`,
           borderColor: liver.profile.themeColor + '60',
         }}
       >
+        {/* LIVER 뱃지 */}
+        <div
+          className="absolute top-2 right-2 text-[9px] font-black px-2 py-0.5 rounded-full text-white shadow"
+          style={{ background: liver.profile.themeColor }}
+        >
+          ★ LIVER
+        </div>
+
         <div className="flex items-start gap-3">
-          <div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 bg-white/70 overflow-hidden"
-          >
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 bg-white/70 overflow-hidden relative">
             {(() => {
               const liverChar = asLiverCharacter(liver);
               if (liverChar?.sprite && liverChar.spriteSize && !liverChar.hairOverlay) {
@@ -163,9 +169,15 @@ export default function LiverDashboard({ liverId, onBack, onLogout }) {
                 );
               }
               return (
-                <div className="text-4xl">
-                  {liver.profile.gender === 'boy' ? '👦' : '👧'}
-                </div>
+                <>
+                  <div className="text-4xl">
+                    {liver.profile.gender === 'boy' ? '👦' : '👧'}
+                  </div>
+                  {/* 꾸미기 힌트 배지 */}
+                  <div className="absolute -bottom-1 -right-1 bg-white text-[8px] font-black px-1.5 py-0.5 rounded-full shadow border border-oshi-sub text-oshi-main">
+                    ✨ NEW
+                  </div>
+                </>
               );
             })()}
           </div>
@@ -188,47 +200,105 @@ export default function LiverDashboard({ liverId, onBack, onLogout }) {
         </div>
       </div>
 
-      {/* 통계 */}
-      <div className="grid grid-cols-2 gap-2 mb-3">
-        <div className="bg-white rounded-2xl border-2 border-oshi-sub p-3 text-center">
-          <div className="text-[10px] text-oshi-dark/60">累計応援pt</div>
-          <div className="text-2xl font-black text-oshi-main">
-            {liver.stats?.totalSupport || 0}
+      {/* 통계 — 이모지 + 그라디언트 */}
+      <div className="grid grid-cols-2 gap-2 mb-4">
+        <div className="relative bg-gradient-to-br from-pink-50 to-pink-100 rounded-2xl border-2 border-pink-200 p-3 text-center overflow-hidden">
+          <div className="absolute -top-2 -right-2 text-4xl opacity-20 select-none">💖</div>
+          <div className="relative">
+            <div className="text-[10px] font-bold text-oshi-dark/60">累計応援pt</div>
+            <div className="text-3xl font-black text-oshi-main leading-tight">
+              {liver.stats?.totalSupport || 0}
+            </div>
           </div>
         </div>
-        <div className="bg-white rounded-2xl border-2 border-oshi-sub p-3 text-center">
-          <div className="text-[10px] text-oshi-dark/60">応援者数</div>
-          <div className="text-2xl font-black text-oshi-dark">
-            {liver.stats?.supporterCount || 0}
+        <div className="relative bg-gradient-to-br from-yellow-50 to-orange-100 rounded-2xl border-2 border-yellow-200 p-3 text-center overflow-hidden">
+          <div className="absolute -top-2 -right-2 text-4xl opacity-20 select-none">👥</div>
+          <div className="relative">
+            <div className="text-[10px] font-bold text-oshi-dark/60">応援者数</div>
+            <div className="text-3xl font-black text-orange-500 leading-tight">
+              {liver.stats?.supporterCount || 0}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 액션 */}
-      <div className="space-y-2">
+      {/* 메인 액션 — 꾸미기 기능 (큰 feature 카드 2개) */}
+      <div className="space-y-3 mb-4">
         <button
           onClick={() => setBuilderMode(true)}
-          className="w-full py-3 rounded-2xl bg-gradient-to-r from-oshi-main to-pink-400 text-white font-black text-sm shadow active:scale-95 transition"
+          className="w-full group relative overflow-hidden rounded-3xl shadow-lg active:scale-[0.98] transition"
         >
-          ✨ 自分を飾る
+          <div className="absolute inset-0 bg-gradient-to-br from-pink-400 via-pink-500 to-rose-400" />
+          {/* 장식 도트 패턴 */}
+          <div
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage:
+                'radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px)',
+              backgroundSize: '16px 16px',
+            }}
+          />
+          <div className="relative flex items-center gap-3 p-4">
+            <div className="w-16 h-16 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center shrink-0 border border-white/40">
+              <div className="text-3xl">✨</div>
+            </div>
+            <div className="flex-1 text-left">
+              <div className="text-white text-lg font-black drop-shadow-sm">
+                自分を飾る
+              </div>
+              <div className="text-white/90 text-[11px] font-medium mt-0.5">
+                新しい姿でファンを驚かせよう
+              </div>
+            </div>
+            <div className="text-white text-2xl font-black pr-1">›</div>
+          </div>
         </button>
+
         <button
           onClick={() => setRoomMode(true)}
-          className="w-full py-3 rounded-2xl bg-gradient-to-r from-purple-400 to-pink-300 text-white font-black text-sm shadow active:scale-95 transition"
+          className="w-full group relative overflow-hidden rounded-3xl shadow-lg active:scale-[0.98] transition"
         >
-          🏠 お部屋を飾る
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-400 via-fuchsia-400 to-pink-300" />
+          <div
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage:
+                'radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px)',
+              backgroundSize: '16px 16px',
+            }}
+          />
+          <div className="relative flex items-center gap-3 p-4">
+            <div className="w-16 h-16 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center shrink-0 border border-white/40">
+              <div className="text-3xl">🏠</div>
+            </div>
+            <div className="flex-1 text-left">
+              <div className="text-white text-lg font-black drop-shadow-sm">
+                お部屋を飾る
+              </div>
+              <div className="text-white/90 text-[11px] font-medium mt-0.5">
+                家具を置いて自分らしい空間に
+              </div>
+            </div>
+            <div className="text-white text-2xl font-black pr-1">›</div>
+          </div>
         </button>
+      </div>
+
+      {/* 보조 메뉴 — 2열 작은 버튼 */}
+      <div className="grid grid-cols-2 gap-2">
         <button
           onClick={() => setEditMode(true)}
-          className="w-full py-3 rounded-2xl bg-white border-2 border-oshi-sub text-oshi-dark font-bold text-sm active:scale-95 transition"
+          className="bg-white rounded-2xl border-2 border-oshi-sub py-3 px-2 text-center active:scale-95 transition hover:border-oshi-main"
         >
-          ✏️ プロフィールを編集
+          <div className="text-xl mb-0.5">✏️</div>
+          <div className="text-[11px] font-bold text-oshi-dark">プロフィール</div>
         </button>
         <button
           onClick={() => setPwMode(true)}
-          className="w-full py-3 rounded-2xl bg-white border-2 border-oshi-sub text-oshi-dark font-bold text-sm active:scale-95 transition"
+          className="bg-white rounded-2xl border-2 border-oshi-sub py-3 px-2 text-center active:scale-95 transition hover:border-oshi-main"
         >
-          🔐 パスワードを変更
+          <div className="text-xl mb-0.5">🔐</div>
+          <div className="text-[11px] font-bold text-oshi-dark">パスワード</div>
         </button>
       </div>
 
