@@ -32,7 +32,15 @@ export default function CharacterDetail({
     );
   }
 
-  const supportPoints = supports[character.id] || 0;
+  // 레벨/EXP 계산 기준:
+  //   - 라이버: Firestore stats.totalSupport (전체 유저 합산) — 랭킹/홈 카드와 일관
+  //   - MyOshi/시드: 내 로컬 supports[id]
+  // 응원 기능도 라이버 전용이라 이 구분이 자연스러움.
+  const mySupport = supports[character.id] || 0;
+  const globalSupport = character.isLiver
+    ? (character.stats?.totalSupport || 0)
+    : mySupport;
+  const supportPoints = globalSupport;
   const level = calcLevel(supportPoints);
   const exp = calcExp(supportPoints);
   const canSupport = points >= SUPPORT_COST;
