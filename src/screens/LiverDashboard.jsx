@@ -222,41 +222,37 @@ export default function LiverDashboard({ liverId, onBack, onLogout }) {
         </div>
       </div>
 
-      {/* 메인 액션 — 꾸미기 기능 (큰 feature 카드 2개) */}
-      <div className="space-y-3 mb-4">
+      {/* 메인 액션 — 꾸미기 기능 (2열 feature 카드) */}
+      <div className="grid grid-cols-2 gap-3 mb-4">
         <button
           onClick={() => setBuilderMode(true)}
-          className="w-full group relative overflow-hidden rounded-3xl shadow-lg active:scale-[0.98] transition"
+          className="group relative overflow-hidden rounded-3xl shadow-lg active:scale-[0.97] transition aspect-[1/1.1]"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-pink-400 via-pink-500 to-rose-400" />
-          {/* 장식 도트 패턴 */}
           <div
             className="absolute inset-0 opacity-20"
             style={{
               backgroundImage:
                 'radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px)',
-              backgroundSize: '16px 16px',
+              backgroundSize: '14px 14px',
             }}
           />
-          <div className="relative flex items-center gap-3 p-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center shrink-0 border border-white/40">
+          <div className="relative flex flex-col items-center justify-center h-full p-3 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center border border-white/40 mb-2">
               <div className="text-3xl">✨</div>
             </div>
-            <div className="flex-1 text-left">
-              <div className="text-white text-lg font-black drop-shadow-sm">
-                自分を飾る
-              </div>
-              <div className="text-white/90 text-[11px] font-medium mt-0.5">
-                新しい姿でファンを驚かせよう
-              </div>
+            <div className="text-white text-base font-black drop-shadow-sm">
+              自分を飾る
             </div>
-            <div className="text-white text-2xl font-black pr-1">›</div>
+            <div className="text-white/90 text-[10px] font-medium mt-0.5">
+              新しい姿に
+            </div>
           </div>
         </button>
 
         <button
           onClick={() => setRoomMode(true)}
-          className="w-full group relative overflow-hidden rounded-3xl shadow-lg active:scale-[0.98] transition"
+          className="group relative overflow-hidden rounded-3xl shadow-lg active:scale-[0.97] transition aspect-[1/1.1]"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-purple-400 via-fuchsia-400 to-pink-300" />
           <div
@@ -264,22 +260,19 @@ export default function LiverDashboard({ liverId, onBack, onLogout }) {
             style={{
               backgroundImage:
                 'radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px)',
-              backgroundSize: '16px 16px',
+              backgroundSize: '14px 14px',
             }}
           />
-          <div className="relative flex items-center gap-3 p-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center shrink-0 border border-white/40">
+          <div className="relative flex flex-col items-center justify-center h-full p-3 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center border border-white/40 mb-2">
               <div className="text-3xl">🏠</div>
             </div>
-            <div className="flex-1 text-left">
-              <div className="text-white text-lg font-black drop-shadow-sm">
-                お部屋を飾る
-              </div>
-              <div className="text-white/90 text-[11px] font-medium mt-0.5">
-                家具を置いて自分らしい空間に
-              </div>
+            <div className="text-white text-base font-black drop-shadow-sm">
+              お部屋を飾る
             </div>
-            <div className="text-white text-2xl font-black pr-1">›</div>
+            <div className="text-white/90 text-[10px] font-medium mt-0.5">
+              空間を作る
+            </div>
           </div>
         </button>
       </div>
