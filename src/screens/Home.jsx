@@ -31,9 +31,9 @@ export default function Home({
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 py-6 space-y-6">
+    <div className="max-w-md mx-auto px-4 py-6 space-y-7">
       {/* 히어로 — 로고 이미지 (ゲームで推しを育てる 부제목도 이미지에 포함됨) */}
-      <section className="text-center pt-2 pb-1">
+      <section className="text-center pt-3 pb-2">
         <img
           src="/logo.png"
           alt="Casオシ — ゲームで推しを育てる、新しい推し活。"
@@ -44,14 +44,14 @@ export default function Home({
       </section>
 
       {/* 액션 섹션 */}
-      <section className="space-y-3">
+      <section className="space-y-4">
         {/* 1열: 출석 / 랭킹 / 마이홈 (3-col) */}
-        <div className="grid grid-cols-3 gap-2">
-          {/* 출석 체크 */}
+        <div className="grid grid-cols-3 gap-3">
+          {/* 출석 체크 — 기본 흰색 */}
           <button
             onClick={handleCheckin}
             disabled={!canCheckin}
-            className={`card flex flex-col items-center justify-center py-4 px-2 transition ${
+            className={`card flex flex-col items-center justify-center py-4 px-2 bg-white transition ${
               canCheckin ? 'hover:bg-oshi-bg cursor-pointer' : 'opacity-50 cursor-not-allowed'
             }`}
           >
@@ -67,10 +67,10 @@ export default function Home({
             <div className="text-[9px] text-oshi-dark/55 mt-0.5">+{DAILY_BONUS} pt</div>
           </button>
 
-          {/* 랭킹 */}
+          {/* 랭킹 — 노란색 강조 (핵심 기능) */}
           <button
             onClick={onOpenRanking}
-            className="card flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-br from-yellow-50 via-orange-50 to-pink-50 hover:scale-[1.03] transition-transform"
+            className="card flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-br from-yellow-100 via-yellow-50 to-white ring-2 ring-yellow-300 shadow-lg hover:scale-[1.03] transition-transform"
           >
             <img
               src="/icons/trophy.png"
@@ -88,11 +88,7 @@ export default function Home({
             return (
               <button
                 onClick={onOpenLiverDashboard}
-                className="card relative flex flex-col items-center justify-center py-4 px-2 hover:scale-[1.03] transition-transform"
-                style={{
-                  background: `linear-gradient(135deg, ${selfLiver.profile.themeColor}22, ${selfLiver.profile.bgColor})`,
-                  borderColor: selfLiver.profile.themeColor + '60',
-                }}
+                className="card relative flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-br from-pink-100 via-pink-50 to-white ring-2 ring-pink-200 hover:scale-[1.03] transition-transform"
               >
                 <span className="absolute top-1 right-1 text-[8px] font-black bg-oshi-main text-white px-1.5 py-0.5 rounded-full">
                   LIVER
@@ -112,11 +108,7 @@ export default function Home({
           })() : myOshiChar ? (
             <button
               onClick={() => onSelectCharacter(MY_OSHI_ID)}
-              className="card flex flex-col items-center justify-center py-4 px-2 hover:scale-[1.03] transition-transform"
-              style={{
-                background: `linear-gradient(135deg, ${myOshiChar.themeColor}22, ${myOshiChar.bgColor})`,
-                borderColor: myOshiChar.themeColor + '60',
-              }}
+              className="card flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-br from-pink-100 via-pink-50 to-white ring-2 ring-pink-200 hover:scale-[1.03] transition-transform"
             >
               <AvatarTile
                 sprite={myOshiChar.sprite}
@@ -132,7 +124,7 @@ export default function Home({
           ) : (
             <button
               onClick={onOpenBuilder}
-              className="card flex flex-col items-center justify-center py-4 px-2 border-dashed border-2 border-oshi-main/40 bg-gradient-to-br from-oshi-sub/40 via-white to-oshi-bg hover:scale-[1.03] transition-transform"
+              className="card flex flex-col items-center justify-center py-4 px-2 bg-white border-dashed border-2 border-oshi-main/40 hover:scale-[1.03] transition-transform"
             >
               <div className="w-12 h-12 mb-1 flex items-center justify-center text-3xl">➕</div>
               <div className="text-[11px] font-bold text-oshi-main leading-tight text-center">マイ推し</div>
@@ -142,10 +134,10 @@ export default function Home({
         </div>
 
         {/* 2열: 게임 3개 */}
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-3">
           <button
             onClick={onOpenTapGame}
-            className="card flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-br from-oshi-sub to-oshi-bg hover:scale-[1.03] transition-transform"
+            className="card flex flex-col items-center justify-center py-4 px-2 bg-white hover:scale-[1.03] transition-transform"
           >
             <img
               src="/icons/tap.png"
@@ -159,7 +151,7 @@ export default function Home({
 
           <button
             onClick={onOpenCraneGame}
-            className="card flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-br from-pink-100 via-pink-50 to-pink-100 hover:scale-[1.03] transition-transform border-pink-200"
+            className="card flex flex-col items-center justify-center py-4 px-2 bg-white hover:scale-[1.03] transition-transform"
           >
             <img
               src="/icons/crane.png"
@@ -173,7 +165,7 @@ export default function Home({
 
           <button
             onClick={onOpenRhythmGame}
-            className="card relative flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-br from-purple-100 via-pink-50 to-orange-50 hover:scale-[1.03] transition-transform border-purple-200"
+            className="card relative flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-br from-purple-100 via-purple-50 to-white ring-2 ring-purple-200 hover:scale-[1.03] transition-transform"
           >
             <span className="absolute top-1.5 right-1.5 text-[8px] font-black bg-oshi-main text-white px-1.5 py-0.5 rounded-full">NEW</span>
             <img
