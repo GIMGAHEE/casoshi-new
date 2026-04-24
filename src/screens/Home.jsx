@@ -45,7 +45,7 @@ export default function Home({
             <img
               src="/icons/calendar.png"
               alt=""
-              className="w-12 h-12 mb-1"
+              className="w-16 h-16 mb-1"
               style={{ imageRendering: 'pixelated' }}
             />
             <div className="text-sm font-bold text-oshi-dark">
@@ -61,7 +61,7 @@ export default function Home({
             <img
               src="/icons/tap.png"
               alt=""
-              className="w-12 h-12 mb-1"
+              className="w-16 h-16 mb-1"
               style={{ imageRendering: 'pixelated' }}
             />
             <div className="text-sm font-bold text-oshi-dark">タップゲーム</div>
@@ -77,7 +77,7 @@ export default function Home({
           <img
             src="/icons/crane.png"
             alt=""
-            className="w-12 h-12"
+            className="w-16 h-16"
             style={{ imageRendering: 'pixelated' }}
           />
           <div className="flex-1 text-left">
@@ -94,7 +94,7 @@ export default function Home({
           <img
             src="/icons/trophy.png"
             alt=""
-            className="w-14 h-14"
+            className="w-16 h-16"
             style={{ imageRendering: 'pixelated' }}
           />
           <div className="flex-1 text-left">

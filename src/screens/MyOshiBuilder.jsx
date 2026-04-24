@@ -88,24 +88,26 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
         <div className="grid grid-cols-2 bg-white rounded-full p-1 border border-oshi-sub">
           <button
             onClick={() => handleGenderChange('girl')}
-            className={`py-2 rounded-full text-xs font-bold transition ${
+            className={`py-2 rounded-full text-xs font-bold transition flex items-center justify-center gap-1.5 ${
               gender === 'girl'
                 ? 'bg-oshi-main text-white shadow'
                 : 'text-oshi-dark/60'
             }`}
           >
-            👧 女の子
+            <img src="/icons/girl.png" alt="" className="w-5 h-5" style={{ imageRendering: 'pixelated' }} />
+            女の子
           </button>
           <button
             onClick={() => handleGenderChange('boy')}
-            className={`py-2 rounded-full text-xs font-bold transition ${
+            className={`py-2 rounded-full text-xs font-bold transition flex items-center justify-center gap-1.5 ${
               gender === 'boy'
                 ? 'text-white shadow'
                 : 'text-oshi-dark/60'
             }`}
             style={gender === 'boy' ? { backgroundColor: '#5BA4E0' } : {}}
           >
-            👦 男の子
+            <img src="/icons/boy.png" alt="" className="w-5 h-5" style={{ imageRendering: 'pixelated' }} />
+            男の子
           </button>
         </div>
       </div>
