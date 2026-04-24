@@ -15,6 +15,7 @@ import AdminLogin from './screens/AdminLogin';
 import AdminDashboard from './screens/AdminDashboard';
 import LiverLogin from './screens/LiverLogin';
 import LiverDashboard from './screens/LiverDashboard';
+import BottomNav from './components/BottomNav';
 import { getSession } from './auth/session';
 import { getUserId } from './auth/userIdentity';
 import { saveMyOshi as saveMyOshiRemote, deleteMyOshi as deleteMyOshiRemote } from './data/myOshiRepository';
@@ -61,6 +62,38 @@ export default function App() {
 
   // 운영/로그인 화면에선 PointsBar 숨김 (홈은 라이버 로그인 상태여도 표시)
   const hidePointsBar = ['adminLogin', 'adminDashboard', 'liverLogin', 'liverDashboard'].includes(screen.name);
+  // 하단 네비: 메인 흐름 (home/ranking/minihome/characterDetail 등) 에서만 표시.
+  // 게임/빌더/에디터/운영/로그인 중엔 숨겨서 집중하게.
+  const hideBottomNav = [
+    'adminLogin', 'adminDashboard',
+    'liverLogin', 'liverDashboard',
+    'builder', 'roomEditor',
+    'tapGame', 'craneGame', 'rhythmGame',
+  ].includes(screen.name);
+
+  // 현재 화면으로부터 활성 탭 결정
+  const activeTab = (() => {
+    if (screen.name === 'ranking') return 'ranking';
+    return 'home'; // minihome / characterDetail 등은 home 트리로 간주
+  })();
+
+  const handleNav = (tabId) => {
+    switch (tabId) {
+      case 'home':
+        setScreen({ name: 'home' });
+        break;
+      case 'ranking':
+      case 'support':
+        setScreen({ name: 'ranking' });
+        break;
+      case 'shop':
+        alert('ショップは準備中です 🛍️');
+        break;
+      case 'menu':
+        alert('メニューは準備中です ☰');
+        break;
+    }
+  };
 
   const handleReset = () => {
     if (!window.confirm('全データをリセットしますか？\nマイ推しも削除されます。この操作は取り消せません。')) return;
@@ -88,7 +121,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className={`min-h-screen ${hideBottomNav ? '' : 'pb-16'}`}>
       {!hidePointsBar && <PointsBar points={points} onReset={handleReset} />}
 
       {screen.name === 'home' && (
@@ -225,6 +258,8 @@ export default function App() {
           }}
         />
       )}
+
+      {!hideBottomNav && <BottomNav active={activeTab} onNavigate={handleNav} />}
     </div>
   );
 }

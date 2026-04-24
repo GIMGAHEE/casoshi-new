@@ -6,11 +6,11 @@ export default function PointsBar({ points, onReset }) {
           <img
             src="/icons/heart.png"
             alt=""
-            className="w-7 h-7"
+            className="w-8 h-8"
             style={{ imageRendering: 'pixelated' }}
           />
           <div>
-            <div className="text-xs text-oshi-dark/60 leading-none">ポイント</div>
+            <div className="text-[11px] text-oshi-dark/60 leading-none">ポイント</div>
             <div className="text-xl font-black text-oshi-main leading-tight">
               {points.toLocaleString()}
             </div>
@@ -18,8 +18,9 @@ export default function PointsBar({ points, onReset }) {
         </div>
         <button
           onClick={onReset}
-          className="text-xs text-oshi-dark/40 hover:text-oshi-dark/70 underline"
+          className="flex items-center gap-1 text-[11px] font-bold text-oshi-dark/60 hover:text-oshi-dark bg-white border-2 border-oshi-sub rounded-full px-3 py-1.5 active:scale-95 transition"
         >
+          <span className="text-sm leading-none">↻</span>
           リセット
         </button>
       </div>
