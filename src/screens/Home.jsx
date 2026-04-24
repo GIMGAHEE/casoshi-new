@@ -254,10 +254,12 @@ export default function Home({
 
 /**
  * 아바타 썸네일 타일 — 전신 sprite 에서 상반신만 보이게 크롭.
- * <img> 는 Tailwind preflight 의 max-width:100% 때문에 커지지 않아
- * 의도한 크롭이 깨짐. 그래서 background-image 로 구현 —
- * backgroundSize: 'auto 170%' 로 타일 높이의 170% 크기로 그려서
- * 'center top' 기준으로 배치 → 상반신만 표시됨.
+ *
+ * 이전 시도들 (objectFit:cover / height:170% / backgroundSize:170%) 이
+ * Tailwind preflight 또는 브라우저 CSS 해석 차이로 일관되지 않아서,
+ * 가장 확실한 방식으로 구현: <img> 를 정상 크기로 렌더한 뒤
+ * CSS transform scale(1.7) 로 확대 + origin 'center top' 으로 상단 앵커.
+ * overflow-hidden 이 오버플로한 하반신을 잘라낸다.
  */
 function AvatarTile({ sprite, hairOverlay, hairTransform, fallbackEmoji }) {
   if (!sprite) {
@@ -267,31 +269,38 @@ function AvatarTile({ sprite, hairOverlay, hairTransform, fallbackEmoji }) {
       </div>
     );
   }
-  const baseBg = {
-    backgroundImage: `url(${sprite})`,
-    backgroundSize: 'auto 170%',
-    backgroundPosition: 'center top',
-    backgroundRepeat: 'no-repeat',
+  const SCALE = 1.7;
+  // hairOverlay 는 sprite 와 같은 canvas 기준이라 동일한 base transform 을 받아야
+  // 정렬이 유지됨. hairTransform 은 그 위에 추가로 적용.
+  const baseTransform = `translateX(-50%) scale(${SCALE})`;
+  const hairExtra = hairTransform
+    ? ` translate(${hairTransform.x}%, ${hairTransform.y}%) scale(${hairTransform.scale})`
+    : '';
+  const imgBase = {
+    position: 'absolute',
+    top: 0,
+    left: '50%',
+    width: '100%',
+    transformOrigin: 'center top',
     imageRendering: 'pixelated',
   };
   return (
-    <div
-      className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden relative"
-      style={baseBg}
-    >
+    <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden relative">
+      <img
+        src={sprite}
+        alt=""
+        draggable={false}
+        style={{ ...imgBase, transform: baseTransform }}
+      />
       {hairOverlay && (
-        <div
-          className="absolute inset-0 pointer-events-none"
+        <img
+          src={hairOverlay}
+          alt=""
+          draggable={false}
           style={{
-            backgroundImage: `url(${hairOverlay})`,
-            backgroundSize: 'auto 170%',
-            backgroundPosition: 'center top',
-            backgroundRepeat: 'no-repeat',
-            imageRendering: 'pixelated',
-            transform: hairTransform
-              ? `translate(${hairTransform.x}%, ${hairTransform.y}%) scale(${hairTransform.scale})`
-              : undefined,
-            transformOrigin: 'center top',
+            ...imgBase,
+            transform: baseTransform + hairExtra,
+            pointerEvents: 'none',
           }}
         />
       )}
