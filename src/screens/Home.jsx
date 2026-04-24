@@ -1,5 +1,6 @@
-import { SEED_CHARACTERS, asCharacter, MY_OSHI_ID, MY_OSHI_PRESETS } from '../data/characters';
+import { SEED_CHARACTERS, asCharacter, asLiverCharacter, MY_OSHI_ID, MY_OSHI_PRESETS } from '../data/characters';
 import { todayKey, DAILY_BONUS } from '../data/gameRules';
+import { listLivers } from '../auth/liverRepository';
 import CharacterCard from '../components/CharacterCard';
 import PixelAvatar from '../components/PixelAvatar';
 
@@ -13,6 +14,8 @@ export default function Home({
   const today = todayKey();
   const canCheckin = lastCheckin !== today;
   const myOshiChar = asCharacter(myOshi);
+  // 운영자가 등록한 라이버들 → Character 형태로 변환
+  const registeredLivers = listLivers().map(asLiverCharacter).filter(Boolean);
 
   const handleCheckin = () => {
     if (!canCheckin) return;
@@ -160,10 +163,37 @@ export default function Home({
         )}
       </section>
 
-      {/* 시드 캐릭터 */}
+      {/* 등록된 라이버 */}
       <section>
         <div className="flex items-center justify-between mb-3 px-1">
-          <h2 className="text-lg font-black text-oshi-dark">人気の推し</h2>
+          <h2 className="text-lg font-black text-oshi-dark">🎤 登録ライバー</h2>
+          <span className="text-xs text-oshi-dark/60">{registeredLivers.length}人</span>
+        </div>
+        {registeredLivers.length === 0 ? (
+          <div className="bg-white/60 rounded-2xl border-2 border-dashed border-oshi-sub p-6 text-center">
+            <div className="text-3xl mb-2">🎤</div>
+            <div className="text-xs text-oshi-dark/60">
+              まだ登録されたライバーがいません
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {registeredLivers.map(ch => (
+              <CharacterCard
+                key={ch.id}
+                character={ch}
+                supportPoints={supports[ch.id] || 0}
+                onClick={() => onSelectCharacter(ch.id)}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* 시드 캐릭터 (샘플) */}
+      <section>
+        <div className="flex items-center justify-between mb-3 px-1">
+          <h2 className="text-lg font-black text-oshi-dark">サンプル推し</h2>
           <span className="text-xs text-oshi-dark/60">{SEED_CHARACTERS.length}人</span>
         </div>
         <div className="space-y-3">

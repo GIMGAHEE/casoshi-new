@@ -291,12 +291,52 @@ export const asCharacter = (myOshi) => {
   };
 };
 
-// 전체 캐릭터 목록 (시드 + 있으면 마이 추시)
-export const allCharacters = (myOshi) => {
+// 전체 캐릭터 목록 (시드 + 있으면 마이 추시 + 등록된 라이버)
+export const allCharacters = (myOshi, livers = []) => {
   const my = asCharacter(myOshi);
-  return my ? [my, ...SEED_CHARACTERS] : SEED_CHARACTERS;
+  const liverChars = livers.map(asLiverCharacter).filter(Boolean);
+  return [
+    ...(my ? [my] : []),
+    ...liverChars,
+    ...SEED_CHARACTERS,
+  ];
 };
 
-export const findCharacter = (myOshi, id) => {
-  return allCharacters(myOshi).find(c => c.id === id) || null;
+export const findCharacter = (myOshi, id, livers = []) => {
+  return allCharacters(myOshi, livers).find(c => c.id === id) || null;
+};
+
+// ============================================================
+// 🎤 라이버 → Character 변환 (운영자가 등록한 라이버를 홈/랭킹/상세에 표시)
+// ============================================================
+export const asLiverCharacter = (liver) => {
+  if (!liver) return null;
+  const p = liver.profile || {};
+  const gender = p.gender === 'boy' ? 'boy' : 'girl';
+  return {
+    id: liver.id,
+    creatorId: liver.username,
+    name: p.name,
+    nameRomaji: '',
+    type: 'ライバー',
+    typeLabel: '라이버',
+    emoji: gender === 'boy' ? '🎤' : '💖',
+    themeColor: p.themeColor || '#FF6B9D',
+    bgColor: p.bgColor || '#FFE5EC',
+    sprite: p.imageUrl || null,
+    catchphrase: p.streamSchedule
+      ? `📅 ${p.streamSchedule}`
+      : 'よろしくお願いします！',
+    bio: p.bio || `${p.name}です、応援お願いします！`,
+    dialogues: GENERIC_DIALOGUES.map(d => ({
+      ...d,
+      text: d.text.replace('{name}', p.name),
+    })),
+    // 라이버 고유 메타
+    isLiver: true,
+    liverId: liver.id,
+    casLiveHandle: p.casLiveHandle || '',
+    streamSchedule: p.streamSchedule || '',
+    gender,
+  };
 };

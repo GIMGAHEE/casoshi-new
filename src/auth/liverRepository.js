@@ -109,3 +109,20 @@ export function deleteLiver(id) {
   const livers = readAll().filter(l => l.id !== id);
   writeAll(livers);
 }
+
+// 응원 포인트 누적 (팬이 응원 시 호출)
+export function addLiverSupport(liverId, points) {
+  const livers = readAll();
+  const idx = livers.findIndex(l => l.id === liverId);
+  if (idx === -1) return false;
+  const liver = livers[idx];
+  const prevTotal = liver.stats?.totalSupport || 0;
+  liver.stats = {
+    ...liver.stats,
+    totalSupport: prevTotal + points,
+    supporterCount: liver.stats?.supporterCount || 0,
+  };
+  liver.updatedAt = new Date().toISOString();
+  writeAll(livers);
+  return true;
+}

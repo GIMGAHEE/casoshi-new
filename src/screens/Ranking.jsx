@@ -1,4 +1,5 @@
 import { allCharacters, calcLevel } from '../data/characters';
+import { listLivers } from '../auth/liverRepository';
 import PixelAvatar from '../components/PixelAvatar';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
@@ -40,7 +41,7 @@ function Avatar({ character, size }) {
 }
 
 export default function Ranking({ myOshi, supports, onBack, onSelectCharacter }) {
-  const characters = allCharacters(myOshi);
+  const characters = allCharacters(myOshi, listLivers());
   const ranked = [...characters]
     .map(c => ({ ...c, supportPoints: supports[c.id] || 0 }))
     .sort((a, b) => b.supportPoints - a.supportPoints);

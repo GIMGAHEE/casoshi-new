@@ -4,6 +4,7 @@ import {
   getUnlockedDialogues, findCharacter,
 } from '../data/characters';
 import { SUPPORT_COST } from '../data/gameRules';
+import { listLivers, addLiverSupport } from '../auth/liverRepository';
 import LevelUpModal from '../components/LevelUpModal';
 import PixelAvatar from '../components/PixelAvatar';
 
@@ -14,7 +15,7 @@ export default function CharacterDetail({
   supports, setSupports,
   onBack, onEditMyOshi, onOpenMiniHome,
 }) {
-  const character = findCharacter(myOshi, characterId);
+  const character = findCharacter(myOshi, characterId, listLivers());
   const [feedback, setFeedback] = useState(null);
   const [levelUpTo, setLevelUpTo] = useState(null);
 
@@ -49,6 +50,11 @@ export default function CharacterDetail({
       ...s,
       [character.id]: (s[character.id] || 0) + SUPPORT_COST,
     }));
+
+    // 라이버면 라이버 stats 도 동기화 (라이버 대시보드에 반영되도록)
+    if (character.isLiver && character.liverId) {
+      addLiverSupport(character.liverId, SUPPORT_COST);
+    }
 
     if (nextLevel > prevLevel) {
       // 레벨업! 모달 띄우기

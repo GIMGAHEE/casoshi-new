@@ -201,6 +201,7 @@ export default function App() {
 
 // RoomEditor에 character 정보 넘기는 헬퍼 (배경 결정용)
 import { findCharacter } from './data/characters';
+import { listLivers } from './auth/liverRepository';
 function findCharacterForRoom(id, myOshi) {
-  return findCharacter(myOshi, id);
+  return findCharacter(myOshi, id, listLivers());
 }
