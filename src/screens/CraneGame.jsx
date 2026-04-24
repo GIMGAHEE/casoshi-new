@@ -21,10 +21,11 @@ const GLASS = {
   right:  '17%',
 };
 
-// 크레인 드롭 범위 (playfield 높이 % 기준)
-// 시작: 14% (상단 라이트 아래 레일)
-// 끝: 14% + 51% = 65% (shelf 위 인형에 닿는 위치)
-const DROP_MAX_PCT = 51;
+// 크레인 레이아웃 (playfield 높이 % 기준)
+const RAIL_TOP_PCT = 14;       // 레일 위치 (glass_bg 라이트 바로 아래)
+const CLAW_IDLE_OFFSET = 6;    // idle 시 클로가 레일에서 내려와 있는 거리
+const DROP_MAX_PCT = 45;       // 추가 드롭 거리 (idle → 바닥)
+// 결과: idle 클로 top = 20%, 최대 드롭 top = 65%
 
 const MACHINE_WIDTH_PX = 320;
 const DOLL_SIZE = 56;
@@ -67,6 +68,7 @@ export default function CraneGame({ points, setPoints, onBack }) {
     const AMPLITUDE = 40;          // 10% ~ 90% 사이
     const ANGULAR_SPEED = 1.8;     // rad/sec → 한 사이클 약 3.5초 (느리게)
     let lastT = performance.now();
+    let rafId;                     // 로컬: 다른 애니메이션(드롭)과 공유 금지
     const loop = () => {
       const now = performance.now();
       const dt = (now - lastT) / 1000;
@@ -74,10 +76,10 @@ export default function CraneGame({ points, setPoints, onBack }) {
       phaseRef.current += dt * ANGULAR_SPEED;
       const pos = CENTER + AMPLITUDE * Math.sin(phaseRef.current);
       setCranePos(pos);
-      animationRef.current = requestAnimationFrame(loop);
+      rafId = requestAnimationFrame(loop);
     };
-    animationRef.current = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(animationRef.current);
+    rafId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafId);
   }, [state]);
 
   // 게임판 실제 width 측정 (거리 판정용)
@@ -327,19 +329,21 @@ export default function CraneGame({ points, setPoints, onBack }) {
 
           {/* 크레인 레일 (glass_bg 상단 라이트 바로 아래에 얇게) */}
           <div
-            className="absolute left-[3%] right-[3%] top-[14%] h-[2px] bg-gray-500/40 rounded-full"
-            style={{ zIndex: 3 }}
+            className="absolute left-[3%] right-[3%] h-[2px] bg-gray-500/60 rounded-full"
+            style={{ top: `${RAIL_TOP_PCT}%`, zIndex: 3 }}
           />
 
-          {/* 케이블 (레일 → 집게 상단까지 직선) */}
+          {/* 케이블 (레일 → 집게 상단까지, idle에도 항상 보이게) */}
           <div
-            className="absolute bg-gray-400/90"
+            className="absolute bg-slate-600"
             style={{
               left: `${cranePos}%`,
-              top: '14%',
-              width: 2,
-              height: `calc(${craneDropY * DROP_MAX_PCT}% + 4px)`,
-              transform: 'translateX(-1px)',
+              top: `${RAIL_TOP_PCT}%`,
+              width: 3,
+              // idle: 6% + 4px / drop: 6% + 45% + 4px
+              height: `calc(${CLAW_IDLE_OFFSET + craneDropY * DROP_MAX_PCT}% + 4px)`,
+              transform: 'translateX(-1.5px)',
+              boxShadow: '0 0 2px rgba(0,0,0,0.25)',
               zIndex: 4,
             }}
           />
@@ -351,7 +355,7 @@ export default function CraneGame({ points, setPoints, onBack }) {
             className="absolute select-none pointer-events-none"
             style={{
               left: `${cranePos}%`,
-              top: `calc(14% + ${craneDropY * DROP_MAX_PCT}%)`,
+              top: `calc(${RAIL_TOP_PCT + CLAW_IDLE_OFFSET}% + ${craneDropY * DROP_MAX_PCT}%)`,
               transform: 'translateX(-50%)',
               width: 46,
               imageRendering: 'pixelated',
@@ -360,7 +364,7 @@ export default function CraneGame({ points, setPoints, onBack }) {
             draggable={false}
           />
 
-          {/* 잡힌 인형: 집게 상승 중 + 결과 모달 표시 중 → 집게 아래에 붙어서 따라옴 */}
+          {/* 잡힌 인형: clawPhase = 'closed' 일 때 집게에 붙어서 같이 이동 */}
           {grabbedDoll && clawPhase === 'closed' && (
             <img
               src={grabbedDoll.image}
@@ -368,7 +372,7 @@ export default function CraneGame({ points, setPoints, onBack }) {
               className="absolute select-none pointer-events-none"
               style={{
                 left: `${cranePos}%`,
-                top: `calc(14% + ${craneDropY * DROP_MAX_PCT}% + 40px)`,
+                top: `calc(${RAIL_TOP_PCT + CLAW_IDLE_OFFSET}% + ${craneDropY * DROP_MAX_PCT}% + 40px)`,
                 transform: 'translateX(-50%)',
                 width: 46,
                 height: 'auto',
