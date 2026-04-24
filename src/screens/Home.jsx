@@ -32,8 +32,9 @@ export default function Home({
         </div>
       </section>
 
-      {/* 액션 3개 */}
+      {/* 액션 섹션 */}
       <section className="space-y-3">
+        {/* 1열: 출석 + 랭킹 */}
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={handleCheckin}
@@ -55,75 +56,65 @@ export default function Home({
           </button>
 
           <button
+            onClick={onOpenRanking}
+            className="card flex flex-col items-center justify-center py-5 bg-gradient-to-br from-yellow-50 via-orange-50 to-pink-50 hover:scale-[1.02] transition-transform"
+          >
+            <img
+              src="/icons/trophy.png"
+              alt=""
+              className="h-16 w-auto mb-1"
+              style={{ imageRendering: 'pixelated' }}
+            />
+            <div className="text-sm font-bold text-oshi-dark">推しランキング</div>
+            <div className="text-[10px] text-oshi-dark/60">推しをチェック</div>
+          </button>
+        </div>
+
+        {/* 2열: 게임 3개 */}
+        <div className="grid grid-cols-3 gap-2">
+          <button
             onClick={onOpenTapGame}
-            className="card flex flex-col items-center justify-center py-5 bg-gradient-to-br from-oshi-sub to-oshi-bg hover:scale-[1.02] transition-transform"
+            className="card flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-br from-oshi-sub to-oshi-bg hover:scale-[1.03] transition-transform"
           >
             <img
               src="/icons/tap.png"
               alt=""
-              className="w-16 h-16 mb-1"
+              className="w-14 h-14 mb-1"
               style={{ imageRendering: 'pixelated' }}
             />
-            <div className="text-sm font-bold text-oshi-dark">タップゲーム</div>
-            <div className="text-[10px] text-oshi-dark/60">タップで +1 ポイント</div>
+            <div className="text-[11px] font-bold text-oshi-dark leading-tight text-center">タップゲーム</div>
+            <div className="text-[9px] text-oshi-dark/55 mt-0.5">+1 pt</div>
+          </button>
+
+          <button
+            onClick={onOpenCraneGame}
+            className="card flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-br from-pink-100 via-pink-50 to-pink-100 hover:scale-[1.03] transition-transform border-pink-200"
+          >
+            <img
+              src="/icons/crane.png"
+              alt=""
+              className="w-14 h-14 mb-1"
+              style={{ imageRendering: 'pixelated' }}
+            />
+            <div className="text-[11px] font-bold text-oshi-dark leading-tight text-center">クレーン</div>
+            <div className="text-[9px] text-oshi-dark/55 mt-0.5">1日1回無料</div>
+          </button>
+
+          <button
+            onClick={onOpenRhythmGame}
+            className="card relative flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-br from-purple-100 via-pink-50 to-orange-50 hover:scale-[1.03] transition-transform border-purple-200"
+          >
+            <span className="absolute top-1.5 right-1.5 text-[8px] font-black bg-oshi-main text-white px-1.5 py-0.5 rounded-full">NEW</span>
+            <img
+              src="/icons/rhythm.png"
+              alt=""
+              className="w-14 h-14 mb-1 object-contain"
+              style={{ imageRendering: 'pixelated' }}
+            />
+            <div className="text-[11px] font-bold text-oshi-dark leading-tight text-center">推しコール</div>
+            <div className="text-[9px] text-oshi-dark/55 mt-0.5">30秒 リズム</div>
           </button>
         </div>
-
-        {/* 크레인 게임 */}
-        <button
-          onClick={onOpenCraneGame}
-          className="card w-full flex items-center gap-4 px-5 py-4 bg-gradient-to-r from-pink-100 via-pink-50 to-pink-100 hover:scale-[1.01] transition-transform border-pink-200"
-        >
-          <img
-            src="/icons/crane.png"
-            alt=""
-            className="w-16 h-16"
-            style={{ imageRendering: 'pixelated' }}
-          />
-          <div className="flex-1 text-left">
-            <div className="text-sm font-bold text-oshi-dark">クレーンゲーム</div>
-            <div className="text-[10px] text-oshi-dark/60">かわいい人形をゲット！ 無料1日1回</div>
-          </div>
-          <div className="text-pink-400 text-lg">›</div>
-        </button>
-
-        {/* 🎤 리듬 모드 (NEW) */}
-        <button
-          onClick={onOpenRhythmGame}
-          className="card w-full flex items-center gap-4 px-5 py-4 bg-gradient-to-r from-purple-100 via-pink-50 to-orange-50 hover:scale-[1.01] transition-transform border-purple-200"
-        >
-          <img
-            src="/icons/rhythm.png"
-            alt=""
-            className="w-16 h-16 object-contain"
-            style={{ imageRendering: 'pixelated' }}
-          />
-          <div className="flex-1 text-left">
-            <div className="text-sm font-bold text-oshi-dark flex items-center gap-1.5">
-              推しコール
-              <span className="text-[9px] font-black bg-oshi-main text-white px-1.5 py-0.5 rounded-full">NEW</span>
-            </div>
-            <div className="text-[10px] text-oshi-dark/60">リズムに合わせてコール！ 30秒の推し活</div>
-          </div>
-          <div className="text-purple-400 text-lg">›</div>
-        </button>
-
-        <button
-          onClick={onOpenRanking}
-          className="card w-full flex items-center gap-4 px-5 py-4 bg-gradient-to-r from-yellow-50 via-orange-50 to-pink-50 hover:scale-[1.01] transition-transform"
-        >
-          <img
-            src="/icons/trophy.png"
-            alt=""
-            className="h-12 w-auto"
-            style={{ imageRendering: 'pixelated' }}
-          />
-          <div className="flex-1 text-left">
-            <div className="text-sm font-bold text-oshi-dark">推しランキング</div>
-            <div className="text-[10px] text-oshi-dark/60">一番推されている推しをチェック！</div>
-          </div>
-          <div className="text-oshi-dark/40 text-lg">›</div>
-        </button>
       </section>
 
       {/* 마이 추시 섹션 */}
