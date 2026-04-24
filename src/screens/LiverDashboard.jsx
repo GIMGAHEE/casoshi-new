@@ -384,6 +384,13 @@ function EditProfileForm({ liver, onCancel, onSaved }) {
           </div>
         </Field>
 
+        {/* 레벨별 セリフ 편집 */}
+        <DialoguesEditor
+          values={form.dialogues || []}
+          name={form.name}
+          onChange={(dialogues) => setForm({ ...form, dialogues })}
+        />
+
         <button
           type="submit"
           disabled={loading}
@@ -392,6 +399,64 @@ function EditProfileForm({ liver, onCancel, onSaved }) {
           {loading ? '...' : '保存'}
         </button>
       </form>
+    </div>
+  );
+}
+
+// ===== セリフ (레벨별 대사) 편집 섹션 =====
+const DIALOGUE_LEVELS = [1, 2, 3, 5, 10];
+
+function DialoguesEditor({ values, name, onChange }) {
+  // values 는 [{ unlockLevel, text }] 배열. 레벨별로 map.
+  const byLevel = Object.fromEntries(
+    DIALOGUE_LEVELS.map(lv => [
+      lv,
+      (values.find(d => d.unlockLevel === lv)?.text) || '',
+    ])
+  );
+
+  const placeholders = {
+    1: `よろしくね！私は${name || '…'}だよ♪`,
+    2: 'えへへ、また会えたね！',
+    3: 'あなたのおかげで、元気が出るよ！',
+    5: 'ずっと応援してくれて、本当にありがとう。',
+    10: '私の一番の推し活仲間、それはあなただよ！',
+  };
+
+  const handleChange = (lv, text) => {
+    const next = DIALOGUE_LEVELS
+      .map(l => ({
+        unlockLevel: l,
+        text: (l === lv ? text : byLevel[l]).trim(),
+      }))
+      .filter(d => d.text);
+    onChange(next);
+  };
+
+  return (
+    <div className="pt-2">
+      <label className="text-xs font-black text-oshi-dark/70 mb-1 block">
+        セリフ（レベル別）
+      </label>
+      <div className="text-[10px] text-oshi-dark/50 mb-2">
+        ファンが応援してレベルアップすると解放されます。空欄はデフォルトが使われます。
+      </div>
+      <div className="space-y-2">
+        {DIALOGUE_LEVELS.map(lv => (
+          <div key={lv} className="flex items-start gap-2">
+            <span className="text-[10px] font-black px-2 py-1 rounded-full bg-oshi-main text-white shrink-0">
+              Lv.{lv}
+            </span>
+            <input
+              type="text"
+              value={byLevel[lv]}
+              onChange={e => handleChange(lv, e.target.value.slice(0, 80))}
+              placeholder={placeholders[lv]}
+              className="flex-1 px-3 py-1.5 rounded-xl border-2 border-oshi-sub focus:border-oshi-main outline-none text-sm"
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

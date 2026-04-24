@@ -9,6 +9,7 @@ import RhythmGame from './screens/RhythmGame';
 import CraneGame from './screens/CraneGame';
 import Ranking from './screens/Ranking';
 import MyOshiBuilder from './screens/MyOshiBuilder';
+import ProfileEditor from './screens/ProfileEditor';
 import MiniHome from './screens/MiniHome';
 import RoomEditor from './screens/RoomEditor';
 import AdminLogin from './screens/AdminLogin';
@@ -69,6 +70,7 @@ export default function App() {
     'liverLogin', 'liverDashboard',
     'builder', 'roomEditor',
     'tapGame', 'craneGame', 'rhythmGame',
+    'myOshiProfileEditor', 'liverProfileEditor',
   ].includes(screen.name);
 
   // 현재 화면으로부터 활성 탭 결정
@@ -157,6 +159,7 @@ export default function App() {
           onBack={() => setScreen({ name: 'home' })}
           onOpenDetail={(id) => setScreen({ name: 'character', params: { id } })}
           onEditRoom={() => setScreen({ name: 'roomEditor', params: screen.params })}
+          onEditProfile={() => setScreen({ name: 'myOshiProfileEditor' })}
         />
       )}
 
@@ -208,6 +211,27 @@ export default function App() {
           initialOshi={myOshi}
           onSave={handleSaveMyOshi}
           onCancel={() => setScreen({ name: myOshi ? 'minihome' : 'home', params: myOshi ? { id: 'my_oshi' } : undefined })}
+        />
+      )}
+
+      {screen.name === 'myOshiProfileEditor' && myOshi && (
+        <ProfileEditor
+          title={`${myOshi.name}のプロフィール`}
+          initialBio={myOshi.bio || ''}
+          initialDialogues={myOshi.dialogues || []}
+          bioPlaceholder={`${myOshi.name}は、あなただけのために生まれた推しです…`}
+          dialoguePlaceholders={{
+            1: 'よろしくね！私は' + myOshi.name + 'だよ♪',
+            2: 'えへへ、また会えたね！',
+            3: 'あなたのおかげで、元気が出るよ！',
+            5: 'ずっと応援してくれて、本当にありがとう。',
+            10: '私の一番の推し活仲間、それはあなただよ！',
+          }}
+          onSave={(result) => {
+            setMyOshi({ ...myOshi, bio: result.bio, dialogues: result.dialogues });
+            setScreen({ name: 'minihome', params: { id: 'my_oshi' } });
+          }}
+          onCancel={() => setScreen({ name: 'minihome', params: { id: 'my_oshi' } })}
         />
       )}
 

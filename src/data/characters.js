@@ -284,19 +284,32 @@ export const asCharacter = (myOshi, opts = {}) => {
     catchphrase: isOwn
       ? 'あなたが作った、あなただけの推し。'
       : '誰かが作った推しキャラ。',
-    bio: isOwn
+    bio: (myOshi.bio && myOshi.bio.trim()) || (isOwn
       ? `${myOshi.name}は、あなただけのために生まれた推しです。一緒に育てていこう！`
-      : `${myOshi.name}は、他のユーザーが作った推しキャラです。`,
-    dialogues: GENERIC_DIALOGUES.map(d => ({
-      ...d,
-      text: d.text.replace('{name}', myOshi.name),
-    })),
+      : `${myOshi.name}は、他のユーザーが作った推しキャラです。`),
+    dialogues: mergeDialogues(myOshi.dialogues, myOshi.name),
     isMyOshi: isOwn,
     isOtherUserOshi: !isOwn,
     presetId: preset.id,
     updatedAt: opts.updatedAt || null,
   };
 };
+
+// 커스텀 대사 + 기본 대사 머지 — 커스텀이 비어있으면 default 사용
+function mergeDialogues(custom, name) {
+  const defaultDialogues = GENERIC_DIALOGUES.map(d => ({
+    ...d,
+    text: d.text.replace('{name}', name || ''),
+  }));
+  if (!Array.isArray(custom) || custom.length === 0) return defaultDialogues;
+  return defaultDialogues.map(def => {
+    const match = custom.find(c => c.unlockLevel === def.unlockLevel);
+    return match && match.text && match.text.trim()
+      ? { unlockLevel: def.unlockLevel, text: match.text }
+      : def;
+  });
+}
+export { mergeDialogues };
 
 // 전체 캐릭터 목록 (시드 + 있으면 마이 추시 + 등록된 라이버)
 export const allCharacters = (myOshi, livers = []) => {
@@ -360,10 +373,7 @@ export const asLiverCharacter = (liver) => {
       ? `📅 ${p.streamSchedule}`
       : 'よろしくお願いします！',
     bio: p.bio || `${p.name}です、応援お願いします！`,
-    dialogues: GENERIC_DIALOGUES.map(d => ({
-      ...d,
-      text: d.text.replace('{name}', p.name),
-    })),
+    dialogues: mergeDialogues(p.dialogues, p.name),
     // 라이버 고유 메타
     isLiver: true,
     liverId: liver.id,

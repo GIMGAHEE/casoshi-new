@@ -6,7 +6,7 @@ import PixelAvatar from '../components/PixelAvatar';
 
 export default function MiniHome({
   characterId, myOshi, supports, room,
-  onBack, onOpenDetail, onEditRoom,
+  onBack, onOpenDetail, onEditRoom, onEditProfile,
 }) {
   const livers = useLivers();
   const character = findCharacter(myOshi, characterId, livers);
@@ -175,13 +175,28 @@ export default function MiniHome({
               ? () => alert('ライバー本人がマイページから飾ります 🎤')
               : onEditRoom}
           />
-          <MenuButton
-            emoji={character.isLiver
-              ? <img src="/icons/heart.png" alt="" className="w-5 h-5" style={{ imageRendering: 'pixelated' }} />
-              : <img src="/icons/note.png" alt="" className="w-6 h-6" style={{ imageRendering: 'pixelated' }} />}
-            label={character.isLiver ? '応援' : 'プロフィール'}
-            onClick={() => onOpenDetail(characterId)}
-          />
+          {(() => {
+            const isOwnMyOshi = character.isMyOshi && !character.isOtherUserOshi;
+            return (
+              <MenuButton
+                emoji={character.isLiver
+                  ? <img src="/icons/heart.png" alt="" className="w-5 h-5" style={{ imageRendering: 'pixelated' }} />
+                  : <img src="/icons/note.png" alt="" className="w-6 h-6" style={{ imageRendering: 'pixelated' }} />}
+                label={
+                  character.isLiver ? '応援'
+                    : isOwnMyOshi ? 'プロフィール編集'
+                      : 'プロフィール'
+                }
+                onClick={() => {
+                  if (isOwnMyOshi && onEditProfile) {
+                    onEditProfile();
+                  } else {
+                    onOpenDetail(characterId);
+                  }
+                }}
+              />
+            );
+          })()}
           <MenuButton
             emoji={<img src="/icons/camera.png" alt="" className="w-6 h-6" style={{ imageRendering: 'pixelated' }} />}
             label="アルバム"
