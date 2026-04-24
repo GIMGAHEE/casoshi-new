@@ -12,7 +12,7 @@ const TABS = [
   { id: 'home',    icon: '/icons/home.png',   label: 'ホーム' },
   { id: 'ranking', icon: '/icons/trophy.png', label: 'ランキング' },
   { id: 'support', icon: '/icons/heart.png',  label: '応援' },
-  { id: 'myoshi',  icon: '/icons/sofa.png',   label: 'マイ推し' },
+  { id: 'myoshi',  icon: '/icons/sofa.png',   label: 'マイホーム' },
 ];
 
 export default function BottomNav({ active, onNavigate }) {
