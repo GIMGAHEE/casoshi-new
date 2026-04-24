@@ -47,6 +47,7 @@ export default function CraneGame({ points, setPoints, onBack }) {
   const boardRef = useRef(null);
   const phaseRef = useRef(-Math.PI / 2); // 사인파 위상 (-π/2 = 왼쪽 끝)
   const [craneDropY, setCraneDropY] = useState(0); // 0~1 (0 = 윗쪽, 1 = 바닥)
+  const [confetti, setConfetti] = useState([]); // 성공 시 파티클
 
   const canFree = Date.now() - lastFreeAt > CRANE_FREE_INTERVAL_MS;
   const canPlay = canFree || points >= CRANE_COST;
@@ -75,6 +76,39 @@ export default function CraneGame({ points, setPoints, onBack }) {
 
   // 게임판 실제 width 측정 (거리 판정용)
   const getActualWidth = () => boardRef.current?.offsetWidth || MACHINE_WIDTH_PX;
+
+  // 🎉 컨페티 파티클 생성 (x,y: playfield % 기준)
+  const spawnConfetti = (x, y, count = 25, rarity = 'R') => {
+    // 기본 파스텔 팔레트 + 희귀도별 강조색
+    const basePalette = ['#FF6B9D', '#FFC1D8', '#FFD93D', '#A0D8F1', '#C8A4E8', '#B5E8D6', '#FFFFFF'];
+    const accent = { N: null, R: '#5BA4E0', SR: '#B77EE0', SSR: '#FFB800' }[rarity];
+    const palette = accent ? [...basePalette, accent, accent] : basePalette;
+
+    const pieces = Array.from({ length: count }, (_, i) => {
+      // 각도: 위쪽 반원 (-π ~ 0) 분포, 약간 상방 편향
+      const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.1;
+      const speed = 60 + Math.random() * 110;
+      const isStrip = Math.random() < 0.4;
+      return {
+        id: `confetti_${Date.now()}_${i}_${Math.random().toString(36).slice(2, 6)}`,
+        startX: x + (Math.random() - 0.5) * 6,  // 살짝 흩어짐
+        startY: y,
+        tx: Math.cos(angle) * speed,
+        ty: Math.sin(angle) * speed,
+        color: palette[Math.floor(Math.random() * palette.length)],
+        shape: isStrip ? 'strip' : (Math.random() < 0.5 ? 'circle' : 'square'),
+        size: 4 + Math.random() * 6,
+        rotation: Math.random() * 720 - 360,
+        delay: Math.random() * 80,
+      };
+    });
+    setConfetti(prev => [...prev, ...pieces]);
+    // 2초 뒤 정리
+    const ids = new Set(pieces.map(p => p.id));
+    setTimeout(() => {
+      setConfetti(prev => prev.filter(p => !ids.has(p.id)));
+    }, 2000);
+  };
 
   const startGame = () => {
     if (state !== 'idle') return;
@@ -148,6 +182,10 @@ export default function CraneGame({ points, setPoints, onBack }) {
 
       // 포인트 지급
       if (reward > 0) setPoints(p => p + reward);
+
+      // 🎉 컨페티 파티클 (희귀도에 따라 개수 조정)
+      const confettiCount = { N: 20, R: 28, SR: 40, SSR: 55 }[closest.rarity] || 24;
+      spawnConfetti(closest.x, 70, confettiCount, closest.rarity);
 
       // 이력 저장
       setHistory(h => [
@@ -325,6 +363,28 @@ export default function CraneGame({ points, setPoints, onBack }) {
               </div>
             </div>
           ))}
+
+          {/* 🎉 컨페티 파티클 */}
+          {confetti.map(p => (
+            <div
+              key={p.id}
+              className="confetti-piece absolute pointer-events-none"
+              style={{
+                left: `${p.startX}%`,
+                top: `${p.startY}%`,
+                width: p.size,
+                height: p.shape === 'strip' ? p.size * 0.4 : p.size,
+                background: p.color,
+                borderRadius: p.shape === 'circle' ? '50%' : '1px',
+                '--tx': `${p.tx}px`,
+                '--ty': `${p.ty}px`,
+                '--rot': `${p.rotation}deg`,
+                animationDelay: `${p.delay}ms`,
+                zIndex: 10,
+                willChange: 'transform, opacity',
+              }}
+            />
+          ))}
         </div>
 
         {/* 투명 탭 영역: 기계 하단 컨트롤 패널 위 전체를 덮음 → 핑크 별 버튼을 누르는 느낌 */}
@@ -422,6 +482,30 @@ export default function CraneGame({ points, setPoints, onBack }) {
           0%   { transform: translate(-50%, 0) scale(0.8); opacity: 0.5; }
           30%  { transform: translate(-50%, -8px) scale(1.1); opacity: 1; }
           100% { transform: translate(-50%, -20px) scale(1); opacity: 1; }
+        }
+        /* 🎉 컨페티: 위로 터지면서 아치를 그리며 떨어짐 */
+        .confetti-piece {
+          transform: translate(-50%, -50%);
+          opacity: 1;
+          animation: confetti-fly 1.6s cubic-bezier(0.22, 0.7, 0.35, 1) forwards;
+        }
+        @keyframes confetti-fly {
+          0% {
+            transform: translate(-50%, -50%) rotate(0);
+            opacity: 1;
+          }
+          35% {
+            transform:
+              translate(calc(-50% + var(--tx) * 0.75), calc(-50% + var(--ty) * 1.0))
+              rotate(calc(var(--rot) * 0.4));
+            opacity: 1;
+          }
+          100% {
+            transform:
+              translate(calc(-50% + var(--tx)), calc(-50% + var(--ty) + 90px))
+              rotate(var(--rot));
+            opacity: 0;
+          }
         }
       `}</style>
     </div>
