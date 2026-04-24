@@ -96,23 +96,45 @@ export default function Home({
                 <span className="absolute top-1 right-1 text-[8px] font-black bg-oshi-main text-white px-1.5 py-0.5 rounded-full">
                   LIVER
                 </span>
-                <div className="w-12 h-12 mb-1 rounded-xl bg-white/80 flex items-center justify-center shadow-inner overflow-hidden">
-                  {liverChar?.sprite && liverChar.spriteSize && !liverChar.hairOverlay ? (
-                    <img
-                      src={liverChar.sprite}
-                      alt=""
-                      draggable={false}
-                      style={{ height: '95%', width: 'auto', imageRendering: 'pixelated' }}
-                    />
-                  ) : liverChar?.sprite ? (
-                    <PixelAvatar
-                      sprite={liverChar.sprite}
-                      size={44}
-                      hairOverlay={liverChar.hairOverlay}
-                      hairTransform={liverChar.hairTransform}
-                    />
+                <div className="w-16 h-16 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden relative">
+                  {liverChar?.sprite ? (
+                    <>
+                      <img
+                        src={liverChar.sprite}
+                        alt=""
+                        draggable={false}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          objectPosition: 'top',
+                          imageRendering: 'pixelated',
+                        }}
+                      />
+                      {liverChar.hairOverlay && (
+                        <img
+                          src={liverChar.hairOverlay}
+                          alt=""
+                          draggable={false}
+                          style={{
+                            position: 'absolute',
+                            inset: 0,
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            objectPosition: 'top',
+                            transform: liverChar.hairTransform
+                              ? `translate(${liverChar.hairTransform.x}%, ${liverChar.hairTransform.y}%) scale(${liverChar.hairTransform.scale})`
+                              : undefined,
+                            transformOrigin: 'center top',
+                            imageRendering: 'pixelated',
+                            pointerEvents: 'none',
+                          }}
+                        />
+                      )}
+                    </>
                   ) : (
-                    <div className="text-2xl">
+                    <div className="w-full h-full flex items-center justify-center text-3xl">
                       {selfLiver.profile.gender === 'boy' ? '🎤' : '💖'}
                     </div>
                   )}
@@ -132,23 +154,45 @@ export default function Home({
                 borderColor: myOshiChar.themeColor + '60',
               }}
             >
-              <div className="w-12 h-12 mb-1 rounded-xl bg-white/80 flex items-center justify-center shadow-inner overflow-hidden">
-                {myOshiChar.sprite && myOshiChar.spriteSize && !myOshiChar.hairOverlay ? (
-                  <img
-                    src={myOshiChar.sprite}
-                    alt=""
-                    draggable={false}
-                    style={{ height: '95%', width: 'auto', imageRendering: 'pixelated' }}
-                  />
-                ) : myOshiChar.sprite ? (
-                  <PixelAvatar
-                    sprite={myOshiChar.sprite}
-                    size={44}
-                    hairOverlay={myOshiChar.hairOverlay}
-                    hairTransform={myOshiChar.hairTransform}
-                  />
+              <div className="w-16 h-16 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden relative">
+                {myOshiChar.sprite ? (
+                  <>
+                    <img
+                      src={myOshiChar.sprite}
+                      alt=""
+                      draggable={false}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'top',
+                        imageRendering: 'pixelated',
+                      }}
+                    />
+                    {myOshiChar.hairOverlay && (
+                      <img
+                        src={myOshiChar.hairOverlay}
+                        alt=""
+                        draggable={false}
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          objectPosition: 'top',
+                          transform: myOshiChar.hairTransform
+                            ? `translate(${myOshiChar.hairTransform.x}%, ${myOshiChar.hairTransform.y}%) scale(${myOshiChar.hairTransform.scale})`
+                            : undefined,
+                          transformOrigin: 'center top',
+                          imageRendering: 'pixelated',
+                          pointerEvents: 'none',
+                        }}
+                      />
+                    )}
+                  </>
                 ) : (
-                  <div className="text-2xl">💖</div>
+                  <div className="w-full h-full flex items-center justify-center text-3xl">💖</div>
                 )}
               </div>
               <div className="text-[11px] font-bold text-oshi-dark leading-tight text-center truncate w-full">
