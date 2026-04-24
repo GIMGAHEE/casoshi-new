@@ -178,7 +178,7 @@ export default function MiniHome({
           <MenuButton
             emoji={character.isLiver
               ? <img src="/icons/heart.png" alt="" className="w-5 h-5" style={{ imageRendering: 'pixelated' }} />
-              : <div className="text-xl">📝</div>}
+              : <img src="/icons/note.png" alt="" className="w-6 h-6" style={{ imageRendering: 'pixelated' }} />}
             label={character.isLiver ? '応援' : 'プロフィール'}
             onClick={() => onOpenDetail(characterId)}
           />
