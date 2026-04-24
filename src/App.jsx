@@ -17,7 +17,7 @@ import LiverLogin from './screens/LiverLogin';
 import LiverDashboard from './screens/LiverDashboard';
 import { getSession } from './auth/session';
 import { getUserId } from './auth/userIdentity';
-import { saveMyOshi as saveMyOshiRemote } from './data/myOshiRepository';
+import { saveMyOshi as saveMyOshiRemote, deleteMyOshi as deleteMyOshiRemote } from './data/myOshiRepository';
 
 export default function App() {
   const [points, setPoints] = useLocalStorage('casoshi:points', 0);
@@ -64,6 +64,11 @@ export default function App() {
 
   const handleReset = () => {
     if (!window.confirm('全データをリセットしますか？\nマイ推しも削除されます。この操作は取り消せません。')) return;
+    // Firestore 의 MyOshi 문서 먼저 삭제 (localStorage 초기화하면 userId 도 사라져서 참조 불가)
+    const uid = getUserId();
+    deleteMyOshiRemote(uid).catch(err => {
+      console.warn('[myOshi reset] delete failed', err);
+    });
     setPoints(0);
     setSupports({});
     setLastCheckin(null);

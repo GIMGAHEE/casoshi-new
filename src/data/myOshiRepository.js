@@ -1,5 +1,5 @@
 import {
-  collection, doc, setDoc, onSnapshot, serverTimestamp,
+  collection, doc, setDoc, deleteDoc, onSnapshot, serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
@@ -44,4 +44,9 @@ export async function saveMyOshi(userId, oshi) {
     },
     { merge: true }
   );
+}
+
+export async function deleteMyOshi(userId) {
+  if (!userId) return;
+  await deleteDoc(doc(db, COL, userId));
 }
