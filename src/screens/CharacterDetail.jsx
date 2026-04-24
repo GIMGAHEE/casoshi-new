@@ -216,38 +216,40 @@ export default function CharacterDetail({
         </section>
       </div>
 
-      {/* 응원 버튼 (고정) */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-oshi-bg via-oshi-bg to-transparent">
-        <div className="max-w-md mx-auto">
-          <button
-            onClick={handleSupport}
-            disabled={!canSupport}
-            className={`w-full py-4 rounded-full font-black text-lg shadow-xl transition-all ${
-              canSupport
-                ? 'bg-oshi-main text-white active:scale-95 hover:bg-pink-500'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            <img
-              src="/icons/heart.png"
-              alt=""
-              className="w-5 h-5 inline-block mr-1 align-middle"
-              style={{ imageRendering: 'pixelated' }}
-            />
-            応援する（-{SUPPORT_COST} ポイント）
-          </button>
-
-          {feedback && (
-            <div
-              className={`mt-2 text-center text-sm font-bold animate-pop ${
-                feedback.type === 'ok' ? 'text-oshi-main' : 'text-red-500'
+      {/* 응원 버튼 (고정) — 라이버에게만 표시 */}
+      {character.isLiver && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-oshi-bg via-oshi-bg to-transparent">
+          <div className="max-w-md mx-auto">
+            <button
+              onClick={handleSupport}
+              disabled={!canSupport}
+              className={`w-full py-4 rounded-full font-black text-lg shadow-xl transition-all ${
+                canSupport
+                  ? 'bg-oshi-main text-white active:scale-95 hover:bg-pink-500'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >
-              {feedback.text}
-            </div>
-          )}
+              <img
+                src="/icons/heart.png"
+                alt=""
+                className="w-5 h-5 inline-block mr-1 align-middle"
+                style={{ imageRendering: 'pixelated' }}
+              />
+              応援する（-{SUPPORT_COST} ポイント）
+            </button>
+
+            {feedback && (
+              <div
+                className={`mt-2 text-center text-sm font-bold animate-pop ${
+                  feedback.type === 'ok' ? 'text-oshi-main' : 'text-red-500'
+                }`}
+              >
+                {feedback.text}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {levelUpTo !== null && (
         <LevelUpModal

@@ -176,8 +176,10 @@ export default function MiniHome({
               : onEditRoom}
           />
           <MenuButton
-            emoji={<img src="/icons/heart.png" alt="" className="w-5 h-5" style={{ imageRendering: 'pixelated' }} />}
-            label="応援"
+            emoji={character.isLiver
+              ? <img src="/icons/heart.png" alt="" className="w-5 h-5" style={{ imageRendering: 'pixelated' }} />
+              : <div className="text-xl">📝</div>}
+            label={character.isLiver ? '応援' : 'プロフィール'}
             onClick={() => onOpenDetail(characterId)}
           />
           <MenuButton
