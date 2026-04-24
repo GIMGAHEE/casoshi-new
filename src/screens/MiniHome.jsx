@@ -11,7 +11,7 @@ export default function MiniHome({
   if (!character) {
     return (
       <div className="max-w-md mx-auto px-4 py-8">
-        <button onClick={onBack} className="text-oshi-dark/60 mb-4">← 戻る</button>
+        <button onClick={onBack} className="text-oshi-dark/60 mb-4"><img src="/icons/back.png" alt="戻る" className="w-10 h-10 object-contain" style={{ imageRendering: "pixelated" }} draggable={false} /></button>
         <div>キャラクターが見つかりません</div>
       </div>
     );
@@ -28,7 +28,7 @@ export default function MiniHome({
         onClick={onBack}
         className="text-sm text-oshi-dark/70 hover:text-oshi-dark"
       >
-        ← 戻る
+        <img src="/icons/back.png" alt="戻る" className="w-10 h-10 object-contain" style={{ imageRendering: "pixelated" }} draggable={false} />
       </button>
 
       {/* Cyworld-style 헤더 */}

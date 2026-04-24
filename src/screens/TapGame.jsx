@@ -106,7 +106,7 @@ export default function TapGame({ points, setPoints, onBack }) {
         onClick={onBack}
         className="text-sm text-oshi-dark/70 hover:text-oshi-dark self-start"
       >
-        ← 戻る
+        <img src="/icons/back.png" alt="戻る" className="w-10 h-10 object-contain" style={{ imageRendering: "pixelated" }} draggable={false} />
       </button>
 
       {/* 통계 헤더 */}

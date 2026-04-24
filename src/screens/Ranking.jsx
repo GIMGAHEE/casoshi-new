@@ -54,7 +54,7 @@ export default function Ranking({ myOshi, supports, onBack, onSelectCharacter })
         onClick={onBack}
         className="text-sm text-oshi-dark/70 hover:text-oshi-dark"
       >
-        ← 戻る
+        <img src="/icons/back.png" alt="戻る" className="w-10 h-10 object-contain" style={{ imageRendering: "pixelated" }} draggable={false} />
       </button>
 
       {/* 헤더 */}
