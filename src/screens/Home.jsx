@@ -253,44 +253,47 @@ export default function Home({
 }
 
 /**
- * 아바타 썸네일 타일 — 전신 sprite 를 상반신만 보이게 크롭한다.
- * 이미지를 타일 높이보다 크게(170%) 렌더하고 top 기준으로 absolute 배치해서
- * objectFit: cover 보다 더 안정적으로 반신 샷이 되도록.
+ * 아바타 썸네일 타일 — 전신 sprite 에서 상반신만 보이게 크롭.
+ * <img> 는 Tailwind preflight 의 max-width:100% 때문에 커지지 않아
+ * 의도한 크롭이 깨짐. 그래서 background-image 로 구현 —
+ * backgroundSize: 'auto 170%' 로 타일 높이의 170% 크기로 그려서
+ * 'center top' 기준으로 배치 → 상반신만 표시됨.
  */
 function AvatarTile({ sprite, hairOverlay, hairTransform, fallbackEmoji }) {
   if (!sprite) {
     return (
-      <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden relative flex items-center justify-center">
+      <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden flex items-center justify-center">
         <div className="text-3xl">{fallbackEmoji}</div>
       </div>
     );
   }
-  const imgStyle = {
-    height: '170%',
-    width: 'auto',
-    maxWidth: 'none',
+  const baseBg = {
+    backgroundImage: `url(${sprite})`,
+    backgroundSize: 'auto 170%',
+    backgroundPosition: 'center top',
+    backgroundRepeat: 'no-repeat',
     imageRendering: 'pixelated',
   };
   return (
-    <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden relative">
-      <div className="absolute inset-0 flex justify-center items-start">
-        <img src={sprite} alt="" draggable={false} style={imgStyle} />
-      </div>
+    <div
+      className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden relative"
+      style={baseBg}
+    >
       {hairOverlay && (
-        <div className="absolute inset-0 flex justify-center items-start pointer-events-none">
-          <img
-            src={hairOverlay}
-            alt=""
-            draggable={false}
-            style={{
-              ...imgStyle,
-              transform: hairTransform
-                ? `translate(${hairTransform.x}%, ${hairTransform.y}%) scale(${hairTransform.scale})`
-                : undefined,
-              transformOrigin: 'center top',
-            }}
-          />
-        </div>
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: `url(${hairOverlay})`,
+            backgroundSize: 'auto 170%',
+            backgroundPosition: 'center top',
+            backgroundRepeat: 'no-repeat',
+            imageRendering: 'pixelated',
+            transform: hairTransform
+              ? `translate(${hairTransform.x}%, ${hairTransform.y}%) scale(${hairTransform.scale})`
+              : undefined,
+            transformOrigin: 'center top',
+          }}
+        />
       )}
     </div>
   );
