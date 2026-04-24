@@ -365,5 +365,7 @@ export const asLiverCharacter = (liver) => {
     gender,
     // 방 데이터 (MiniHome 이 사용)
     liverRoom: liver.room || null,
+    // 전체 유저 누적 통계 (Firestore)
+    stats: liver.stats || { totalSupport: 0, supporterCount: 0 },
   };
 };

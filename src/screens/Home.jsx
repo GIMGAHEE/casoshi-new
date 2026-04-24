@@ -206,7 +206,7 @@ export default function Home({
               <CharacterCard
                 key={ch.id}
                 character={ch}
-                supportPoints={supports[ch.id] || 0}
+                supportPoints={ch.stats?.totalSupport || 0}
                 onClick={() => onSelectCharacter(ch.id)}
               />
             ))}

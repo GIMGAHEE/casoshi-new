@@ -46,11 +46,12 @@ export default function Ranking({ myOshi, supports, onBack, onSelectCharacter })
   const livers = useLivers();
   const [tab, setTab] = useState('liver'); // 'liver' | 'character'
 
-  // 라이버 랭킹
+  // 라이버 랭킹 — Firestore 에 쌓인 전체 유저 누적 pt (stats.totalSupport) 기준.
+  // supports[c.id] 로컬값은 "나 혼자 응원한 양" 이라 진짜 랭킹이 아님.
   const liverRanked = livers
     .map(asLiverCharacter)
     .filter(Boolean)
-    .map(c => ({ ...c, supportPoints: supports[c.id] || 0 }))
+    .map(c => ({ ...c, supportPoints: c.stats?.totalSupport || 0 }))
     .sort((a, b) => b.supportPoints - a.supportPoints);
 
   // 캐릭터 랭킹 (MyOshi + 시드)
