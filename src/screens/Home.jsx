@@ -277,19 +277,20 @@ function AvatarTile({ sprite, hairOverlay, hairTransform, fallbackEmoji }) {
   const isHairBaked = !hairOverlay;
 
   if (isHairBaked) {
-    // hairBaked: contain 으로 전신 다 보이게. 더 이상 잘라내려 하지 않음.
+    // momo(긴머리) 와 동일한 프레이밍 목표: 머리 위 약간 + 상반신, 다리 잘림.
+    // 방법: 이미지를 컨테이너보다 크게(높이 140%) + 상단 정렬 + overflow-hidden.
+    // sprite 가 타이트 크롭이라 단순히 height 만 키우면 됨.
     return (
-      <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden flex items-center justify-center">
+      <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden relative flex justify-center">
         <img
           src={sprite}
           alt=""
           draggable={false}
           style={{
-            maxHeight: '90%',
-            maxWidth: '90%',
+            position: 'absolute',
+            top: 0,
+            height: '140%',
             width: 'auto',
-            height: 'auto',
-            objectFit: 'contain',
             imageRendering: 'pixelated',
           }}
         />
