@@ -275,8 +275,10 @@ function AvatarTile({ sprite, hairOverlay, hairTransform, fallbackEmoji }) {
   // - 일반 sprite: scale 1.3 + top anchor → 자연스레 상반신만 보임
   // - hairBaked:  scale 0.85 정도가 적정. 다리 안 보이게 살짝 위로 끌어올림.
   const isHairBaked = !hairOverlay;
-  const SCALE = isHairBaked ? 0.72 : 1.3;
-  const Y_OFFSET = isHairBaked ? '-2%' : '0%'; // 살짝 위로 끌어 다리 잘리게
+  const SCALE = isHairBaked ? 0.65 : 1.3;
+  // hairBaked sprite 는 다리까지 너무 잘 보이지만 잘라낼 수가 없어서 (이미 타이트한 sprite),
+  // 그냥 작게 + 위쪽으로 살짝 — 다리는 보이는 채로 두는 트레이드오프.
+  const Y_OFFSET = '0%';
   return (
     <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden flex justify-center">
       <div
