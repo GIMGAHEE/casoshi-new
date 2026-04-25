@@ -101,7 +101,10 @@ export default function AdminDashboard({ onLogout }) {
             tab === 'liver' ? 'bg-oshi-main text-white shadow' : 'text-oshi-dark/60'
           }`}
         >
-          🎤 ライバー <span className="text-[10px] opacity-70">({livers.length})</span>
+          <span className="inline-flex items-center gap-1">
+            <img src="/icons/mic.png" alt="" className="w-4 h-4 object-contain" style={{ imageRendering: 'pixelated' }} />
+            ライバー
+          </span> <span className="text-[10px] opacity-70">({livers.length})</span>
         </button>
         <button
           onClick={() => setTab('user')}
@@ -126,7 +129,7 @@ export default function AdminDashboard({ onLogout }) {
           {/* 라이버 리스트 */}
           {livers.length === 0 ? (
             <div className="bg-white/60 rounded-2xl border-2 border-dashed border-oshi-sub p-8 text-center">
-              <div className="text-3xl mb-2">🎤</div>
+              <img src="/icons/mic.png" alt="" className="w-10 h-10 object-contain mx-auto mb-2" style={{ imageRendering: 'pixelated' }} />
               <div className="text-sm text-oshi-dark/60">
                 まだ登録されたライバーがいません<br />
                 上の「＋」ボタンから登録してください

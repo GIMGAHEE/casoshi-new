@@ -59,7 +59,7 @@ export default function LiverLogin({ onSuccess, onCancel }) {
       <div className="flex-1 flex flex-col justify-center">
         <div className="bg-white rounded-3xl shadow-xl border-2 border-oshi-sub p-6">
           <div className="text-center mb-4">
-            <div className="text-4xl mb-2">🎤</div>
+            <img src="/icons/mic.png" alt="" className="w-12 h-12 object-contain mx-auto mb-2" style={{ imageRendering: 'pixelated' }} />
             <div className="text-xl font-black text-oshi-dark">
               {step === 'login' ? 'ライバーログイン' : '初期パスワード変更'}
             </div>

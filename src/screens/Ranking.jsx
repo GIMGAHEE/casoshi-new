@@ -119,7 +119,7 @@ export default function Ranking({ myOshi, supports, onBack, onSelectCharacter })
         <TabButton
           active={tab === 'liver'}
           onClick={() => setTab('liver')}
-          icon="🎤"
+          icon="/icons/mic.png"
           label="ライバー"
           count={liverRanked.length}
         />
@@ -135,7 +135,7 @@ export default function Ranking({ myOshi, supports, onBack, onSelectCharacter })
       {/* 라이버 없는 경우 */}
       {isLiverTabEmpty ? (
         <div className="bg-white/60 rounded-2xl border-2 border-dashed border-oshi-sub p-10 text-center">
-          <div className="text-4xl mb-2">🎤</div>
+          <img src="/icons/mic.png" alt="" className="w-12 h-12 object-contain mx-auto mb-2" style={{ imageRendering: 'pixelated' }} />
           <div className="text-sm text-oshi-dark/60">
             まだ登録されたライバーがいません
           </div>
@@ -268,6 +268,8 @@ export default function Ranking({ myOshi, supports, onBack, onSelectCharacter })
 }
 
 function TabButton({ active, onClick, icon, label, count }) {
+  // icon: 문자열에 ".png" 들어가면 이미지 경로로 인식, 아니면 이모지
+  const isImg = typeof icon === 'string' && icon.includes('.png');
   return (
     <button
       onClick={onClick}
@@ -277,7 +279,11 @@ function TabButton({ active, onClick, icon, label, count }) {
           : 'text-oshi-dark/60 hover:text-oshi-dark'
       }`}
     >
-      <span>{icon}</span>
+      {isImg ? (
+        <img src={icon} alt="" className="w-4 h-4 object-contain" style={{ imageRendering: 'pixelated' }} />
+      ) : (
+        <span>{icon}</span>
+      )}
       <span>{label}</span>
       <span className={`text-[10px] font-bold px-1.5 rounded-full ${
         active ? 'bg-white/30' : 'bg-oshi-sub/50 text-oshi-dark/70'

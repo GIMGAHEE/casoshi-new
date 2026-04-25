@@ -117,7 +117,10 @@ export default function LiverDashboard({ liverId, onBack, onLogout }) {
           />
         </button>
         <div className="text-center">
-          <div className="text-sm font-black text-oshi-dark">🎤 マイページ</div>
+          <div className="text-sm font-black text-oshi-dark inline-flex items-center gap-1">
+            <img src="/icons/mic.png" alt="" className="w-4 h-4 object-contain" style={{ imageRendering: 'pixelated' }} />
+            マイページ
+          </div>
           <div className="text-[10px] text-oshi-dark/60">ID: {liver.username}</div>
         </div>
         <button

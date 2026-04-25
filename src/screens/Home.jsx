@@ -183,12 +183,15 @@ export default function Home({
       {/* 등록된 라이버 */}
       <section>
         <div className="flex items-center justify-between mb-3 px-1">
-          <h2 className="text-lg font-black text-oshi-dark">🎤 登録ライバー</h2>
+          <h2 className="text-lg font-black text-oshi-dark inline-flex items-center gap-1.5">
+            <img src="/icons/mic.png" alt="" className="w-5 h-5 object-contain" style={{ imageRendering: 'pixelated' }} />
+            登録ライバー
+          </h2>
           <span className="text-xs text-oshi-dark/60">{registeredLivers.length}人</span>
         </div>
         {registeredLivers.length === 0 ? (
           <div className="bg-white/60 rounded-2xl border-2 border-dashed border-oshi-sub p-6 text-center">
-            <div className="text-3xl mb-2">🎤</div>
+            <img src="/icons/mic.png" alt="" className="w-10 h-10 object-contain mx-auto mb-2" style={{ imageRendering: 'pixelated' }} />
             <div className="text-xs text-oshi-dark/60">
               まだ登録されたライバーがいません
             </div>
@@ -232,12 +235,14 @@ export default function Home({
             onClick={onOpenLiverLogin}
             className="text-oshi-dark/60 hover:text-oshi-main underline underline-offset-2"
           >
-            🎤 ライバーログイン
+            <img src="/icons/mic.png" alt="" className="w-4 h-4 inline-block mr-1 align-middle" style={{ imageRendering: 'pixelated' }} />
+            ライバーログイン
           </button>
         )}
         {liverSession && selfLiver && (
-          <div className="text-oshi-main/80">
-            🎤 ログイン中: <span className="font-bold">{selfLiver.profile.name}</span>
+          <div className="text-oshi-main/80 inline-flex items-center gap-1 justify-center">
+            <img src="/icons/mic.png" alt="" className="w-4 h-4 object-contain" style={{ imageRendering: 'pixelated' }} />
+            ログイン中: <span className="font-bold">{selfLiver.profile.name}</span>
           </div>
         )}
         <div>Phase 2 · ローカル保存 · 無課金</div>
