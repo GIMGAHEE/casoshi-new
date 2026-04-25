@@ -133,70 +133,67 @@ export default function Home({
           )}
         </div>
 
-        {/* 2열: 게임 3개 */}
-        <div className="grid grid-cols-3 gap-3">
+        {/* 2열: 게임 4개 (タップ/クレーン/推しコール/ガチャ) */}
+        <div className="grid grid-cols-4 gap-2">
           <button
             onClick={onOpenTapGame}
-            className="card flex flex-col items-center justify-center py-4 px-2 bg-white hover:scale-[1.03] transition-transform"
+            className="card !p-2 flex flex-col items-center justify-center py-3 bg-white hover:scale-[1.03] transition-transform"
           >
             <img
               src="/icons/tap.png"
               alt=""
-              className="w-14 h-14 mb-1"
+              className="w-12 h-12 mb-1"
               style={{ imageRendering: 'pixelated' }}
             />
-            <div className="text-[11px] font-bold text-oshi-dark leading-tight text-center">タップゲーム</div>
-            <div className="text-[9px] text-oshi-dark/55 mt-0.5">+1 pt</div>
+            <div className="text-[10px] font-bold text-oshi-dark leading-tight text-center">タップ</div>
+            <div className="text-[8px] text-oshi-dark/55 mt-0.5">+1 pt</div>
           </button>
 
           <button
             onClick={onOpenCraneGame}
-            className="card flex flex-col items-center justify-center py-4 px-2 bg-white hover:scale-[1.03] transition-transform"
+            className="card !p-2 flex flex-col items-center justify-center py-3 bg-white hover:scale-[1.03] transition-transform"
           >
             <img
               src="/icons/crane.png"
               alt=""
-              className="w-14 h-14 mb-1"
+              className="w-12 h-12 mb-1"
               style={{ imageRendering: 'pixelated' }}
             />
-            <div className="text-[11px] font-bold text-oshi-dark leading-tight text-center">クレーン</div>
-            <div className="text-[9px] text-oshi-dark/55 mt-0.5">1日1回無料</div>
+            <div className="text-[10px] font-bold text-oshi-dark leading-tight text-center">クレーン</div>
+            <div className="text-[8px] text-oshi-dark/55 mt-0.5">1日1回無料</div>
           </button>
 
           <button
             onClick={onOpenRhythmGame}
-            className="card relative flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-br from-purple-100 via-purple-50 to-white ring-2 ring-purple-200 hover:scale-[1.03] transition-transform"
+            className="card !p-2 relative flex flex-col items-center justify-center py-3 bg-gradient-to-br from-purple-100 via-purple-50 to-white ring-2 ring-purple-200 hover:scale-[1.03] transition-transform"
           >
-            <span className="absolute top-1.5 right-1.5 text-[8px] font-black bg-oshi-main text-white px-1.5 py-0.5 rounded-full">NEW</span>
+            <span className="absolute top-1 right-1 text-[7px] font-black bg-oshi-main text-white px-1 py-0.5 rounded-full">NEW</span>
             <img
               src="/icons/rhythm.png"
               alt=""
-              className="w-14 h-14 mb-1 object-contain"
+              className="w-12 h-12 mb-1 object-contain"
               style={{ imageRendering: 'pixelated' }}
             />
-            <div className="text-[11px] font-bold text-oshi-dark leading-tight text-center">推しコール</div>
-            <div className="text-[9px] text-oshi-dark/55 mt-0.5">30秒 リズム</div>
+            <div className="text-[10px] font-bold text-oshi-dark leading-tight text-center">推しコール</div>
+            <div className="text-[8px] text-oshi-dark/55 mt-0.5">30秒 リズム</div>
+          </button>
+
+          <button
+            onClick={onOpenGacha}
+            className="card !p-2 relative flex flex-col items-center justify-center py-3 bg-gradient-to-br from-yellow-50 via-pink-50 to-pink-100 ring-2 ring-pink-300 hover:scale-[1.03] transition-transform"
+          >
+            <span className="absolute top-1 right-1 text-[7px] font-black bg-oshi-main text-white px-1 py-0.5 rounded-full">NEW</span>
+            <img
+              src="/casoshi/gacha/icon.png"
+              alt=""
+              className="w-12 h-12 mb-1 object-contain drop-shadow"
+              style={{ imageRendering: 'pixelated' }}
+              draggable={false}
+            />
+            <div className="text-[10px] font-bold text-oshi-dark leading-tight text-center">ガチャ</div>
+            <div className="text-[8px] text-oshi-dark/55 mt-0.5">1日1回無料</div>
           </button>
         </div>
-
-        {/* 3열: 가챠 (크게 한 칸) */}
-        <button
-          onClick={onOpenGacha}
-          className="card relative w-full flex items-center justify-center gap-3 py-3 px-4 bg-gradient-to-r from-yellow-50 via-pink-50 to-pink-100 ring-2 ring-pink-300 hover:scale-[1.02] transition-transform"
-        >
-          <span className="absolute top-1.5 right-2 text-[8px] font-black bg-oshi-main text-white px-1.5 py-0.5 rounded-full">NEW</span>
-          <img
-            src="/casoshi/gacha/icon.png"
-            alt=""
-            className="w-14 h-14 object-contain drop-shadow"
-            style={{ imageRendering: 'pixelated' }}
-            draggable={false}
-          />
-          <div className="text-left">
-            <div className="text-sm font-black text-oshi-dark">缶バッジガチャ</div>
-            <div className="text-[10px] text-oshi-dark/60">推しの缶バッジを集めよう ・ 1日1回無料</div>
-          </div>
-        </button>
       </section>
 
       {/* 등록된 라이버 */}
