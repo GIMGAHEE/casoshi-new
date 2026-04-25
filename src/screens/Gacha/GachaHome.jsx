@@ -86,9 +86,15 @@ export default function GachaHome({ userId, onBack }) {
           {[1, 2, 3, 4, 5].map((i) => (
             <div
               key={i}
-              className="w-12 h-12 rounded-full bg-oshi-bg border-2 border-white shadow-sm flex-shrink-0 flex items-center justify-center text-xs text-oshi-dark/30"
+              className="w-12 h-12 rounded-full bg-white border-2 border-oshi-sub shadow-sm flex-shrink-0 flex items-center justify-center overflow-hidden"
             >
-              ?
+              <img
+                src="/casoshi/gacha/capsule.png"
+                alt=""
+                className="w-10 h-10 object-contain opacity-70"
+                style={{ imageRendering: 'pixelated' }}
+                draggable={false}
+              />
             </div>
           ))}
         </div>
@@ -96,13 +102,14 @@ export default function GachaHome({ userId, onBack }) {
 
       {/* 가챠머신 비주얼 */}
       <div className="card !p-6 bg-gradient-to-b from-white to-oshi-bg">
-        <div className="flex justify-center items-center py-4">
+        <div className="flex justify-center items-center py-2">
           <div className="relative">
             <img
               src="/casoshi/gacha/machine.png"
               alt="ガチャ"
-              className="w-48 h-48 object-contain"
+              className="w-56 h-56 object-contain drop-shadow-xl"
               style={{ imageRendering: 'pixelated' }}
+              draggable={false}
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
                 e.currentTarget.nextElementSibling.style.display = 'flex';
@@ -110,7 +117,7 @@ export default function GachaHome({ userId, onBack }) {
             />
             <div
               style={{ display: 'none' }}
-              className="w-48 h-48 rounded-3xl bg-oshi-sub border-4 border-oshi-main items-center justify-center text-6xl shadow-xl"
+              className="w-56 h-56 rounded-3xl bg-oshi-sub border-4 border-oshi-main items-center justify-center text-6xl shadow-xl"
             >
               🎰
             </div>

@@ -37,8 +37,9 @@ export const RARITY_CONFIG = {
   normal: {
     key: 'normal',
     label: 'ノーマル',
-    color: '#A0A0A0',
-    glowColor: '#E0E0E0',
+    color: '#FFB5C5',         // 핑크 톤 (라벨 이미지와 어울림)
+    glowColor: '#FFE4F1',
+    labelImage: '/casoshi/rarity/normal.png',
     rate: 0.80,
     refundPoints: 10,
     stars: 1,
@@ -46,18 +47,31 @@ export const RARITY_CONFIG = {
   rare: {
     key: 'rare',
     label: 'レア',
-    color: '#5B9CFF',
-    glowColor: '#A0C8FF',
+    color: '#C8B5E8',         // 라벤더 (R 라벨 톤)
+    glowColor: '#E8DCFF',
+    labelImage: '/casoshi/rarity/rare.png',
     rate: 0.18,
     refundPoints: 30,
     stars: 2,
   },
-  // SR 자리는 나중을 위해 비워둠 — 추가시 rate 재조정 필요
+  // SR 슬롯 — 이미지 라벨은 준비되어 있고, 캔뱃지가 추가되면 자동 활성화
+  // 현재는 캔뱃지 풀이 비어있어 가챠에서 안 나옴 (gacha.js 의 폴백 로직)
+  sr: {
+    key: 'sr',
+    label: 'SR',
+    color: '#FFC580',         // 오렌지 골드 (SR 라벨 톤)
+    glowColor: '#FFE4B0',
+    labelImage: '/casoshi/rarity/sr.png',
+    rate: 0,                  // 이미지 추가시 0.05 등으로 조정
+    refundPoints: 60,
+    stars: 3,
+  },
   ur: {
     key: 'ur',
     label: 'UR',
-    color: '#FFD700',
-    glowColor: '#FFF4A0',
+    color: '#FFD8E8',         // 파스텔 핑크 (UR 라벨 톤, 화려)
+    glowColor: '#FFF0F8',
+    labelImage: '/casoshi/rarity/ur.png',
     rate: 0.02,
     refundPoints: 100,
     stars: 4,
