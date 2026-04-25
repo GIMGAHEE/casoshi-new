@@ -12,7 +12,7 @@ export const DOLL_POOL = [
 
   // R (레어) - 30% — 기본 동물
   { id: 'r_bunny_pink',  name: 'ピンクうさちゃん', rarity: 'R', image: '/crane/doll_r_bunny_pink.png' },
-  { id: 'r_bunny_white', name: 'しろうさちゃん',   rarity: 'R', image: '/crane/doll_r_bunny_white.png' },
+  { id: 'r_bunny_white', name: 'きょむちゃん',   rarity: 'R', image: '/crane/doll_r_bunny_white.png' },
   { id: 'r_bear',        name: 'くまちゃん',       rarity: 'R', image: '/crane/doll_r_bear.png' },
   { id: 'r_cat',         name: 'ねこちゃん',       rarity: 'R', image: '/crane/doll_r_cat.png' },
 
