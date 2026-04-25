@@ -6,6 +6,9 @@ import {
 } from '../data/characters';
 import { SUPPORT_COST } from '../data/gameRules';
 import { addLiverSupport } from '../auth/liverRepository';
+import { addGachaPoints, claimDailyBonusIfNeeded } from '../utils/inventory';
+import { GACHA_REWARDS } from '../data/badges';
+import { getUserId } from '../auth/userIdentity';
 import { useLivers } from '../hooks/useLivers';
 import LevelUpModal from '../components/LevelUpModal';
 import PixelAvatar from '../components/PixelAvatar';
@@ -80,6 +83,19 @@ export default function CharacterDetail({
     // 라이버면 라이버 stats 도 동기화 (라이버 대시보드에 반영되도록)
     if (character.isLiver && character.liverId) {
       addLiverSupport(character.liverId, SUPPORT_COST);
+    }
+
+    // 가챠 포인트 적립 (라이버 응원시에만)
+    // - 응원 1회당 GACHA_REWARDS.perSupport pt
+    // - 하루 첫 응원이면 보너스 추가
+    if (character.isLiver) {
+      const uid = getUserId();
+      addGachaPoints(uid, GACHA_REWARDS.perSupport, 'support').catch(err => {
+        console.warn('[gacha pt] add failed', err);
+      });
+      claimDailyBonusIfNeeded(uid, GACHA_REWARDS.dailyFirstSupport).catch(err => {
+        console.warn('[gacha pt] daily bonus failed', err);
+      });
     }
 
     if (nextLevel > prevLevel) {

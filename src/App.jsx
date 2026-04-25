@@ -16,6 +16,7 @@ import AdminLogin from './screens/AdminLogin';
 import AdminDashboard from './screens/AdminDashboard';
 import LiverLogin from './screens/LiverLogin';
 import LiverDashboard from './screens/LiverDashboard';
+import GachaHome from './screens/Gacha/GachaHome';
 import BottomNav from './components/BottomNav';
 import { getSession } from './auth/session';
 import { getUserId } from './auth/userIdentity';
@@ -70,6 +71,7 @@ export default function App() {
     'liverLogin', 'liverDashboard',
     'builder', 'roomEditor',
     'tapGame', 'craneGame', 'rhythmGame',
+    'gacha',
     'myOshiProfileEditor', 'liverProfileEditor',
     'character',
   ].includes(screen.name);
@@ -142,6 +144,7 @@ export default function App() {
           onOpenTapGame={() => setScreen({ name: 'tap' })}
           onOpenRhythmGame={() => setScreen({ name: 'rhythm' })}
           onOpenCraneGame={() => setScreen({ name: 'crane' })}
+          onOpenGacha={() => setScreen({ name: 'gacha' })}
           onOpenRanking={() => setScreen({ name: 'ranking' })}
           onOpenBuilder={() => setScreen({ name: 'builder' })}
           onOpenLiverLogin={() => setScreen({ name: 'liverLogin' })}
@@ -195,6 +198,13 @@ export default function App() {
       {screen.name === 'crane' && (
         <CraneGame
           points={points} setPoints={setPoints}
+          onBack={() => setScreen({ name: 'home' })}
+        />
+      )}
+
+      {screen.name === 'gacha' && (
+        <GachaHome
+          userId={getUserId()}
           onBack={() => setScreen({ name: 'home' })}
         />
       )}
