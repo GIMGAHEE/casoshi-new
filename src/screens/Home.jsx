@@ -275,9 +275,9 @@ function AvatarTile({ sprite, hairOverlay, hairTransform, fallbackEmoji }) {
   // - 일반 sprite: scale 1.3 + top anchor → 자연스레 상반신만 보임
   // - hairBaked:  scale 0.85 정도가 적정. 다리 안 보이게 살짝 위로 끌어올림.
   const isHairBaked = !hairOverlay;
-  const SCALE = isHairBaked ? 0.95 : 1.3;
+  const SCALE = isHairBaked ? 0.78 : 1.3;
   // hairBaked: scale 키우고 위로 끌어 momo(긴머리) 와 동일한 "머리위 약간 + 상반신" 프레이밍
-  const Y_OFFSET = isHairBaked ? '-5%' : '0%';
+  const Y_OFFSET = isHairBaked ? '-2%' : '0%';
   return (
     <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden flex justify-center">
       <div
