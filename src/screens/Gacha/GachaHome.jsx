@@ -4,8 +4,9 @@ import { GACHA_COST } from '../../data/badges';
 import GachaAnimation from './GachaAnimation';
 import GachaResult from './GachaResult';
 
-export default function GachaHome({ userId, onBack }) {
-  const { inventory, loading, pulling, canUseFreePull, pullSingle, pullTen } = useGacha(userId);
+export default function GachaHome({ userId, points, setPoints, onBack }) {
+  const { inventory, loading, pulling, canUseFreePull, pullSingle, pullTen } =
+    useGacha(userId, points, setPoints);
 
   // 'idle' | 'animating' | 'result'
   const [phase, setPhase] = useState('idle');
@@ -61,7 +62,7 @@ export default function GachaHome({ userId, onBack }) {
 
   return (
     <div className="max-w-md mx-auto px-4 py-4 space-y-4 pb-32">
-      {/* 헤더 */}
+      {/* 헤더 — 좌측 뒤로 + 가운데 타이틀. 포인트는 PointsBar 에 이미 표시됨 */}
       <div className="flex items-center justify-between">
         <button onClick={onBack} className="p-1">
           <img
@@ -73,10 +74,7 @@ export default function GachaHome({ userId, onBack }) {
           />
         </button>
         <h1 className="text-lg font-black text-oshi-dark">缶バッジガチャ</h1>
-        <div className="bg-white rounded-full px-3 py-1.5 border-2 border-oshi-sub flex items-center gap-1 shadow-sm">
-          <span className="text-yellow-500">●</span>
-          <span className="font-bold text-oshi-dark text-sm">{inventory.gachaPoints}</span>
-        </div>
+        <div className="w-10" /> {/* spacer */}
       </div>
 
       {/* 본일의 라인업 (placeholder — 라이버 sprite 가 추가되면 채울 예정) */}
@@ -159,7 +157,7 @@ export default function GachaHome({ userId, onBack }) {
 
         <button
           onClick={() => handlePull(1)}
-          disabled={pulling || (inventory.gachaPoints < GACHA_COST.single && !canUseFreePull)}
+          disabled={pulling || (points < GACHA_COST.single && !canUseFreePull)}
           className="w-full py-3.5 rounded-full bg-white border-2 border-oshi-main text-oshi-main font-bold shadow-md disabled:opacity-50 active:scale-95 transition"
         >
           1回まわす ・ {GACHA_COST.single}pt
@@ -167,7 +165,7 @@ export default function GachaHome({ userId, onBack }) {
 
         <button
           onClick={() => handlePull(10)}
-          disabled={pulling || inventory.gachaPoints < GACHA_COST.ten}
+          disabled={pulling || points < GACHA_COST.ten}
           className="w-full py-3.5 rounded-full bg-oshi-main text-white font-black shadow-lg disabled:opacity-50 active:scale-95 transition"
         >
           10連まわす ・ {GACHA_COST.ten}pt

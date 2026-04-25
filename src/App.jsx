@@ -205,6 +205,8 @@ export default function App() {
       {screen.name === 'gacha' && (
         <GachaHome
           userId={getUserId()}
+          points={points}
+          setPoints={setPoints}
           onBack={() => setScreen({ name: 'home' })}
         />
       )}
