@@ -186,7 +186,7 @@ export default function Home({
         >
           <span className="absolute top-1.5 right-2 text-[8px] font-black bg-oshi-main text-white px-1.5 py-0.5 rounded-full">NEW</span>
           <img
-            src="/casoshi/gacha/machine.png"
+            src="/casoshi/gacha/icon.png"
             alt=""
             className="w-14 h-14 object-contain drop-shadow"
             style={{ imageRendering: 'pixelated' }}
