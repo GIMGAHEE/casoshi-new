@@ -101,7 +101,7 @@ export default function GachaHome({ userId, onBack }) {
       </div>
 
       {/* 가챠머신 비주얼 */}
-      <div className="card !p-6 bg-gradient-to-b from-white to-oshi-bg">
+      <div className="card !p-6 bg-gradient-to-b from-oshi-bg via-pink-100 to-oshi-sub border-oshi-main/30">
         <div className="flex justify-center items-center py-2">
           <div className="relative">
             <img
