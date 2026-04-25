@@ -272,14 +272,17 @@ function AvatarTile({ sprite, hairOverlay, hairTransform, fallbackEmoji }) {
   // hairBaked preset(basic_bob.png 등) 은 sprite 자체가 이미 타이트하게 크롭돼있어서
   // 일반 1024x1536 sprite 와 같은 scale 을 적용하면 얼굴만 거대하게 보임.
   // hairOverlay 없음 = hairBaked 라는 시그널이라 그걸로 분기.
+  // - 일반 sprite: scale 1.3 + top anchor → 자연스레 상반신만 보임
+  // - hairBaked:  scale 0.85 정도가 적정. 다리 안 보이게 살짝 위로 끌어올림.
   const isHairBaked = !hairOverlay;
-  const SCALE = isHairBaked ? 0.55 : 1.3;
+  const SCALE = isHairBaked ? 0.85 : 1.3;
+  const Y_OFFSET = isHairBaked ? '-8%' : '0%'; // 살짝 위로 끌어 다리 잘리게
   return (
     <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden flex justify-center">
       <div
         style={{
           width: '100%',
-          transform: `scale(${SCALE})`,
+          transform: `scale(${SCALE}) translateY(${Y_OFFSET})`,
           transformOrigin: 'center top',
         }}
       >
