@@ -269,23 +269,42 @@ function AvatarTile({ sprite, hairOverlay, hairTransform, fallbackEmoji }) {
       </div>
     );
   }
-  // hairBaked preset(basic_bob.png 등) 은 sprite 자체가 이미 타이트하게 크롭돼있어서
-  // 일반 1024x1536 sprite 와 같은 scale 을 적용하면 얼굴만 거대하게 보임.
-  // hairOverlay 없음 = hairBaked 라는 시그널이라 그걸로 분기.
-  // - 일반 sprite: scale 1.3 + top anchor → 자연스레 상반신만 보임
-  // - hairBaked:  scale 0.85 정도가 적정. 다리 안 보이게 살짝 위로 끌어올림.
+  // 두 종류의 sprite 가 근본적으로 다른 비율이라, 각각 다른 방식으로 표시:
+  //   - 일반 (1024x1536, 큰 빈공간): 컨테이너 가득 + scale up + top anchor
+  //     → 큰 빈공간 덕에 자연스럽게 상반신만 보이고 다리는 overflow
+  //   - hairBaked (~447x854, 타이트): 이미 크롭된 sprite 라서 그냥 contain
+  //     → 머리부터 발끝까지 다 들어오게, 작은 미니 피규어 느낌
   const isHairBaked = !hairOverlay;
-  // momo(긴머리, 일반 1024x1536) 가 보이는 프레이밍을 기준으로 맞춤:
-  //   머리 위 약간 여백 + 어깨~허리, 다리 잘림
-  // hairBaked sprite 는 캔버스 자체가 타이트해서 일반 sprite 와 다른 보정 필요.
-  const SCALE = isHairBaked ? 1.15 : 1.3;
-  const Y_OFFSET = isHairBaked ? '-12%' : '0%';
+
+  if (isHairBaked) {
+    // hairBaked: contain 으로 전신 다 보이게. 더 이상 잘라내려 하지 않음.
+    return (
+      <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden flex items-center justify-center">
+        <img
+          src={sprite}
+          alt=""
+          draggable={false}
+          style={{
+            maxHeight: '90%',
+            maxWidth: '90%',
+            width: 'auto',
+            height: 'auto',
+            objectFit: 'contain',
+            imageRendering: 'pixelated',
+          }}
+        />
+      </div>
+    );
+  }
+
+  // 일반 sprite: 기존 scale + top anchor 방식
+  const SCALE = 1.3;
   return (
     <div className="w-14 h-14 mb-1 rounded-xl bg-white/80 shadow-inner overflow-hidden flex justify-center">
       <div
         style={{
           width: '100%',
-          transform: `scale(${SCALE}) translateY(${Y_OFFSET})`,
+          transform: `scale(${SCALE})`,
           transformOrigin: 'center top',
         }}
       >
