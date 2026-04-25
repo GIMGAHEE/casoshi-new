@@ -288,8 +288,8 @@ function AvatarTile({ sprite, hairOverlay, hairTransform, fallbackEmoji }) {
           draggable={false}
           style={{
             position: 'absolute',
-            top: 0,
-            height: '110%',
+            top: '15%',
+            height: '95%',
             width: 'auto',
             imageRendering: 'pixelated',
           }}
