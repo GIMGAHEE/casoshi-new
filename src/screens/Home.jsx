@@ -165,7 +165,7 @@ export default function Home({
 
           <button
             onClick={onOpenRhythmGame}
-            className="card !p-2 relative flex flex-col items-center justify-center py-3 bg-gradient-to-br from-purple-100 via-purple-50 to-white ring-2 ring-purple-200 hover:scale-[1.03] transition-transform"
+            className="card !p-2 relative flex flex-col items-center justify-center py-3 bg-white hover:scale-[1.03] transition-transform"
           >
             <span className="absolute top-1 right-1 text-[7px] font-black bg-oshi-main text-white px-1 py-0.5 rounded-full">NEW</span>
             <img
@@ -180,7 +180,7 @@ export default function Home({
 
           <button
             onClick={onOpenGacha}
-            className="card !p-2 relative flex flex-col items-center justify-center py-3 bg-gradient-to-br from-yellow-50 via-pink-50 to-pink-100 ring-2 ring-pink-300 hover:scale-[1.03] transition-transform"
+            className="card !p-2 relative flex flex-col items-center justify-center py-3 bg-white hover:scale-[1.03] transition-transform"
           >
             <span className="absolute top-1 right-1 text-[7px] font-black bg-oshi-main text-white px-1 py-0.5 rounded-full">NEW</span>
             <img
