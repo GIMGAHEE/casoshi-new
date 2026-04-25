@@ -41,6 +41,15 @@ service cloud.firestore {
       allow write: if true;
     }
 
+    // 인벤토리 (캔뱃지 가챠 결과 + 가챠 포인트)
+    //   - 익명 userId (localStorage) 로 구분
+    //   - Phase 3b 에서 Firebase Auth uid 로 전환하면
+    //     allow read, write: if request.auth.uid == userId;
+    match /casoshi_inventory/{userId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
     // 다른 컬렉션은 기본 차단
     match /{document=**} {
       allow read, write: if false;

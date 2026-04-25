@@ -9,7 +9,7 @@ export default function Home({
   supports, myOshi,
   liverSession,
   lastCheckin, setLastCheckin,
-  onSelectCharacter, onOpenTapGame, onOpenRhythmGame, onOpenCraneGame, onOpenRanking,
+  onSelectCharacter, onOpenTapGame, onOpenRhythmGame, onOpenCraneGame, onOpenGacha, onOpenRanking,
   onOpenBuilder, onOpenLiverLogin, onOpenLiverDashboard,
 }) {
   const today = todayKey();
@@ -178,6 +178,25 @@ export default function Home({
             <div className="text-[9px] text-oshi-dark/55 mt-0.5">30秒 リズム</div>
           </button>
         </div>
+
+        {/* 3열: 가챠 (크게 한 칸) */}
+        <button
+          onClick={onOpenGacha}
+          className="card relative w-full flex items-center justify-center gap-3 py-3 px-4 bg-gradient-to-r from-yellow-50 via-pink-50 to-pink-100 ring-2 ring-pink-300 hover:scale-[1.02] transition-transform"
+        >
+          <span className="absolute top-1.5 right-2 text-[8px] font-black bg-oshi-main text-white px-1.5 py-0.5 rounded-full">NEW</span>
+          <img
+            src="/casoshi/gacha/machine.png"
+            alt=""
+            className="w-14 h-14 object-contain drop-shadow"
+            style={{ imageRendering: 'pixelated' }}
+            draggable={false}
+          />
+          <div className="text-left">
+            <div className="text-sm font-black text-oshi-dark">缶バッジガチャ</div>
+            <div className="text-[10px] text-oshi-dark/60">推しの缶バッジを集めよう ・ 1日1回無料</div>
+          </div>
+        </button>
       </section>
 
       {/* 등록된 라이버 */}
