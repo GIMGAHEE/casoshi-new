@@ -11,7 +11,7 @@ export default {
           main: '#FF6B9D',
           sub: '#FFC1D8',
           bg: '#FFE5EC',
-          dark: '#2D1B2E',
+          dark: '#7a4a6e',
           accent: '#FFB5C5',
         },
       },

@@ -9,7 +9,7 @@ export default function PointsBar({ points, onReset }) {
 
   return (
     <div className="sticky top-0 z-10">
-      <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+      <div className="max-w-md mx-auto px-3 py-2 flex items-center justify-between">
         {/* 포인트 박스 */}
         <div className="flex items-center gap-2 px-3 py-1.5" style={pixelStyle}>
           <img
