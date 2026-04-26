@@ -412,7 +412,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
           <div className="mt-2 bg-white/70 rounded-2xl px-4 py-2 text-[11px] text-oshi-dark/70 space-y-1 border border-oshi-sub">
             <div className="flex items-center gap-1.5">
               <img src="/icons/perfect.png" alt="" className="w-4 h-4 object-contain" style={{ imageRendering: 'pixelated' }} />
-              <span>PERFECT: +30pt × 희귀도</span>
+              <span>PERFECT: +30pt × レア度</span>
             </div>
             <div className="flex items-center gap-1.5">
               <img src="/icons/good.png" alt="" className="w-4 h-4 object-contain" style={{ imageRendering: 'pixelated' }} />
