@@ -48,4 +48,19 @@
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  /* DotGothic16/픽셀 폰트는 single weight 라 font-bold 가 안 먹음 → text-shadow 로 외곽 두껍게 */
+  .text-thick {
+    text-shadow:
+      1px 0 0 currentColor,
+      -1px 0 0 currentColor,
+      0 1px 0 currentColor,
+      0 -1px 0 currentColor;
+  }
+  .text-extra-thick {
+    text-shadow:
+      1px 0 0 currentColor, -1px 0 0 currentColor,
+      0 1px 0 currentColor, 0 -1px 0 currentColor,
+      1px 1px 0 currentColor, -1px -1px 0 currentColor,
+      1px -1px 0 currentColor, -1px 1px 0 currentColor;
+  }
 }

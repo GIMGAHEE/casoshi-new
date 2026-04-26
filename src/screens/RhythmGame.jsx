@@ -440,7 +440,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
               animation: 'cdPulse 0.8s ease-out',
             }}
           />
-          <div className="text-3xl font-black text-oshi-main tracking-wide font-pixel">
+          <div className="text-3xl font-black text-oshi-main tracking-wide font-pixel text-thick">
             推しリズム
           </div>
           <div className="text-xs text-oshi-dark/70 text-center max-w-[15rem]">
