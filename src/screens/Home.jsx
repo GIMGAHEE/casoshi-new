@@ -199,8 +199,8 @@ export default function Home({
       {/* 등록된 라이버 */}
       <section>
         <div className="flex items-center justify-between mb-3 px-1">
-          <h2 className="text-lg font-black text-oshi-dark inline-flex items-center gap-1.5">
-            <img src="/icons/mic.png" alt="" className="w-5 h-5 object-contain" style={{ imageRendering: 'pixelated' }} />
+          <h2 className="text-lg font-black text-oshi-dark inline-flex items-center gap-2">
+            <img src="/icons/mic.png" alt="" className="w-7 h-7 object-contain" style={{ imageRendering: 'pixelated' }} />
             登録ライバー
           </h2>
           <span className="text-xs text-oshi-dark/60">{registeredLivers.length}人</span>
