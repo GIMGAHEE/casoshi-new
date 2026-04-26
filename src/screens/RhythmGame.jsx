@@ -148,6 +148,13 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
   const startGame = () => {
     sfx.click();
     const tl = generateTimeline(selectedDifficulty);
+    console.log('[RHYTHM DEBUG] startGame', {
+      trackId,
+      difficultyId,
+      difficulty: selectedDifficulty,
+      timelineLen: tl?.length,
+      firstNote: tl?.[0],
+    });
     setTimeline(tl);
     notesIndexRef.current = 0;
     setActiveNotes([]);
@@ -189,10 +196,24 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
     if (state !== 'playing') return;
     if (paused) return;
 
+    console.log('[RHYTHM DEBUG] game loop START', {
+      state,
+      paused,
+      timelineLen: timeline?.length,
+    });
+
+    let firstTickLogged = false;
+    let firstSpawnLogged = false;
+
     const loop = () => {
       const now = performance.now();
       const t = now - startTimeRef.current;
       setElapsed(t);
+
+      if (!firstTickLogged) {
+        console.log('[RHYTHM DEBUG] first tick', { t, timelineLen: timeline?.length });
+        firstTickLogged = true;
+      }
 
       // === 사비 트리거 ===
       // 사비 1.5s 전: 배너 + 말풍선
@@ -215,6 +236,10 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
         tl[notesIndexRef.current].spawnTime <= t
       ) {
         const n = tl[notesIndexRef.current];
+        if (!firstSpawnLogged) {
+          console.log('[RHYTHM DEBUG] first spawn', { t, n });
+          firstSpawnLogged = true;
+        }
         setActiveNotes(prev => [...prev, { ...n, spawnedAt: now }]);
         notesIndexRef.current += 1;
       }
