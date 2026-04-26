@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { RARITY_CONFIG } from '../../data/badges';
+import { sfx } from '../../utils/sound';
 
 /**
  * 가챠 연출 — 4단계
@@ -23,11 +24,32 @@ export default function GachaAnimation({ results, onDone }) {
   // 'shake' | 'drop' | 'open' | 'reveal'
   const [step, setStep] = useState('shake');
 
+  // rarity 별 reveal fanfare 매핑
+  const revealSfxByRarity = {
+    normal: sfx.gachaRevealNormal,
+    rare: sfx.gachaRevealRare,
+    sr: sfx.gachaRevealSR,
+    ur: sfx.gachaRevealUR,
+  };
+
   useEffect(() => {
+    // 1단계 시작과 동시에 shake 사운드
+    sfx.gachaShake();
+
     const timers = [];
-    timers.push(setTimeout(() => setStep('drop'), 1200));
-    timers.push(setTimeout(() => setStep('open'), 2000));
-    timers.push(setTimeout(() => setStep('reveal'), 2600));
+    timers.push(setTimeout(() => {
+      setStep('drop');
+      sfx.gachaDrop();
+    }, 1200));
+    timers.push(setTimeout(() => {
+      setStep('open');
+      sfx.gachaPop();
+    }, 2000));
+    timers.push(setTimeout(() => {
+      setStep('reveal');
+      const fanfare = revealSfxByRarity[featured.rarity] || sfx.gachaRevealNormal;
+      fanfare();
+    }, 2600));
     timers.push(setTimeout(() => onDone(), 4400));
 
     return () => timers.forEach(clearTimeout);

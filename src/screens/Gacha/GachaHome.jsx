@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useGacha } from '../../hooks/useGacha';
 import { GACHA_COST } from '../../data/badges';
+import { sfx } from '../../utils/sound';
 import GachaAnimation from './GachaAnimation';
 import GachaResult from './GachaResult';
 
@@ -13,6 +14,7 @@ export default function GachaHome({ userId, points, setPoints, onBack }) {
   const [pullResult, setPullResult] = useState(null);
 
   const handlePull = async (count) => {
+    sfx.gachaPull();
     const result = count === 1 ? await pullSingle() : await pullTen();
 
     if (!result) return;

@@ -117,4 +117,61 @@ export const sfx = {
       playNote({ freq: f, duration: 0.35, type: 'sine', gain: 0.2, delay: i * 0.1 });
     });
   }),
+
+  // ===== 가챠 전용 =====
+  // 가챠 시작 (1연/10연 버튼) — 코인 투입 + 짧은 상승 swoosh
+  gachaPull: gated(() => {
+    playNote({ freq: 1047, duration: 0.09, type: 'sine', gain: 0.18 });
+    playNote({ freq: 1568, duration: 0.13, type: 'sine', gain: 0.16, delay: 0.06 });
+    playSweep({ from: 200, to: 800, duration: 0.35, type: 'square', gain: 0.05 });
+  }),
+  // 가챠 머신 흔들림 — 빠른 tom roll (8연발)
+  gachaShake: gated(() => {
+    for (let i = 0; i < 8; i++) {
+      playNote({ freq: 180 + (i % 2) * 40, duration: 0.06, type: 'triangle', gain: 0.08, delay: i * 0.13 });
+    }
+  }),
+  // 캡슐 떨어짐 — 빠르게 하강 + thud
+  gachaDrop: gated(() => {
+    playSweep({ from: 600, to: 120, duration: 0.5, type: 'triangle', gain: 0.1 });
+    playNote({ freq: 70, duration: 0.18, type: 'sine', gain: 0.22, delay: 0.5 });
+  }),
+  // 캡슐 까지기 — 짧은 pop + 상승 sparkle
+  gachaPop: gated(() => {
+    playSweep({ from: 80, to: 1200, duration: 0.18, type: 'square', gain: 0.1 });
+    playNote({ freq: 2093, duration: 0.12, type: 'sine', gain: 0.14, delay: 0.18 });
+    playNote({ freq: 2637, duration: 0.16, type: 'sine', gain: 0.12, delay: 0.24 });
+  }),
+  // ===== rarity 별 reveal fanfare =====
+  // normal — 단순 2음 chime
+  gachaRevealNormal: gated(() => {
+    playNote({ freq: 783.99, duration: 0.18, type: 'sine', gain: 0.16 });
+    playNote({ freq: 1047, duration: 0.32, type: 'sine', gain: 0.18, delay: 0.10 });
+  }),
+  // rare — C major triad 빠르게
+  gachaRevealRare: gated(() => {
+    [523.25, 659.25, 783.99, 1047].forEach((f, i) => {
+      playNote({ freq: f, duration: 0.22, type: 'sine', gain: 0.18, delay: i * 0.07 });
+    });
+  }),
+  // SR — square + sine 화려
+  gachaRevealSR: gated(() => {
+    [523.25, 659.25, 783.99].forEach((f, i) => {
+      playNote({ freq: f, duration: 0.25, type: 'square', gain: 0.11, delay: i * 0.05 });
+    });
+    [1047, 1318.5, 1568].forEach((f, i) => {
+      playNote({ freq: f, duration: 0.42, type: 'sine', gain: 0.18, delay: 0.18 + i * 0.06 });
+    });
+  }),
+  // UR — 가장 화려 (encore + 추가 sparkle)
+  gachaRevealUR: gated(() => {
+    [523.25, 659.25, 783.99, 1047, 1318.5].forEach((f, i) => {
+      playNote({ freq: f, duration: 0.4, type: 'sine', gain: 0.2, delay: i * 0.08 });
+    });
+    [1568, 2093, 2637].forEach((f, i) => {
+      playNote({ freq: f, duration: 0.32, type: 'square', gain: 0.10, delay: 0.5 + i * 0.05 });
+    });
+    // 마지막 sustained
+    playNote({ freq: 2093, duration: 0.9, type: 'sine', gain: 0.16, delay: 0.7 });
+  }),
 };
