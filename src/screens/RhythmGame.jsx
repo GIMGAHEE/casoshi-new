@@ -427,23 +427,28 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
           <div className="text-3xl font-black text-oshi-main tracking-wide">
             推しコール
           </div>
-          <div className="text-xs text-oshi-dark/70 text-center max-w-[14rem]">
-            中央に飛んでくるコールに<br />
-            タイミングを合わせてタップ！<br />
-            <span className="text-oshi-main font-bold">PERFECT × 10</span> でフィーバー突入
+          <div className="text-xs text-oshi-dark/70 text-center max-w-[15rem]">
+            上から落ちてくる<span className="text-oshi-main font-bold">5色のコール</span>を<br />
+            対応するボタンでタップ！<br />
+            <span className="text-oshi-main font-bold">PERFECT 10連</span> でフィーバー突入
           </div>
-          <div className="mt-2 bg-white/70 rounded-2xl px-4 py-2 text-[11px] text-oshi-dark/70 space-y-1 border border-oshi-sub">
+          <div className="mt-2 bg-white/70 rounded-2xl px-4 py-2.5 text-[11px] text-oshi-dark/70 space-y-1 border border-oshi-sub">
             <div className="flex items-center gap-1.5">
               <img src="/icons/perfect.png" alt="" className="w-4 h-4 object-contain" style={{ imageRendering: 'pixelated' }} />
-              <span>PERFECT: +30pt × レア度</span>
+              <span>PERFECT (±80ms): +30pt × レア度</span>
             </div>
             <div className="flex items-center gap-1.5">
               <img src="/icons/good.png" alt="" className="w-4 h-4 object-contain" style={{ imageRendering: 'pixelated' }} />
-              <span>GOOD: +10pt</span>
+              <span>GOOD (±200ms): +10pt</span>
             </div>
             <div className="flex items-center gap-1.5">
               <img src="/icons/miss.png" alt="" className="w-4 h-4 object-contain" style={{ imageRendering: 'pixelated' }} />
               <span>MISS: コンボリセット</span>
+            </div>
+            <div className="mt-1.5 pt-1.5 border-t border-oshi-sub/40 text-[10px] space-y-0.5 text-center">
+              <div>💎 レア度: <span className="font-bold">N×1 ／ R×1.5 ／ SR×2.5 ／ SSR×5</span></div>
+              <div>🔥 サビ (13〜18秒): <span className="font-bold">スコア×1.5</span></div>
+              <div>⚡ FEVER 中 (8秒): 全コール&スコアボーナス</div>
             </div>
           </div>
           {bestScore > 0 && (
