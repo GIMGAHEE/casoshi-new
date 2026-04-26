@@ -67,7 +67,7 @@ export default function CharacterCard({ character, supportPoints, onClick, highl
             </span>
           </div>
 
-          <div className="text-lg text-oshi-dark truncate font-display">
+          <div className="text-lg font-black text-oshi-dark truncate">
             {character.name}
           </div>
 
