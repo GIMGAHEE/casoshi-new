@@ -327,13 +327,15 @@ function RegisterLiverForm({ onCancel, onRegistered }) {
                     : 'bg-white border-2 border-oshi-sub text-oshi-dark/70'
                 }`}
               >
-                <img
-                  src={g === 'girl' ? '/icons/girl.png' : '/icons/boy.png'}
-                  alt=""
-                  className={`object-contain ${g === 'girl' ? 'w-11 h-8' : 'w-8 h-8'}`}
-                  style={{ imageRendering: 'pixelated' }}
-                  draggable={false}
-                />
+                <div className="w-8 h-8 flex items-center justify-center overflow-visible">
+                  <img
+                    src={g === 'girl' ? '/icons/girl.png' : '/icons/boy.png'}
+                    alt=""
+                    className={`object-contain ${g === 'girl' ? 'w-12 h-12 -my-2' : 'w-8 h-8'}`}
+                    style={{ imageRendering: 'pixelated' }}
+                    draggable={false}
+                  />
+                </div>
                 {g === 'girl' ? '女性' : '男性'}
               </button>
             ))}

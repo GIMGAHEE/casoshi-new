@@ -94,7 +94,9 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
                 : 'text-oshi-dark/60'
             }`}
           >
-            <img src="/icons/girl.png" alt="" className="w-11 h-8 object-contain" style={{ imageRendering: 'pixelated' }} />
+            <div className="w-8 h-8 flex items-center justify-center overflow-visible">
+              <img src="/icons/girl.png" alt="" className="w-12 h-12 -my-2 object-contain" style={{ imageRendering: 'pixelated' }} />
+            </div>
             女の子
           </button>
           <button
