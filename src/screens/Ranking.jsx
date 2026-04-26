@@ -100,7 +100,7 @@ export default function Ranking({ myOshi, supports, onBack, onSelectCharacter })
 
       {/* 헤더 */}
       <section className="text-center py-2">
-        <div className="text-3xl font-black text-oshi-main flex items-center justify-center gap-2">
+        <div className="text-3xl text-oshi-main flex items-center justify-center gap-2 font-display">
           <img
             src="/icons/trophy.png"
             alt=""

@@ -361,7 +361,7 @@ export default function CraneGame({ points, setPoints, onBack }) {
         </button>
       </div>
 
-      <h2 className="text-lg font-black text-oshi-dark text-center mb-2 flex items-center justify-center gap-2">
+      <h2 className="text-3xl text-oshi-main text-center mb-2 flex items-center justify-center gap-2 font-display">
         <img
           src="/icons/crane.png"
           alt=""

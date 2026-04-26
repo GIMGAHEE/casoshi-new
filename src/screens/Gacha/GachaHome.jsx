@@ -73,7 +73,7 @@ export default function GachaHome({ userId, points, setPoints, onBack }) {
             draggable={false}
           />
         </button>
-        <h1 className="text-lg font-black text-oshi-dark">缶バッジガチャ</h1>
+        <h1 className="text-3xl text-oshi-main font-display">缶バッジガチャ</h1>
         <div className="w-10" /> {/* spacer */}
       </div>
 
