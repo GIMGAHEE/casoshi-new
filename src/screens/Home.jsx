@@ -48,7 +48,7 @@ export default function Home({
   return (
     <div className="max-w-md mx-auto px-4 pt-3 pb-6 space-y-5">
       {/* 히어로 — 로고 이미지 (ゲームで推しを育てる 부제목도 이미지에 포함됨) */}
-      <section className="text-center">
+      <section className="text-center -my-3">
         <img
           src="/logo.png"
           alt="Casオシ — ゲームで推しを育てる、新しい推し活。"
