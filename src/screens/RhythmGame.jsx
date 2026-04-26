@@ -654,25 +654,24 @@ function PlayField({
           </div>
         </div>
 
-        {/* COMBO — combo_label.png (가로 레이아웃: PNG 옆 노란 숫자) */}
-        <div className="flex flex-row items-center justify-center h-full gap-1.5 px-1" style={{ minWidth: '5rem' }}>
+        {/* COMBO — combo_label.png (세로 레이아웃: PNG 위, 노란 숫자 아래) */}
+        <div className="flex flex-col items-center justify-center h-full px-1.5" style={{ minWidth: '4.5rem' }}>
           <img
             src="/rhythm/combo_label.png"
             alt=""
             className="pointer-events-none select-none"
-            style={{ height: '90%', width: 'auto', objectFit: 'contain' }}
+            style={{ height: '48%', width: 'auto', objectFit: 'contain' }}
             draggable={false}
           />
           <div
             className="font-black tabular-nums leading-none"
             style={{
-              fontSize: 'clamp(18px, 4.5vw, 24px)',
+              fontSize: 'clamp(15px, 4vw, 22px)',
               background: 'linear-gradient(180deg, #FFE99A 0%, #FFB800 60%, #FF8800 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               filter: 'drop-shadow(0 2px 0 #B85C00) drop-shadow(0 0 4px rgba(255,184,0,0.4))',
-              minWidth: '1.5em',
-              textAlign: 'center',
+              marginTop: '3px',
             }}
           >
             {combo}
