@@ -606,83 +606,131 @@ function PlayField({
 
   return (
     <div className="flex-1 flex flex-col mt-2">
-      {/* HUD 상단 — 핑크 픽셀 박스 톤 */}
-      <div className="flex items-stretch gap-2 mb-2">
-        {/* SCORE */}
-        <div
-          className="px-3 py-1.5 text-center"
-          style={{
-            background: 'linear-gradient(180deg, #FF7BB8 0%, #FF5599 100%)',
-            border: '2px solid #C73B7E',
-            borderRadius: '12px',
-            boxShadow: '0 2px 0 #A02960, inset 0 2px 0 rgba(255,255,255,0.4)',
-            minWidth: '4.5rem',
-          }}
-        >
-          <div className="text-[8px] text-white/90 font-black tracking-wider drop-shadow">SCORE</div>
-          <div className="text-sm font-black text-white tabular-nums" style={{ textShadow: '1px 1px 0 #A02960' }}>
+      {/* HUD 상단 — PNG 배경 + 텍스트 오버레이 */}
+      <div className="flex items-stretch gap-1.5 mb-2" style={{ height: '52px' }}>
+        {/* SCORE — score_box.png */}
+        <div className="relative h-full" style={{ aspectRatio: '928/297' }}>
+          <img
+            src="/rhythm/score_box.png"
+            alt=""
+            className="absolute inset-0 w-full h-full pointer-events-none select-none"
+            style={{ objectFit: 'fill' }}
+            draggable={false}
+          />
+          <div
+            className="absolute font-black tabular-nums whitespace-nowrap"
+            style={{
+              right: '8%',
+              top: '58%',
+              transform: 'translateY(-50%)',
+              fontSize: 'clamp(10px, 2.4vw, 14px)',
+              color: '#C73B7E',
+              textShadow: '0 1px 0 rgba(255,255,255,0.6)',
+            }}
+          >
             {String(score).padStart(8, '0')}
           </div>
         </div>
-        {/* COMBO */}
-        <div
-          className="px-3 py-1.5 text-center"
-          style={{
-            background: 'linear-gradient(180deg, #FF7BB8 0%, #FF5599 100%)',
-            border: '2px solid #C73B7E',
-            borderRadius: '12px',
-            boxShadow: '0 2px 0 #A02960, inset 0 2px 0 rgba(255,255,255,0.4)',
-          }}
-        >
-          <div className="text-[8px] text-white/90 font-black tracking-wider drop-shadow">COMBO</div>
-          <div className="text-sm font-black text-white tabular-nums" style={{ textShadow: '1px 1px 0 #A02960' }}>
+
+        {/* COMBO — combo_label.png (PNG 의 "123" 자리에 진짜 콤보 수 오버레이) */}
+        <div className="relative h-full" style={{ aspectRatio: '574/280' }}>
+          <img
+            src="/rhythm/combo_label.png"
+            alt=""
+            className="absolute inset-0 w-full h-full pointer-events-none select-none"
+            style={{ objectFit: 'fill' }}
+            draggable={false}
+          />
+          <div
+            className="absolute font-black tabular-nums"
+            style={{
+              left: '50%',
+              top: '72%',
+              transform: 'translate(-50%, -50%)',
+              fontSize: 'clamp(14px, 3.5vw, 20px)',
+              color: '#FFD93D',
+              WebkitTextStroke: '1.2px #C76A00',
+              textShadow: '0 2px 0 #C76A00',
+              minWidth: '40%',
+              textAlign: 'center',
+              background: 'linear-gradient(180deg, #FFE99A 0%, #FFB800 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              filter: 'drop-shadow(0 2px 0 #B85C00)',
+            }}
+          >
             {combo}
           </div>
         </div>
-        {/* FEVER 게이지 — 하트 모양 */}
-        <div
-          className="flex-1 relative flex items-center px-3"
-          style={{
-            background: 'linear-gradient(180deg, #FFB5D5 0%, #FF8FB8 100%)',
-            border: '2px solid #C73B7E',
-            borderRadius: '12px',
-            boxShadow: '0 2px 0 #A02960, inset 0 2px 0 rgba(255,255,255,0.4)',
-            overflow: 'hidden',
-          }}
-        >
-          <div className="text-[10px] font-black text-white mr-2 flex items-center gap-0.5" style={{ textShadow: '1px 1px 0 #A02960' }}>
-            <span>💖</span>
-            <span>FEVER</span>
-          </div>
-          <div className="flex-1 h-2 bg-white/30 rounded-full overflow-hidden">
+
+        {/* FEVER 게이지 — fever_gauge.png + 트랙 영역 fill */}
+        <div className="relative flex-1 h-full min-w-0">
+          <img
+            src="/rhythm/fever_gauge.png"
+            alt=""
+            className="absolute inset-0 w-full h-full pointer-events-none select-none"
+            style={{ objectFit: 'fill' }}
+            draggable={false}
+          />
+          {/* 트랙 영역 위의 게이지 fill (PNG 의 빈 트랙 위치에 맞춰 좌표 잡음) */}
+          <div
+            className="absolute overflow-hidden"
+            style={{
+              left: '32%',
+              right: '4%',
+              top: '38%',
+              bottom: '34%',
+              borderRadius: '999px',
+            }}
+          >
             <div
               className="h-full transition-[width] duration-200"
               style={{
                 width: `${(fever ? feverLeft : Math.min(1, combo / FEVER_TRIGGER_COMBO)) * 100}%`,
                 background: fever
                   ? 'linear-gradient(90deg, #FFB800, #FF6B9D, #B77EE0)'
-                  : 'linear-gradient(90deg, #FFFFFF, #FFE4F0)',
+                  : 'linear-gradient(90deg, #FF6B9D, #FF99CC)',
                 animation: fever ? 'feverPulse 1s ease infinite' : undefined,
               }}
             />
           </div>
         </div>
-        {/* 残り時間 */}
+
+        {/* 残り時間 — 기존 CSS div 유지 (PNG 없음, 톤은 score_box 와 비슷하게) */}
         <div
-          className="px-2 py-1.5 text-center"
+          className="px-2 py-1 text-center flex flex-col justify-center"
           style={{
-            background: 'linear-gradient(180deg, #FF7BB8 0%, #FF5599 100%)',
+            background: 'linear-gradient(180deg, #FFCEE2 0%, #FF8FB8 100%)',
             border: '2px solid #C73B7E',
             borderRadius: '12px',
-            boxShadow: '0 2px 0 #A02960, inset 0 2px 0 rgba(255,255,255,0.4)',
-            minWidth: '3.5rem',
+            boxShadow: '0 2px 0 #A02960, inset 0 2px 0 rgba(255,255,255,0.5)',
+            minWidth: '3rem',
           }}
         >
-          <div className="text-[8px] text-white/90 font-black tracking-wider drop-shadow">残り</div>
-          <div className="text-sm font-black text-white tabular-nums" style={{ textShadow: '1px 1px 0 #A02960' }}>
+          <div className="text-[8px] text-[#C73B7E] font-black tracking-wider">残り</div>
+          <div
+            className="text-sm font-black tabular-nums leading-tight"
+            style={{ color: '#C73B7E', textShadow: '0 1px 0 rgba(255,255,255,0.6)' }}
+          >
             {(timeLeft / 1000).toFixed(0)}s
           </div>
         </div>
+
+        {/* PAUSE 버튼 */}
+        <button
+          type="button"
+          onClick={() => { /* TODO: pause 기능 다음 차시 */ }}
+          className="relative h-full aspect-square shrink-0 active:scale-90 transition-transform"
+          aria-label="pause"
+        >
+          <img
+            src="/rhythm/pause_btn.png"
+            alt=""
+            className="w-full h-full pointer-events-none select-none"
+            style={{ objectFit: 'contain' }}
+            draggable={false}
+          />
+        </button>
       </div>
 
       {/* 진행 바 */}
