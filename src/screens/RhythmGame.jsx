@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { sfx } from '../utils/sound';
 import { createBgmEngine } from '../utils/rhythmBgm';
@@ -248,9 +248,9 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, fever, feverEndsAt, timeline, sabiActive, paused]);
 
-  const showJudgment = (label, rarity = 'N') => {
+  const showJudgment = (label, rarity = 'N', lane = null) => {
     clearTimeout(judgmentFxTimerRef.current);
-    setJudgmentFx({ label, rarity, id: Date.now() + Math.random() });
+    setJudgmentFx({ label, rarity, lane, id: Date.now() + Math.random() });
     judgmentFxTimerRef.current = setTimeout(() => setJudgmentFx(null), 500);
   };
 
@@ -342,7 +342,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
         setPerfectStreak(0);
       }
 
-      showJudgment(judgment, n.rarity);
+      showJudgment(judgment, n.rarity, n.lane);
 
       // 노트 제거
       return prev.filter((_, i) => i !== bestIdx);
@@ -589,6 +589,25 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
           75%  { transform: translate(-50%, -60%) scale(1) rotate(0); opacity: 1; }
           100% { transform: translate(-50%, -80%) scale(0.9) rotate(0); opacity: 0; }
         }
+        @keyframes hitcirclePop {
+          0%   { transform: translate(-50%,-50%) scale(0.4); opacity: 0; }
+          25%  { transform: translate(-50%,-50%) scale(1.2); opacity: 1; }
+          100% { transform: translate(-50%,-50%) scale(1.9); opacity: 0; }
+        }
+        @keyframes sparklesPop {
+          0%   { transform: translate(-50%,-50%) scale(0.5) rotate(-10deg); opacity: 0; }
+          30%  { transform: translate(-50%,-50%) scale(1.1) rotate(5deg); opacity: 1; }
+          100% { transform: translate(-50%,-50%) scale(1.5) rotate(15deg); opacity: 0; }
+        }
+        @keyframes comboHearts {
+          0%   { transform: translate(-50%,-50%) scale(0.6); opacity: 0; }
+          25%  { transform: translate(-50%,-50%) scale(1) rotate(-3deg); opacity: 0.9; }
+          100% { transform: translate(-50%,-50%) scale(1.4) rotate(8deg); opacity: 0; }
+        }
+        @keyframes wingsFlap {
+          0%   { transform: scale(0.95) rotate(-3deg); }
+          100% { transform: scale(1.06) rotate(3deg); }
+        }
       `}</style>
     </div>
   );
@@ -625,6 +644,30 @@ function PlayField({
   const charImage = reactionSprite
     ? `/rhythm/${reactionSprite.sprite}.png`
     : frames[frameIdx];
+
+  // === 버튼 상호작용: pressed (탭 시 swap) ===
+  const [pressedLane, setPressedLane] = useState(null);
+  const pressedTimerRef = useRef(null);
+  const handleButtonPress = (lane) => {
+    setPressedLane(lane);
+    clearTimeout(pressedTimerRef.current);
+    pressedTimerRef.current = setTimeout(() => setPressedLane(null), 130);
+    onHit(lane);
+  };
+
+  // === 버튼 glow: 가까운 노트가 그 레인에 있을 때 ===
+  // 노트가 히트라인 도달 ±300ms 이내면 해당 레인 glow
+  const GLOW_WINDOW_MS = 300;
+  const glowingLanes = useMemo(() => {
+    const set = new Set();
+    activeNotes.forEach(n => {
+      const remaining = (n.hitTime ?? 0) - elapsed;
+      if (remaining > -100 && remaining < GLOW_WINDOW_MS) {
+        set.add(n.lane);
+      }
+    });
+    return set;
+  }, [activeNotes, elapsed]);
 
   return (
     <div className="flex-1 flex flex-col mt-2">
@@ -842,6 +885,61 @@ function PlayField({
           );
         })}
 
+        {/* FEVER 활성 시: floor_light (캐릭터 발 아래) + wings 양옆 */}
+        {fever && (
+          <>
+            <img
+              src="/rhythm/floor_light.png"
+              alt=""
+              className="absolute pointer-events-none"
+              style={{
+                left: '50%',
+                top: '52%',
+                transform: 'translate(-50%, -50%)',
+                width: '80%',
+                height: 'auto',
+                opacity: 0.85,
+                mixBlendMode: 'screen',
+                zIndex: 3,
+                animation: 'feverPulse 1.5s ease infinite',
+              }}
+              draggable={false}
+            />
+            <img
+              src="/rhythm/wings_left.png"
+              alt=""
+              className="absolute pointer-events-none"
+              style={{
+                left: '8%',
+                top: '20%',
+                height: '32%',
+                width: 'auto',
+                zIndex: 5,
+                animation: 'wingsFlap 1.2s ease-in-out infinite alternate',
+                filter: 'drop-shadow(0 0 10px rgba(255,184,0,0.7))',
+                transformOrigin: 'right center',
+              }}
+              draggable={false}
+            />
+            <img
+              src="/rhythm/wings_right.png"
+              alt=""
+              className="absolute pointer-events-none"
+              style={{
+                right: '8%',
+                top: '20%',
+                height: '32%',
+                width: 'auto',
+                zIndex: 5,
+                animation: 'wingsFlap 1.2s ease-in-out infinite alternate-reverse',
+                filter: 'drop-shadow(0 0 10px rgba(255,184,0,0.7))',
+                transformOrigin: 'left center',
+              }}
+              draggable={false}
+            />
+          </>
+        )}
+
         {/* 가운데 캐릭터 */}
         <img
           src={charImage}
@@ -937,19 +1035,19 @@ function PlayField({
           </div>
         )}
 
-        {/* FEVER 컷인 — 페버 진입 순간 큰 배지 */}
+        {/* FEVER 컷인 — 페버 진입 순간 큰 텍스트 */}
         {feverCutIn && (
           <img
-            src="/rhythm/fever_badge.png"
+            src="/rhythm/fever_text.png"
             alt="FEVER"
             className="absolute left-1/2 top-1/2 pointer-events-none z-40"
             style={{
               transform: 'translate(-50%, -50%)',
-              width: '85%',
+              width: '90%',
               height: 'auto',
               imageRendering: 'pixelated',
               animation: 'feverCutIn 1.6s ease-out forwards',
-              filter: 'drop-shadow(0 4px 16px rgba(255,107,157,0.8))',
+              filter: 'drop-shadow(0 4px 16px rgba(255,107,157,0.8)) drop-shadow(0 0 20px rgba(255,184,0,0.6))',
             }}
             draggable={false}
           />
@@ -965,23 +1063,43 @@ function PlayField({
                        : comboBadge.value >= 25 ? '50'   // 25 는 50 배지 빌려쓰기
                        : '10';
           return (
-            <img
-              key={comboBadge.id}
-              src={`/rhythm/combo_${target}.png`}
-              alt=""
-              className="absolute pointer-events-none z-40"
-              style={{
-                left: '50%',
-                top: '40%',
-                transform: 'translate(-50%, -50%)',
-                width: 180,
-                height: 'auto',
-                imageRendering: 'pixelated',
-                animation: 'comboBadge 1.4s ease-out forwards',
-                filter: 'drop-shadow(0 4px 12px rgba(255,107,157,0.6))',
-              }}
-              draggable={false}
-            />
+            <>
+              {/* 콤보 배지 뒤 하트 파티클 (배경 흩뿌림) */}
+              <img
+                key={`hp_${comboBadge.id}`}
+                src="/rhythm/hearts_particle.png"
+                alt=""
+                className="absolute pointer-events-none"
+                style={{
+                  left: '50%',
+                  top: '40%',
+                  transform: 'translate(-50%, -50%)',
+                  width: '70%',
+                  height: 'auto',
+                  animation: 'comboHearts 1.4s ease-out forwards',
+                  mixBlendMode: 'screen',
+                  zIndex: 39,
+                }}
+                draggable={false}
+              />
+              <img
+                key={comboBadge.id}
+                src={`/rhythm/combo_${target}.png`}
+                alt=""
+                className="absolute pointer-events-none z-40"
+                style={{
+                  left: '50%',
+                  top: '40%',
+                  transform: 'translate(-50%, -50%)',
+                  width: 180,
+                  height: 'auto',
+                  imageRendering: 'pixelated',
+                  animation: 'comboBadge 1.4s ease-out forwards',
+                  filter: 'drop-shadow(0 4px 12px rgba(255,107,157,0.6))',
+                }}
+                draggable={false}
+              />
+            </>
           );
         })()}
 
@@ -1036,6 +1154,48 @@ function PlayField({
           />
         )}
 
+        {/* PERFECT 히트 시 hitcircle (그 레인에 ring, 폭발 후 사라짐) */}
+        {judgmentFx?.label === 'PERFECT' && judgmentFx.lane && (
+          <img
+            key={`hc_${judgmentFx.id}`}
+            src={`/rhythm/hitcircle_${judgmentFx.lane}.png`}
+            alt=""
+            className="absolute pointer-events-none"
+            style={{
+              left: `${LANE_X[judgmentFx.lane]}%`,
+              top: `${HIT_LINE_Y}%`,
+              transform: 'translate(-50%, -50%)',
+              width: 100,
+              height: 'auto',
+              animation: 'hitcirclePop 0.55s ease-out forwards',
+              mixBlendMode: 'screen',
+              zIndex: 9,
+            }}
+            draggable={false}
+          />
+        )}
+
+        {/* PERFECT 히트 시 sparkles (그 레인에 흩뿌림) */}
+        {judgmentFx?.label === 'PERFECT' && judgmentFx.lane && (
+          <img
+            key={`sp_${judgmentFx.id}`}
+            src="/rhythm/sparkles.png"
+            alt=""
+            className="absolute pointer-events-none"
+            style={{
+              left: `${LANE_X[judgmentFx.lane]}%`,
+              top: `${HIT_LINE_Y}%`,
+              transform: 'translate(-50%, -50%)',
+              width: 140,
+              height: 'auto',
+              animation: 'sparklesPop 0.7s ease-out forwards',
+              mixBlendMode: 'screen',
+              zIndex: 10,
+            }}
+            draggable={false}
+          />
+        )}
+
         {/* 하트 파티클 */}
         {hearts.map(h => (
           <div
@@ -1059,18 +1219,27 @@ function PlayField({
       <div className="grid grid-cols-5 gap-2 mt-2">
         {LANES.map(lane => {
           const info = LANE_INFO[lane];
+          const isPressed = pressedLane === lane;
+          const isGlowing = !isPressed && glowingLanes.has(lane);
+          const btnSrc = isPressed
+            ? `/rhythm/btn_${lane}_pressed.png`
+            : isGlowing
+              ? `/rhythm/btn_${lane}_glow.png`
+              : `/rhythm/btn_${lane}.png`;
           return (
             <button
               key={lane}
-              onTouchStart={(e) => { e.preventDefault(); onHit(lane); }}
-              onMouseDown={(e) => { e.preventDefault(); onHit(lane); }}
+              onTouchStart={(e) => { e.preventDefault(); handleButtonPress(lane); }}
+              onMouseDown={(e) => { e.preventDefault(); handleButtonPress(lane); }}
               className="relative aspect-square rounded-2xl active:scale-90 transition-transform select-none flex items-center justify-center"
               style={{
-                filter: `drop-shadow(0 0 12px ${info.glow})`,
+                filter: isGlowing
+                  ? `drop-shadow(0 0 18px ${info.glow})`
+                  : `drop-shadow(0 0 12px ${info.glow})`,
               }}
             >
               <img
-                src={`/rhythm/btn_${lane}.png`}
+                src={btnSrc}
                 alt=""
                 className="w-full h-full object-contain pointer-events-none"
                 style={{ imageRendering: 'pixelated' }}
