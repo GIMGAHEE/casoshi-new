@@ -402,7 +402,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
         <div className="text-center">
           <div className="text-sm font-black text-oshi-dark inline-flex items-center gap-1">
             <img src="/icons/mic.png" alt="" className="w-4 h-4 object-contain" style={{ imageRendering: 'pixelated' }} />
-            推しコール
+            推しリズム
           </div>
           {state === 'playing' && (
             <div className="text-[10px] text-oshi-dark/60">リズム合わせてタップ！</div>
@@ -425,7 +425,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
             }}
           />
           <div className="text-3xl font-black text-oshi-main tracking-wide">
-            推しコール
+            推しリズム
           </div>
           <div className="text-xs text-oshi-dark/70 text-center max-w-[15rem]">
             上から落ちてくる<span className="text-oshi-main font-bold">5色のコール</span>を<br />

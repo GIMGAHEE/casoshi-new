@@ -133,7 +133,7 @@ export default function Home({
           )}
         </div>
 
-        {/* 2열: 게임 4개 (タップ/クレーン/推しコール/ガチャ) */}
+        {/* 2열: 게임 4개 (タップ/クレーン/推しリズム/ガチャ) */}
         <div className="grid grid-cols-4 gap-2">
           <button
             onClick={onOpenTapGame}
@@ -174,7 +174,7 @@ export default function Home({
               className="w-12 h-12 mb-1 object-contain"
               style={{ imageRendering: 'pixelated' }}
             />
-            <div className="text-[10px] font-bold text-oshi-dark leading-tight text-center">推しコール</div>
+            <div className="text-[10px] font-bold text-oshi-dark leading-tight text-center">推しリズム</div>
             <div className="text-[8px] text-oshi-dark/55 mt-0.5">30秒 リズム</div>
           </button>
 
