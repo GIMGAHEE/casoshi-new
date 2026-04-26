@@ -654,24 +654,25 @@ function PlayField({
           </div>
         </div>
 
-        {/* COMBO — combo_label.png (잘려서 'COMBO' 라벨만) + 아래 큰 노란 숫자 */}
-        <div className="flex flex-col items-center justify-center h-full px-1" style={{ minWidth: '4.5rem' }}>
+        {/* COMBO — combo_label.png (가로 레이아웃: PNG 옆 노란 숫자) */}
+        <div className="flex flex-row items-center justify-center h-full gap-1.5 px-1" style={{ minWidth: '5rem' }}>
           <img
             src="/rhythm/combo_label.png"
             alt=""
             className="pointer-events-none select-none"
-            style={{ height: '50%', width: 'auto', objectFit: 'contain' }}
+            style={{ height: '90%', width: 'auto', objectFit: 'contain' }}
             draggable={false}
           />
           <div
             className="font-black tabular-nums leading-none"
             style={{
-              fontSize: 'clamp(16px, 4vw, 22px)',
+              fontSize: 'clamp(18px, 4.5vw, 24px)',
               background: 'linear-gradient(180deg, #FFE99A 0%, #FFB800 60%, #FF8800 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               filter: 'drop-shadow(0 2px 0 #B85C00) drop-shadow(0 0 4px rgba(255,184,0,0.4))',
-              marginTop: '2px',
+              minWidth: '1.5em',
+              textAlign: 'center',
             }}
           >
             {combo}
@@ -716,7 +717,7 @@ function PlayField({
       </div>
 
       {/* HUD 2줄: FEVER 게이지 (한 줄 가득) */}
-      <div className="relative w-full mb-2" style={{ height: '46px' }}>
+      <div className="relative w-full mb-2" style={{ height: '40px' }}>
         <img
           src="/rhythm/fever_gauge.png"
           alt=""
@@ -724,14 +725,14 @@ function PlayField({
           style={{ objectFit: 'fill' }}
           draggable={false}
         />
-        {/* 트랙 영역 위의 게이지 fill */}
+        {/* 트랙 영역 위의 게이지 fill (새 디자인 비율 879/164 에 맞춰 좌표 재조정) */}
         <div
           className="absolute overflow-hidden"
           style={{
-            left: '32%',
-            right: '4%',
-            top: '38%',
-            bottom: '34%',
+            left: '17%',
+            right: '6%',
+            top: '24%',
+            bottom: '24%',
             borderRadius: '999px',
           }}
         >
