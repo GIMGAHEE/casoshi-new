@@ -665,7 +665,15 @@ export default function CraneGame({ points, setPoints, onBack }) {
                       draggable={false}
                     />
                   )}
-                  {out === 'miss' && <span className="text-xl">❌</span>}
+                  {out === 'miss' && (
+                    <img
+                      src="/icons/miss.png"
+                      alt="MISS"
+                      className="w-6 h-6 object-contain"
+                      style={{ imageRendering: 'pixelated' }}
+                      draggable={false}
+                    />
+                  )}
                 </div>
               );
             })}

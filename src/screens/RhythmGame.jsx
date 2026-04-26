@@ -409,10 +409,19 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
             タイミングを合わせてタップ！<br />
             <span className="text-oshi-main font-bold">PERFECT × 10</span> でフィーバー突入
           </div>
-          <div className="mt-2 bg-white/70 rounded-2xl px-4 py-2 text-[11px] text-oshi-dark/70 space-y-0.5 border border-oshi-sub">
-            <div>🔴 PERFECT: +30pt × 희귀도</div>
-            <div>🟡 GOOD: +10pt</div>
-            <div>❌ MISS: コンボリセット</div>
+          <div className="mt-2 bg-white/70 rounded-2xl px-4 py-2 text-[11px] text-oshi-dark/70 space-y-1 border border-oshi-sub">
+            <div className="flex items-center gap-1.5">
+              <img src="/icons/perfect.png" alt="" className="w-4 h-4 object-contain" style={{ imageRendering: 'pixelated' }} />
+              <span>PERFECT: +30pt × 희귀도</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <img src="/icons/good.png" alt="" className="w-4 h-4 object-contain" style={{ imageRendering: 'pixelated' }} />
+              <span>GOOD: +10pt</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <img src="/icons/miss.png" alt="" className="w-4 h-4 object-contain" style={{ imageRendering: 'pixelated' }} />
+              <span>MISS: コンボリセット</span>
+            </div>
           </div>
           {bestScore > 0 && (
             <div className="text-xs text-oshi-dark/60">
