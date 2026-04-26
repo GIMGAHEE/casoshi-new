@@ -1,5 +1,7 @@
-import { findCharacter, calcLevel } from '../data/characters';
+import { findCharacter, calcLevel, asCharacter } from '../data/characters';
 import { useLivers } from '../hooks/useLivers';
+import { useMyOshis } from '../hooks/useMyOshis';
+import { getUserId } from '../auth/userIdentity';
 import { findFurniture } from '../data/furniture';
 import IsometricRoom from '../components/IsometricRoom';
 import PixelAvatar from '../components/PixelAvatar';
@@ -9,7 +11,23 @@ export default function MiniHome({
   onBack, onOpenDetail, onEditRoom, onEditProfile,
 }) {
   const livers = useLivers();
-  const character = findCharacter(myOshi, characterId, livers);
+  const allMyOshis = useMyOshis();
+  const myUserId = getUserId();
+
+  // 본인 myOshi + 라이버 + SEED_CHARACTERS 에서 먼저 찾고,
+  // 못 찾으면 다른 유저들이 만든 마이오시 (id: 'myoshi_<userId>') 에서 fallback.
+  let character = findCharacter(myOshi, characterId, livers);
+  if (!character && characterId?.startsWith('myoshi_')) {
+    const otherUserId = characterId.slice('myoshi_'.length);
+    const otherEntry = allMyOshis.find(m => m.userId === otherUserId && m.userId !== myUserId);
+    if (otherEntry?.oshi) {
+      character = asCharacter(otherEntry.oshi, {
+        id: characterId,
+        creatorId: otherUserId,
+        updatedAt: otherEntry.meta?.updatedAt || null,
+      });
+    }
+  }
   if (!character) {
     return (
       <div className="max-w-md mx-auto px-4 py-8">
