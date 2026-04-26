@@ -151,7 +151,13 @@ export default function Ranking({ myOshi, supports, onBack, onSelectCharacter })
               className="rounded-3xl p-6 text-center shadow-lg relative overflow-hidden"
               style={{ backgroundColor: top.bgColor }}
             >
-              <div className="absolute top-3 right-3 text-4xl animate-float">👑</div>
+              <img
+                src="/icons/crown.png"
+                alt=""
+                className="absolute top-3 right-3 w-12 h-12 object-contain animate-float"
+                style={{ imageRendering: 'pixelated' }}
+                draggable={false}
+              />
 
               <div className="text-[10px] font-black tracking-[0.3em] text-oshi-dark/60 mb-2">
                 ✦ #1 {tab === 'liver' ? 'ライバー' : '推し'} ✦

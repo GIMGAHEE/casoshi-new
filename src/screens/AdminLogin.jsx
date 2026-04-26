@@ -25,7 +25,7 @@ export default function AdminLogin({ onSuccess, onCancel }) {
       <div className="flex-1 flex flex-col justify-center">
         <div className="bg-white rounded-3xl shadow-xl border-2 border-oshi-sub p-6">
           <div className="text-center mb-4">
-            <div className="text-4xl mb-2">👑</div>
+            <img src="/icons/crown.png" alt="" className="w-12 h-12 object-contain mx-auto mb-2" style={{ imageRendering: 'pixelated' }} draggable={false} />
             <div className="text-xl font-black text-oshi-dark">運営ログイン</div>
             <div className="text-[11px] text-oshi-dark/60 mt-1">CasOshi 管理画面</div>
           </div>

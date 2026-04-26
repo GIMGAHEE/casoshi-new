@@ -64,7 +64,10 @@ export default function AdminDashboard({ onLogout }) {
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-3">
         <div>
-          <div className="text-lg font-black text-oshi-dark">👑 運営ダッシュボード</div>
+          <div className="text-lg font-black text-oshi-dark flex items-center gap-2">
+            <img src="/icons/crown.png" alt="" className="w-7 h-7 object-contain" style={{ imageRendering: 'pixelated' }} draggable={false} />
+            運営ダッシュボード
+          </div>
           <div className="text-[11px] text-oshi-dark/60">ライバー・ユーザー管理</div>
         </div>
         <button
