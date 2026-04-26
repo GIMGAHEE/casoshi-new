@@ -30,6 +30,13 @@ export default function Home({
     setLastCheckin(today);
   };
 
+  // 보라+핑크 톤 카드 스타일 (흰 카드들 톤 통일용)
+  const purpleCard = {
+    borderColor: '#D4B8F0',
+    background: 'linear-gradient(135deg, #FFFFFF 0%, #FAF3FF 55%, #F0E6FA 100%)',
+    boxShadow: '0 4px 14px rgba(155, 123, 217, 0.18)',
+  };
+
   return (
     <div className="max-w-md mx-auto px-4 pt-3 pb-6 space-y-5">
       {/* 히어로 — 로고 이미지 (ゲームで推しを育てる 부제목도 이미지에 포함됨) */}
@@ -47,12 +54,13 @@ export default function Home({
       <section className="space-y-4">
         {/* 1열: 출석 / 랭킹 / 마이홈 (3-col) */}
         <div className="grid grid-cols-3 gap-3">
-          {/* 출석 체크 — 기본 흰색 */}
+          {/* 출석 체크 — 보라+핑크 톤 */}
           <button
             onClick={handleCheckin}
             disabled={!canCheckin}
-            className={`card flex flex-col items-center justify-center py-4 px-2 bg-white transition ${
-              canCheckin ? 'hover:bg-oshi-bg cursor-pointer' : 'opacity-50 cursor-not-allowed'
+            style={purpleCard}
+            className={`card flex flex-col items-center justify-center py-4 px-2 transition ${
+              canCheckin ? 'hover:brightness-105 cursor-pointer' : 'opacity-50 cursor-not-allowed'
             }`}
           >
             <img
@@ -137,7 +145,8 @@ export default function Home({
         <div className="grid grid-cols-4 gap-2">
           <button
             onClick={onOpenTapGame}
-            className="card !p-2 flex flex-col items-center justify-center py-3 bg-white hover:scale-[1.03] transition-transform"
+            style={purpleCard}
+            className="card !p-2 flex flex-col items-center justify-center py-3 hover:scale-[1.03] transition-transform"
           >
             <img
               src="/icons/tap.png"
@@ -151,7 +160,8 @@ export default function Home({
 
           <button
             onClick={onOpenCraneGame}
-            className="card !p-2 flex flex-col items-center justify-center py-3 bg-white hover:scale-[1.03] transition-transform"
+            style={purpleCard}
+            className="card !p-2 flex flex-col items-center justify-center py-3 hover:scale-[1.03] transition-transform"
           >
             <img
               src="/icons/crane.png"
@@ -165,7 +175,8 @@ export default function Home({
 
           <button
             onClick={onOpenRhythmGame}
-            className="card !p-2 relative flex flex-col items-center justify-center py-3 bg-white hover:scale-[1.03] transition-transform"
+            style={purpleCard}
+            className="card !p-2 relative flex flex-col items-center justify-center py-3 hover:scale-[1.03] transition-transform"
           >
             <span className="absolute top-1 right-1 text-[7px] font-black bg-oshi-main text-white px-1 py-0.5 rounded-full">NEW</span>
             <img
@@ -180,7 +191,8 @@ export default function Home({
 
           <button
             onClick={onOpenGacha}
-            className="card !p-2 relative flex flex-col items-center justify-center py-3 bg-white hover:scale-[1.03] transition-transform"
+            style={purpleCard}
+            className="card !p-2 relative flex flex-col items-center justify-center py-3 hover:scale-[1.03] transition-transform"
           >
             <span className="absolute top-1 right-1 text-[7px] font-black bg-oshi-main text-white px-1 py-0.5 rounded-full">NEW</span>
             <img
@@ -206,7 +218,7 @@ export default function Home({
           <span className="text-xs text-oshi-dark/60">{registeredLivers.length}人</span>
         </div>
         {registeredLivers.length === 0 ? (
-          <div className="bg-white/60 rounded-2xl border-2 border-dashed border-oshi-sub p-6 text-center">
+          <div className="bg-white/60 rounded-2xl border-2 border-dashed p-6 text-center" style={{ borderColor: '#D4B8F0' }}>
             <img src="/icons/mic.png" alt="" className="w-10 h-10 object-contain mx-auto mb-2" style={{ imageRendering: 'pixelated' }} />
             <div className="text-xs text-oshi-dark/60">
               まだ登録されたライバーがいません
