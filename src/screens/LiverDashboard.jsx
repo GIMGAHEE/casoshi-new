@@ -173,9 +173,13 @@ export default function LiverDashboard({ liverId, onBack, onLogout }) {
               }
               return (
                 <>
-                  <div className="text-4xl">
-                    {liver.profile.gender === 'boy' ? '👦' : '👧'}
-                  </div>
+                  <img
+                    src={liver.profile.gender === 'boy' ? '/icons/boy.png' : '/icons/girl.png'}
+                    alt=""
+                    className="w-12 h-12 object-contain"
+                    style={{ imageRendering: 'pixelated' }}
+                    draggable={false}
+                  />
                   {/* 꾸미기 힌트 배지 */}
                   <div className="absolute -bottom-1 -right-1 bg-white text-[8px] font-black px-1.5 py-0.5 rounded-full shadow border border-oshi-sub text-oshi-main">
                     ✨ NEW

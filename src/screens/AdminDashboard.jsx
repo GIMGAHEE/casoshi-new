@@ -146,9 +146,13 @@ export default function AdminDashboard({ onLogout }) {
                     className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
                     style={{ background: l.profile.bgColor || '#FFE5EC' }}
                   >
-                    <div className="text-2xl">
-                      {l.profile.gender === 'boy' ? '👦' : '👧'}
-                    </div>
+                    <img
+                      src={l.profile.gender === 'boy' ? '/icons/boy.png' : '/icons/girl.png'}
+                      alt=""
+                      className="w-9 h-9 object-contain"
+                      style={{ imageRendering: 'pixelated' }}
+                      draggable={false}
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-black text-oshi-dark truncate">
@@ -315,7 +319,7 @@ function RegisterLiverForm({ onCancel, onRegistered }) {
                 key={g}
                 type="button"
                 onClick={() => setForm({ ...form, gender: g })}
-                className={`py-2 rounded-xl text-sm font-bold transition ${
+                className={`py-2 rounded-xl text-sm font-bold transition flex items-center justify-center gap-1.5 ${
                   form.gender === g
                     ? g === 'girl'
                       ? 'bg-oshi-main text-white'
@@ -323,7 +327,14 @@ function RegisterLiverForm({ onCancel, onRegistered }) {
                     : 'bg-white border-2 border-oshi-sub text-oshi-dark/70'
                 }`}
               >
-                {g === 'girl' ? '👧 女性' : '👦 男性'}
+                <img
+                  src={g === 'girl' ? '/icons/girl.png' : '/icons/boy.png'}
+                  alt=""
+                  className="w-5 h-5 object-contain"
+                  style={{ imageRendering: 'pixelated' }}
+                  draggable={false}
+                />
+                {g === 'girl' ? '女性' : '男性'}
               </button>
             ))}
           </div>
