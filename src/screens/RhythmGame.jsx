@@ -2,22 +2,23 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { sfx } from '../utils/sound';
 import { createBgmEngine } from '../utils/rhythmBgm';
-import { TRACKS, DEFAULT_TRACK_ID, findTrack, getTrackIndex } from '../data/rhythmTracks';
+import { TRACKS, DEFAULT_TRACK_ID, findTrack } from '../data/rhythmTracks';
 import {
   generateTimeline,
   RARITY_INFO,
-  JUDGMENT,
   JUDGMENT_SCORE,
-  NOTE_TRAVEL_MS,
   SESSION_DURATION_MS,
   SABI_START_MS,
   SABI_END_MS,
   SABI_BANNER_LEAD_MS,
   SABI_SCORE_MULT,
+  DIFFICULTIES,
+  DEFAULT_DIFFICULTY_ID,
+  findDifficulty,
 } from '../data/rhythm';
 
-// ===== 페버 조건 =====
-const FEVER_TRIGGER_COMBO = 10;       // 10 PERFECT 연쇄 → 페버 진입
+// ===== 페버 지속 시간 =====
+// (트리거 콤보 수는 난이도별로 다름 — selectedDifficulty.feverTriggerCombo)
 const FEVER_DURATION_MS = 8_000;
 
 // 콤보 마일스톤 (사운드 cue)
@@ -79,9 +80,15 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
   // 선택된 트랙 (localStorage 저장 → 다음 게임에 기억)
   const [trackId, setTrackId] = useLocalStorage('casoshi:rhythm:track', DEFAULT_TRACK_ID);
   const selectedTrack = findTrack(trackId);
-  const trackIndex = getTrackIndex(trackId);
-  const prevTrack = () => setTrackId(TRACKS[(trackIndex - 1 + TRACKS.length) % TRACKS.length].id);
-  const nextTrack = () => setTrackId(TRACKS[(trackIndex + 1) % TRACKS.length].id);
+
+  // 선택된 난이도
+  const [difficultyId, setDifficultyId] = useLocalStorage('casoshi:rhythm:difficulty', DEFAULT_DIFFICULTY_ID);
+  const selectedDifficulty = findDifficulty(difficultyId);
+  // 자주 쓰는 alias
+  const TRAVEL = selectedDifficulty.noteTravelMs;
+  const FEVER_TRIGGER = selectedDifficulty.feverTriggerCombo;
+  const PERFECT_W = selectedDifficulty.judgmentPerfect;
+  const GOOD_W = selectedDifficulty.judgmentGood;
 
   // 말풍선 표시 (id 바뀔 때마다 useEffect 가 auto-cleanup)
   const showSpeech = (key) => {
@@ -140,7 +147,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
   // 타임라인 생성 (게임 시작 시)
   const startGame = () => {
     sfx.click();
-    const tl = generateTimeline();
+    const tl = generateTimeline(selectedDifficulty);
     setTimeline(tl);
     notesIndexRef.current = 0;
     setActiveNotes([]);
@@ -217,7 +224,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
         const missed = [];
         const remain = prev.filter(n => {
           const deltaFromHit = t - n.hitTime;
-          if (deltaFromHit > JUDGMENT.GOOD) {
+          if (deltaFromHit > GOOD_W) {
             missed.push(n);
             return false;
           }
@@ -289,8 +296,8 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
 
       // 판정
       let judgment = null;
-      if (deltaMs <= JUDGMENT.PERFECT) judgment = 'PERFECT';
-      else if (deltaMs <= JUDGMENT.GOOD) judgment = 'GOOD';
+      if (deltaMs <= PERFECT_W) judgment = 'PERFECT';
+      else if (deltaMs <= GOOD_W) judgment = 'GOOD';
 
       if (!judgment) {
         // 너무 빠르거나 늦음 — 빈 탭 (무반응 or 약한 fx)
@@ -325,7 +332,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
         });
         setPerfectStreak(ps => {
           const next = ps + 1;
-          if (next >= FEVER_TRIGGER_COMBO && !fever) {
+          if (next >= FEVER_TRIGGER && !fever) {
             // 페버 진입!
             sfx.fever();
             setFever(true);
@@ -466,55 +473,80 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
             </div>
           )}
 
-          {/* 트랙 선택 */}
-          <div className="flex items-center gap-2 mt-1">
-            <button
-              onClick={prevTrack}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-base font-black active:translate-y-0.5 transition"
-              style={{
-                background: '#fffafd',
-                border: `2px solid ${selectedTrack.accentColor}`,
-                color: selectedTrack.accentColor,
-                boxShadow: `0 2px 0 0 ${selectedTrack.accentColor}`,
-              }}
-            >
-              ◀
-            </button>
-            <div
-              className="px-4 py-2.5 text-center"
-              style={{
-                background: '#fffafd',
-                border: `2px solid ${selectedTrack.accentColor}`,
-                borderRadius: '14px',
-                boxShadow: `0 2px 0 0 ${selectedTrack.accentColor}`,
-                minWidth: '180px',
-              }}
-            >
-              <div className="text-[9px] font-bold tracking-wider" style={{ color: selectedTrack.accentColor }}>
-                ♪ {selectedTrack.genre} · {selectedTrack.bpm} BPM
-              </div>
-              <div className="text-sm font-black mt-0.5 text-oshi-dark">
-                {selectedTrack.name}
-              </div>
-              <div className="text-[10px] text-oshi-dark/60">
-                {selectedTrack.subtitle}
-              </div>
-              <div className="text-[8px] text-oshi-dark/40 mt-0.5">
-                {trackIndex + 1} / {TRACKS.length}
-              </div>
+          {/* 트랙 선택 — 5버튼 그리드 */}
+          <div className="w-full max-w-sm mt-1">
+            <div className="text-[10px] font-bold text-oshi-dark/70 mb-1.5 text-center tracking-wider">
+              ♪ MUSIC
             </div>
-            <button
-              onClick={nextTrack}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-base font-black active:translate-y-0.5 transition"
-              style={{
-                background: '#fffafd',
-                border: `2px solid ${selectedTrack.accentColor}`,
-                color: selectedTrack.accentColor,
-                boxShadow: `0 2px 0 0 ${selectedTrack.accentColor}`,
-              }}
-            >
-              ▶
-            </button>
+            <div className="grid grid-cols-5 gap-1.5">
+              {TRACKS.map(t => {
+                const active = t.id === trackId;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => setTrackId(t.id)}
+                    className="px-1 py-2 active:translate-y-0.5 transition text-center"
+                    style={{
+                      background: active ? '#fffafd' : '#fff5fa',
+                      border: `2px solid ${active ? t.accentColor : '#ffd6e4'}`,
+                      borderRadius: '10px',
+                      boxShadow: active
+                        ? `0 3px 0 0 ${t.accentColor}`
+                        : `0 1px 0 0 #ffd6e4`,
+                      opacity: active ? 1 : 0.65,
+                    }}
+                  >
+                    <div className="text-[8px] font-black tracking-wider" style={{ color: t.accentColor }}>
+                      {t.genre}
+                    </div>
+                    <div className="text-[9px] font-bold text-oshi-dark mt-0.5 leading-tight">
+                      {t.name.length > 6 ? t.name.slice(0, 6) : t.name}
+                    </div>
+                    <div className="text-[7px] text-oshi-dark/50 mt-0.5">
+                      {t.bpm} BPM
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 난이도 선택 — 3버튼 그리드 */}
+          <div className="w-full max-w-sm mt-1">
+            <div className="text-[10px] font-bold text-oshi-dark/70 mb-1.5 text-center tracking-wider">
+              ⚡ DIFFICULTY
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {DIFFICULTIES.map(d => {
+                const active = d.id === difficultyId;
+                return (
+                  <button
+                    key={d.id}
+                    onClick={() => setDifficultyId(d.id)}
+                    className="px-2 py-2 active:translate-y-0.5 transition text-center"
+                    style={{
+                      background: active ? '#fffafd' : '#fff5fa',
+                      border: `2px solid ${active ? d.accentColor : '#ffd6e4'}`,
+                      borderRadius: '12px',
+                      boxShadow: active
+                        ? `0 3px 0 0 ${d.accentColor}`
+                        : `0 1px 0 0 #ffd6e4`,
+                      opacity: active ? 1 : 0.65,
+                    }}
+                  >
+                    <div className="text-base font-black" style={{ color: d.accentColor }}>
+                      {d.name}
+                    </div>
+                    <div className="text-[8px] font-bold tracking-wider text-oshi-dark/60">
+                      {d.sub}
+                    </div>
+                    <div className="text-[8px] text-oshi-dark/50 mt-0.5">
+                      ♪ {d.totalNotes} ／ ±{d.judgmentPerfect}ms
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <button
@@ -852,7 +884,7 @@ function PlayField({
             <div
               className="h-full transition-[width] duration-200"
               style={{
-                width: `${(fever ? feverLeft : Math.min(1, combo / FEVER_TRIGGER_COMBO)) * 100}%`,
+                width: `${(fever ? feverLeft : Math.min(1, combo / FEVER_TRIGGER)) * 100}%`,
                 background: fever
                   ? 'linear-gradient(90deg, #FFB800, #FF6B9D, #B77EE0)'
                   : 'linear-gradient(90deg, #FF6B9D, #FF99CC)',
@@ -1339,7 +1371,9 @@ function PlayField({
 // ===== 날아오는 개별 노트 (픽셀 하트, 위→아래) =====
 function FlyingNote({ note, elapsed }) {
   const t = elapsed - note.spawnTime;
-  const progress = Math.max(0, Math.min(1, t / NOTE_TRAVEL_MS));
+  // 노트마다 자체 비행 시간 사용 (난이도별로 다름 — generateTimeline 이 spawnTime 을 difficulty.noteTravelMs 로 계산)
+  const travel = note.hitTime - note.spawnTime;
+  const progress = Math.max(0, Math.min(1, t / travel));
   const cx = LANE_X[note.lane] ?? 50;
   const y = NOTE_START_Y + (HIT_LINE_Y - NOTE_START_Y) * progress;
   const info = RARITY_INFO[note.rarity] || RARITY_INFO.N;

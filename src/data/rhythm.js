@@ -58,6 +58,53 @@ export const NOTE_TRAVEL_MS = 1400;  // 1.4초 동안 날아옴
 export const SESSION_DURATION_MS = 30_000;  // 30초 플레이
 export const TOTAL_NOTES = 28;              // 총 노트 수 (사비에서 몰아치므로 기존보다 살짝 증가)
 
+// ===== 난이도 =====
+// 노트 수 / 떨어지는 속도 / 판정 너그러움 / 페버 트리거 콤보 모두 다름
+export const DIFFICULTIES = [
+  {
+    id: 'easy',
+    name: '初級',
+    sub: 'EASY',
+    accentColor: '#7DDC6E',
+    totalNotes: 20,
+    sabiNotes: 8,
+    noteTravelMs: 1700,    // 1.7s — 천천히 떨어짐
+    judgmentPerfect: 100,  // ±100ms 너그러움
+    judgmentGood: 240,
+    feverTriggerCombo: 8,
+  },
+  {
+    id: 'normal',
+    name: '中級',
+    sub: 'NORMAL',
+    accentColor: '#FFB840',
+    totalNotes: 28,
+    sabiNotes: 11,
+    noteTravelMs: 1400,    // 기본
+    judgmentPerfect: 80,
+    judgmentGood: 200,
+    feverTriggerCombo: 10,
+  },
+  {
+    id: 'hard',
+    name: '上級',
+    sub: 'HARD',
+    accentColor: '#FF3D7F',
+    totalNotes: 40,
+    sabiNotes: 16,
+    noteTravelMs: 1100,    // 1.1s — 빠르게
+    judgmentPerfect: 60,   // ±60ms 빡빡
+    judgmentGood: 160,
+    feverTriggerCombo: 15,
+  },
+];
+
+export const DEFAULT_DIFFICULTY_ID = 'normal';
+
+export function findDifficulty(id) {
+  return DIFFICULTIES.find(d => d.id === id) || DIFFICULTIES[1];
+}
+
 // ===== サビ (클라이맥스) 구간 =====
 // 세션 30초의 중간 부분 = 한바탕 몰아치는 5초 구간
 export const SABI_START_MS = 13_000;  // 13s
@@ -95,16 +142,21 @@ export const rollDirection = rollLane;
 
 // 세션 타임라인 생성 — [{ id, hitTime, rarity, phrase, direction, isSabi }]
 // 3구간 분배: pre(0~SABI_START) · sabi(SABI_START~SABI_END, 밀도↑) · post(SABI_END~)
-export function generateTimeline() {
-  const notes = [];
-  const startBuffer = NOTE_TRAVEL_MS + 500;   // 첫 노트 등장 여유
-  const endBuffer = 2000;                      // 마지막 노트 이후 여유
+// difficulty 객체로 노트 수/속도 조절 (선택). 없으면 기본 상수 사용.
+export function generateTimeline(difficulty) {
+  const TOTAL  = difficulty?.totalNotes  ?? TOTAL_NOTES;
+  const SABI_N = difficulty?.sabiNotes   ?? SABI_NOTES;
+  const TRAVEL = difficulty?.noteTravelMs ?? NOTE_TRAVEL_MS;
 
-  // 전체 28 중 11개는 사비. 나머지 17개를 pre/post에 적절 분배
-  const preRange = SABI_START_MS - startBuffer;                     // 약 10.1s
-  const postRange = SESSION_DURATION_MS - SABI_END_MS - endBuffer;  // 약 10s
+  const notes = [];
+  const startBuffer = TRAVEL + 500;            // 첫 노트 등장 여유
+  const endBuffer = 2000;                       // 마지막 노트 이후 여유
+
+  // 사비 외 노트를 pre/post 에 분배
+  const preRange = SABI_START_MS - startBuffer;
+  const postRange = SESSION_DURATION_MS - SABI_END_MS - endBuffer;
   const totalNonSabiRange = preRange + postRange;
-  const nonSabiCount = TOTAL_NOTES - SABI_NOTES;
+  const nonSabiCount = TOTAL - SABI_N;
   const preCount = Math.round(nonSabiCount * (preRange / totalNonSabiRange));
   const postCount = nonSabiCount - preCount;
 
@@ -120,7 +172,7 @@ export function generateTimeline() {
       notes.push({
         id: `note_${notes.length}`,
         hitTime,
-        spawnTime: hitTime - NOTE_TRAVEL_MS,
+        spawnTime: hitTime - TRAVEL,
         rarity: rollNoteRarity(),
         phrase: null,
         lane,
@@ -133,7 +185,7 @@ export function generateTimeline() {
   // 1) Pre (0 ~ 13s)
   spread(preCount, startBuffer, SABI_START_MS - 200, 0.55, false);
   // 2) Sabi (13 ~ 18s) — 밀도↑, 지터 낮춰서 박자감 강조
-  spread(SABI_NOTES, SABI_START_MS, SABI_END_MS, 0.25, true);
+  spread(SABI_N, SABI_START_MS, SABI_END_MS, 0.25, true);
   // 3) Post (18 ~ 28s)
   spread(postCount, SABI_END_MS + 200, SESSION_DURATION_MS - endBuffer, 0.55, false);
 
