@@ -667,10 +667,10 @@ function PlayField({
             className="font-black tabular-nums leading-none"
             style={{
               fontSize: 'clamp(15px, 4vw, 22px)',
-              background: 'linear-gradient(180deg, #FFE99A 0%, #FFB800 60%, #FF8800 100%)',
+              background: 'linear-gradient(180deg, #FFCDE2 0%, #FF6B9D 60%, #C73B7E 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              filter: 'drop-shadow(0 2px 0 #B85C00) drop-shadow(0 0 4px rgba(255,184,0,0.4))',
+              filter: 'drop-shadow(0 2px 0 #A02960) drop-shadow(0 0 4px rgba(255,107,157,0.4))',
               marginTop: '3px',
             }}
           >
@@ -715,57 +715,59 @@ function PlayField({
         </button>
       </div>
 
-      {/* HUD 2줄: FEVER 게이지 (CSS 만, score 박스 톤에 맞춤) */}
-      <div className="w-full mb-2 flex items-center gap-2" style={{ height: '32px' }}>
-        {/* 좌측 하트 라벨 */}
-        <div
-          className="shrink-0 flex items-center justify-center"
-          style={{
-            width: '40px',
-            height: '32px',
-            background: 'linear-gradient(180deg, #FF7BB8 0%, #FF5599 100%)',
-            border: '2px solid #C73B7E',
-            borderRadius: '999px',
-            boxShadow: '0 2px 0 #A02960, inset 0 2px 0 rgba(255,255,255,0.45)',
-            fontSize: '14px',
-          }}
-        >
-          <span style={{ filter: fever ? 'drop-shadow(0 0 4px rgba(255,184,0,0.9))' : undefined }}>💖</span>
-        </div>
-
-        {/* 게이지 트랙 */}
-        <div
-          className="relative flex-1 h-full overflow-hidden"
-          style={{
-            background: 'linear-gradient(180deg, rgba(199,59,126,0.2) 0%, rgba(160,41,96,0.3) 100%)',
-            border: '2px solid #C73B7E',
-            borderRadius: '999px',
-            boxShadow: '0 2px 0 #A02960, inset 0 2px 4px rgba(0,0,0,0.2)',
-          }}
-        >
-          {/* fill */}
+      {/* HUD 2줄: FEVER 게이지 (CSS, 가로 70% 가운데 정렬) */}
+      <div className="w-full mb-2 flex justify-center">
+        <div className="flex items-center gap-2" style={{ height: '32px', width: '70%' }}>
+          {/* 좌측 하트 라벨 */}
           <div
-            className="h-full transition-[width] duration-200"
+            className="shrink-0 flex items-center justify-center"
             style={{
-              width: `${(fever ? feverLeft : Math.min(1, combo / FEVER_TRIGGER_COMBO)) * 100}%`,
-              background: fever
-                ? 'linear-gradient(90deg, #FFB800, #FF6B9D, #B77EE0)'
-                : 'linear-gradient(90deg, #FF6B9D, #FF99CC)',
-              animation: fever ? 'feverPulse 1s ease infinite' : undefined,
-              boxShadow: fever ? '0 0 10px rgba(255,184,0,0.6)' : undefined,
-            }}
-          />
-          {/* 라벨 (트랙 위 absolute) */}
-          <div
-            className="absolute inset-0 flex items-center justify-center pointer-events-none font-black tracking-widest"
-            style={{
-              fontSize: '11px',
-              color: '#FFFFFF',
-              textShadow: '0 1px 0 #A02960, 0 0 4px rgba(0,0,0,0.4)',
-              letterSpacing: '0.18em',
+              width: '40px',
+              height: '32px',
+              background: 'linear-gradient(180deg, #FF7BB8 0%, #FF5599 100%)',
+              border: '2px solid #C73B7E',
+              borderRadius: '999px',
+              boxShadow: '0 2px 0 #A02960, inset 0 2px 0 rgba(255,255,255,0.45)',
+              fontSize: '14px',
             }}
           >
-            FEVER
+            <span style={{ filter: fever ? 'drop-shadow(0 0 4px rgba(255,184,0,0.9))' : undefined }}>💖</span>
+          </div>
+
+          {/* 게이지 트랙 */}
+          <div
+            className="relative flex-1 h-full overflow-hidden"
+            style={{
+              background: 'linear-gradient(180deg, rgba(199,59,126,0.2) 0%, rgba(160,41,96,0.3) 100%)',
+              border: '2px solid #C73B7E',
+              borderRadius: '999px',
+              boxShadow: '0 2px 0 #A02960, inset 0 2px 4px rgba(0,0,0,0.2)',
+            }}
+          >
+            {/* fill */}
+            <div
+              className="h-full transition-[width] duration-200"
+              style={{
+                width: `${(fever ? feverLeft : Math.min(1, combo / FEVER_TRIGGER_COMBO)) * 100}%`,
+                background: fever
+                  ? 'linear-gradient(90deg, #FFB800, #FF6B9D, #B77EE0)'
+                  : 'linear-gradient(90deg, #FF6B9D, #FF99CC)',
+                animation: fever ? 'feverPulse 1s ease infinite' : undefined,
+                boxShadow: fever ? '0 0 10px rgba(255,184,0,0.6)' : undefined,
+              }}
+            />
+            {/* 라벨 (트랙 위 absolute) */}
+            <div
+              className="absolute inset-0 flex items-center justify-center pointer-events-none font-black tracking-widest"
+              style={{
+                fontSize: '11px',
+                color: '#FFFFFF',
+                textShadow: '0 1px 0 #A02960, 0 0 4px rgba(0,0,0,0.4)',
+                letterSpacing: '0.18em',
+              }}
+            >
+              FEVER
+            </div>
           </div>
         </div>
       </div>
