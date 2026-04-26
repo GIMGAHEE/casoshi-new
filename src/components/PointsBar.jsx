@@ -22,7 +22,7 @@ export default function PointsBar({ points, onReset }) {
             <div className="text-[10px] leading-none" style={{ color: '#a888a4' }}>
               ポイント
             </div>
-            <div className="text-lg font-black leading-tight" style={{ color: '#ff5fa2' }}>
+            <div className="text-lg font-black leading-tight font-pixel" style={{ color: '#ff5fa2' }}>
               {points.toLocaleString()}
             </div>
           </div>

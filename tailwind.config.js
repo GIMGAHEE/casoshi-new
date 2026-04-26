@@ -17,6 +17,7 @@ export default {
       },
       fontFamily: {
         sans: ['"DotGothic16"', '"Noto Sans JP"', 'system-ui', 'sans-serif'],
+        pixel: ['"Press Start 2P"', '"DotGothic16"', '"Noto Sans JP"', 'monospace'],
       },
       animation: {
         'pop': 'pop 0.3s ease-out',

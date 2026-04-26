@@ -440,7 +440,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
               animation: 'cdPulse 0.8s ease-out',
             }}
           />
-          <div className="text-3xl font-black text-oshi-main tracking-wide">
+          <div className="text-3xl font-black text-oshi-main tracking-wide font-pixel">
             推しリズム
           </div>
           <div className="text-xs text-oshi-dark/70 text-center max-w-[15rem]">
@@ -551,7 +551,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
 
           <button
             onClick={startGame}
-            className="mt-2 px-8 py-3 rounded-full bg-oshi-main text-white font-black text-base shadow-lg active:scale-95 transition-transform"
+            className="mt-2 px-8 py-3 rounded-full bg-oshi-main text-white font-black text-base shadow-lg active:scale-95 transition-transform font-pixel tracking-wider"
           >
             ▶ START
           </button>
@@ -563,7 +563,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
         <div className="flex-1 flex items-center justify-center">
           <div
             key={countdown}
-            className="text-9xl font-black text-oshi-main"
+            className="text-9xl font-black text-oshi-main font-pixel"
             style={{ animation: 'cdPulse 0.8s ease-out' }}
           >
             {countdown > 0 ? countdown : 'GO!'}
@@ -777,7 +777,7 @@ function PlayField({
             draggable={false}
           />
           <div
-            className="absolute font-black tabular-nums whitespace-nowrap"
+            className="absolute font-black tabular-nums whitespace-nowrap font-pixel"
             style={{
               right: '8%',
               top: '58%',
@@ -801,7 +801,7 @@ function PlayField({
             draggable={false}
           />
           <div
-            className="font-black tabular-nums leading-none"
+            className="font-black tabular-nums leading-none font-pixel"
             style={{
               fontSize: 'clamp(15px, 4vw, 22px)',
               background: 'linear-gradient(180deg, #FFCDE2 0%, #FF6B9D 60%, #C73B7E 100%)',
@@ -1352,7 +1352,7 @@ function PlayField({
           onClick={onTogglePause}
         >
           <div
-            className="font-black tracking-widest mb-3"
+            className="font-black tracking-widest mb-3 font-pixel"
             style={{
               fontSize: '40px',
               color: '#FFE99A',
@@ -1461,7 +1461,7 @@ function ResultScreen({ score, stats, bestScore, isNewBest, onRestart, onHome })
       <div className="w-full max-w-xs bg-white rounded-3xl p-5 shadow-lg border-2 border-oshi-sub">
         <div className="text-center mb-3">
           <div className="text-[10px] text-oshi-dark/60 uppercase tracking-widest">Final Score</div>
-          <div className="text-5xl font-black text-oshi-main">{score}</div>
+          <div className="text-5xl font-black text-oshi-main font-pixel">{score}</div>
           {isNewBest && (
             <div className="inline-block mt-1 px-2 py-0.5 rounded-full bg-oshi-main text-white text-[10px] font-bold">
               🏆 新記録！
