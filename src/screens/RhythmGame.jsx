@@ -22,16 +22,6 @@ const FEVER_DURATION_MS = 8_000;
 // 콤보 마일스톤 (사운드 cue)
 const COMBO_MILESTONES = new Set([10, 25, 50, 100]);
 
-// 레인(방향)별 화면 시작 위치 (%)
-const LANE_ORIGIN = {
-  top:   { x: 50, y: -12 },
-  left:  { x: -12, y: 50 },
-  right: { x: 112, y: 50 },
-};
-
-// 히트 존 중심 (%)
-const HIT_CENTER = { x: 50, y: 55 };
-
 // ===== 💬 캐릭터 말풍선 멘트 =====
 const SPEECH_MAP = {
   combo5:     ['いいよ〜！', 'うんうん〜♪', 'のってきた！'],
@@ -247,18 +237,19 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
     judgmentFxTimerRef.current = setTimeout(() => setJudgmentFx(null), 500);
   };
 
-  // ★ 핵심: 히트 존 탭 처리
-  const handleHit = () => {
+  // ★ 핵심: 레인 버튼 탭 처리
+  const handleHit = (lane) => {
     if (state !== 'playing') return;
 
     const t = performance.now() - startTimeRef.current;
 
-    // 가장 가까운 활성 노트 찾기
+    // 같은 레인의 가장 가까운 활성 노트 찾기
     setActiveNotes(prev => {
       if (prev.length === 0) return prev;
       let bestIdx = -1;
       let bestDelta = Infinity;
       prev.forEach((n, i) => {
+        if (lane && n.lane !== lane) return;  // 같은 레인만
         const delta = Math.abs(t - n.hitTime);
         if (delta < bestDelta) {
           bestDelta = delta;
@@ -313,7 +304,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
         // SSR PERFECT 캐치 → 말풍선
         if (n.rarity === 'SSR') showSpeech('ssrHit');
         // 하트 파티클
-        spawnHearts(n.direction, 3);
+        spawnHearts(n.lane, 3);
       } else {
         sfx.good();
         setStats(s => ({ ...s, good: s.good + 1 }));
@@ -328,14 +319,16 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
     });
   };
 
-  const spawnHearts = (direction, count) => {
+  const spawnHearts = (lane, count) => {
     const now = Date.now();
-    const origin = LANE_ORIGIN[direction] || LANE_ORIGIN.top;
+    // 5레인의 X 중심 (각 20% 간격, 10/30/50/70/90)
+    const laneX = { pink: 10, blue: 30, purple: 50, green: 70, orange: 90 };
+    const cx = laneX[lane] ?? 50;
     const arr = Array.from({ length: count }, (_, i) => ({
       id: now + i + Math.random(),
-      x: HIT_CENTER.x + (Math.random() - 0.5) * 14,
-      y: HIT_CENTER.y + (Math.random() - 0.5) * 10,
-      dx: (Math.random() - 0.5) * 120,
+      x: cx + (Math.random() - 0.5) * 8,
+      y: 80 + (Math.random() - 0.5) * 6,
+      dx: (Math.random() - 0.5) * 80,
       dy: -60 - Math.random() * 80,
       delay: i * 40,
     }));
@@ -536,6 +529,15 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
   );
 }
 
+// ===== PlayField + FlyingNote — 5 LANES VERSION =====
+import { LANES, LANE_INFO } from '../data/rhythm';
+
+// 5레인의 X 중심 (% — 화면 가로 위치)
+const LANE_X = { pink: 10, blue: 30, purple: 50, green: 70, orange: 90 };
+// 노트가 떨어지는 시작 Y (위쪽) 와 도착 Y (히트라인)
+const NOTE_START_Y = 8;   // %
+const HIT_LINE_Y = 78;    // % — 게임 영역 안에서 히트 가이드 위치
+
 // ===== PlayField (게임 중) =====
 function PlayField({
   elapsed, activeNotes, score, combo, fever, feverEndsAt,
@@ -546,91 +548,118 @@ function PlayField({
   const progress = Math.min(1, elapsed / SESSION_DURATION_MS);
   const feverLeft = fever ? Math.max(0, feverEndsAt - performance.now()) / FEVER_DURATION_MS : 0;
 
-  // 캐릭터 스케일/애니메이션은 콤보에 따라 변화
+  // 캐릭터 스케일/애니메이션
   const charScale = fever ? 1.18 : sabiActive ? 1.1 : combo >= 30 ? 1.08 : combo >= 10 ? 1.04 : 1;
   const charImage = fever ? charFever : charNormal;
-  const highlightMode = fever || sabiActive;
 
   return (
     <div className="flex-1 flex flex-col mt-2">
-      {/* HUD 상단 */}
-      <div className="grid grid-cols-3 gap-2 text-center bg-white/70 rounded-2xl p-2 border border-oshi-sub">
-        <div>
-          <div className="text-[10px] text-oshi-dark/60">SCORE</div>
-          <div className="text-sm font-black text-oshi-dark">{score}</div>
+      {/* HUD 상단 — SCORE / COMBO / FEVER 게이지 */}
+      <div className="flex items-stretch gap-2 mb-2">
+        {/* SCORE */}
+        <div className="bg-white/80 rounded-2xl border border-oshi-sub px-3 py-1.5 text-center">
+          <div className="text-[8px] text-oshi-dark/60 font-bold tracking-wider">SCORE</div>
+          <div className="text-sm font-black text-oshi-dark tabular-nums">
+            {String(score).padStart(8, '0')}
+          </div>
         </div>
-        <div>
-          <div className="text-[10px] text-oshi-dark/60">COMBO</div>
-          <div className={`text-sm font-black ${combo >= 10 ? 'text-oshi-main' : 'text-oshi-dark'}`}>
+        {/* COMBO */}
+        <div className="bg-white/80 rounded-2xl border border-oshi-sub px-3 py-1.5 text-center">
+          <div className="text-[8px] text-oshi-dark/60 font-bold tracking-wider">COMBO</div>
+          <div className={`text-sm font-black tabular-nums ${combo >= 10 ? 'text-oshi-main' : 'text-oshi-dark'}`}>
             {combo}
           </div>
         </div>
-        <div>
-          <div className="text-[10px] text-oshi-dark/60">残り</div>
-          <div className="text-sm font-black text-oshi-dark">{(timeLeft / 1000).toFixed(1)}s</div>
+        {/* FEVER 게이지 */}
+        <div className="flex-1 relative bg-white/80 rounded-2xl border border-oshi-sub overflow-hidden flex items-center px-3">
+          <div className="text-[10px] font-black text-oshi-main mr-2 flex items-center gap-0.5">
+            <span>💖</span>
+            <span>FEVER</span>
+          </div>
+          <div className="flex-1 h-2 bg-oshi-sub/40 rounded-full overflow-hidden">
+            <div
+              className="h-full transition-[width] duration-200"
+              style={{
+                width: `${(fever ? feverLeft : Math.min(1, combo / FEVER_TRIGGER_COMBO)) * 100}%`,
+                background: fever
+                  ? 'linear-gradient(90deg, #FFB800, #FF6B9D, #B77EE0)'
+                  : 'linear-gradient(90deg, #FF6B9D, #FFB800)',
+                animation: fever ? 'feverPulse 1s ease infinite' : undefined,
+              }}
+            />
+          </div>
+        </div>
+        {/* 残り時間 */}
+        <div className="bg-white/80 rounded-2xl border border-oshi-sub px-2 py-1.5 text-center min-w-[3.5rem]">
+          <div className="text-[8px] text-oshi-dark/60 font-bold tracking-wider">残り</div>
+          <div className="text-sm font-black text-oshi-dark tabular-nums">
+            {(timeLeft / 1000).toFixed(0)}s
+          </div>
         </div>
       </div>
 
       {/* 진행 바 */}
-      <div className="mt-1 h-1 bg-oshi-sub/30 rounded-full overflow-hidden">
+      <div className="h-1 bg-oshi-sub/30 rounded-full overflow-hidden mb-2">
         <div
           className="h-full bg-oshi-main transition-[width]"
           style={{ width: `${progress * 100}%` }}
         />
       </div>
 
-      {/* 페버 배너 */}
-      {fever && (
-        <div
-          className="mt-2 py-1.5 rounded-xl text-white font-black text-center text-sm shadow"
-          style={{
-            background:
-              'linear-gradient(90deg, #FF6B9D, #FFB800, #B77EE0, #5BA4E0, #FF6B9D)',
-            backgroundSize: '200% 100%',
-            animation: 'feverPulse 1.2s ease infinite',
-          }}
-        >
-          🔥 FEVER TIME! × 2 배점 ({(feverLeft * (FEVER_DURATION_MS / 1000)).toFixed(1)}s)
-        </div>
-      )}
-
-      {/* 사비 배너 (사비 시작 ~1.5초 전부터 잠깐 뜸) */}
-      {sabiBanner && (
-        <div
-          className="absolute left-1/2 top-1/3 -translate-x-1/2 z-30 pointer-events-none font-black text-center"
-          style={{
-            animation: 'sabiBannerPop 2.5s ease-out forwards',
-          }}
-        >
-          <div className="inline-block px-5 py-2 rounded-full shadow-2xl text-white text-2xl"
-               style={{
-                 background: 'linear-gradient(90deg, #FFB800, #FF6B9D, #B77EE0)',
-                 textShadow: '0 2px 8px rgba(0,0,0,0.4)',
-               }}>
-            ✨ サビ来るよ〜！
-          </div>
-        </div>
-      )}
-
-      {/* 플레이 스테이지 */}
+      {/* 게임 영역 — 5레인 무대 */}
       <div
-        className="relative flex-1 mt-3 rounded-3xl overflow-hidden border-2 border-oshi-sub"
-        onClick={onHit}
-        onTouchStart={(e) => { e.preventDefault(); onHit(); }}
+        className="relative flex-1 rounded-3xl overflow-hidden border-2 border-oshi-sub shadow-inner"
+        style={{
+          background: fever
+            ? 'linear-gradient(180deg, #2a1444 0%, #4a1f5e 40%, #6b2a78 100%)'
+            : sabiActive
+              ? 'linear-gradient(180deg, #2d1640 0%, #3d1f54 50%, #4a2860 100%)'
+              : 'linear-gradient(180deg, #1f1438 0%, #2d1a48 50%, #3a1f5a 100%)',
+          minHeight: '50vh',
+        }}
       >
-        {/* 스테이지 배경 이미지 */}
-        <img
-          src="/rhythm/stage_bg.png"
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+        {/* 무대 조명 (위에서 아래로) */}
+        <div className="absolute inset-x-0 top-0 h-1/3 pointer-events-none"
           style={{
+            background: 'radial-gradient(ellipse at top, rgba(255,255,255,0.15) 0%, transparent 60%)',
+          }}
+        />
+
+        {/* 5개 레인 컬러 빔 — 위에서 아래로 내려오는 빛줄기 */}
+        {LANES.map((lane, i) => {
+          const cx = LANE_X[lane];
+          return (
+            <div
+              key={lane}
+              className="absolute top-0 bottom-0 pointer-events-none"
+              style={{
+                left: `${cx}%`,
+                width: '14%',
+                transform: 'translateX(-50%)',
+                background: `linear-gradient(180deg, ${LANE_INFO[lane].glow} 0%, transparent 85%)`,
+                opacity: fever ? 0.8 : sabiActive ? 0.6 : 0.4,
+              }}
+            />
+          );
+        })}
+
+        {/* 가운데 캐릭터 */}
+        <img
+          src={charImage}
+          alt=""
+          className="absolute pointer-events-none select-none"
+          style={{
+            left: '50%',
+            top: '20%',
+            transform: `translateX(-50%) scale(${charScale})`,
+            height: '40%',
+            width: 'auto',
             imageRendering: 'pixelated',
+            zIndex: 4,
             filter: fever
-              ? 'saturate(1.5) brightness(1.1) hue-rotate(8deg)'
-              : sabiActive
-                ? 'saturate(1.3) brightness(1.08)'
-                : undefined,
-            transition: 'filter 0.4s ease',
+              ? 'drop-shadow(0 0 20px rgba(255,184,0,0.9)) drop-shadow(0 6px 10px rgba(0,0,0,0.4))'
+              : 'drop-shadow(0 6px 12px rgba(0,0,0,0.4))',
+            transition: 'transform 0.3s ease, height 0.3s ease',
           }}
           draggable={false}
         />
@@ -641,7 +670,7 @@ function PlayField({
             className="absolute inset-0 pointer-events-none mix-blend-overlay"
             style={{
               background:
-                'linear-gradient(135deg, rgba(255,107,157,0.3), rgba(255,184,0,0.2), rgba(183,126,224,0.3))',
+                'linear-gradient(135deg, rgba(255,107,157,0.4), rgba(255,184,0,0.3), rgba(183,126,224,0.4))',
               backgroundSize: '200% 100%',
               animation: 'feverPulse 2s ease infinite',
             }}
@@ -658,31 +687,11 @@ function PlayField({
                 animation: 'feverPulse 1.5s ease infinite',
               }}
             />
-            <div className="absolute top-1.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 text-white font-bold text-[10px] shadow z-10">
+            <div className="absolute top-1.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 text-white font-bold text-[10px] shadow z-20">
               ✨ サビ ×1.5
             </div>
           </>
         )}
-
-        {/* 추し 캐릭터 */}
-        <img
-          src={charImage}
-          alt=""
-          className="absolute pointer-events-none select-none"
-          style={{
-            left: '50%',
-            top: fever ? '8%' : '10%',
-            transform: `translateX(-50%) scale(${charScale})`,
-            height: fever ? '45%' : '42%',
-            width: 'auto',
-            imageRendering: 'pixelated',
-            filter: fever
-              ? 'drop-shadow(0 0 20px rgba(255,184,0,0.8)) drop-shadow(0 6px 10px rgba(0,0,0,0.25))'
-              : 'drop-shadow(0 6px 10px rgba(0,0,0,0.25))',
-            transition: 'transform 0.3s ease, height 0.3s ease, top 0.3s ease',
-          }}
-          draggable={false}
-        />
 
         {/* 💬 캐릭터 말풍선 */}
         {speech && (
@@ -691,138 +700,93 @@ function PlayField({
             className="absolute z-20 pointer-events-none"
             style={{
               left: '66%',
-              top: '14%',
+              top: '24%',
               animation: 'speechPop 1.2s ease-out forwards',
               willChange: 'transform, opacity',
             }}
           >
-            <div
-              className="relative bg-white border-2 border-oshi-main rounded-2xl px-3 py-1.5 shadow-lg whitespace-nowrap"
-            >
+            <div className="relative bg-white border-2 border-oshi-main rounded-2xl px-3 py-1.5 shadow-lg whitespace-nowrap">
               <span className="text-[13px] font-black text-oshi-main">{speech.text}</span>
-              {/* 말풍선 꼬리 */}
               <div
                 className="absolute w-0 h-0"
                 style={{
-                  left: '-9px',
-                  top: '50%',
+                  left: '-9px', top: '50%',
                   transform: 'translateY(-50%)',
                   borderTop: '6px solid transparent',
                   borderBottom: '6px solid transparent',
                   borderRight: '9px solid #FF6B9D',
                 }}
               />
-              <div
-                className="absolute w-0 h-0"
-                style={{
-                  left: '-6px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  borderTop: '5px solid transparent',
-                  borderBottom: '5px solid transparent',
-                  borderRight: '7px solid white',
-                }}
-              />
             </div>
           </div>
         )}
 
-        {/* 관객 실루엣 (하단) */}
-        <img
-          src="/rhythm/audience_silhouette.png"
-          alt=""
-          className="absolute left-0 right-0 bottom-0 w-full pointer-events-none select-none"
-          style={{
-            height: '22%',
-            objectFit: 'cover',
-            objectPosition: 'bottom',
-            imageRendering: 'pixelated',
-            transform: fever
-              ? `translateY(${Math.sin(Date.now() / 180) * 3}px)`
-              : undefined,
-            filter: fever ? 'drop-shadow(0 -4px 12px rgba(255,107,157,0.5))' : undefined,
-          }}
-          draggable={false}
-        />
+        {/* 사비 배너 */}
+        {sabiBanner && (
+          <div
+            className="absolute left-1/2 top-1/3 -translate-x-1/2 z-30 pointer-events-none font-black text-center"
+            style={{
+              fontSize: 32,
+              color: '#fff',
+              textShadow: '0 0 12px #FF6B9D, 0 0 24px #FFB800',
+              animation: 'sabiBannerPop 1.4s ease-out forwards',
+            }}
+          >
+            ✨ サビ来るよ〜！ ✨
+          </div>
+        )}
 
-        {/* 히트 존 링 */}
-        <div
-          className="absolute rounded-full border-4"
-          style={{
-            left: `${HIT_CENTER.x}%`,
-            top: `${HIT_CENTER.y}%`,
-            width: 100,
-            height: 100,
-            borderColor: fever ? '#FFB800' : '#FF6B9D',
-            background: 'rgba(255,255,255,0.25)',
-            transform: 'translate(-50%, -50%)',
-            animation: 'ringPulse 1s ease-in-out infinite',
-            boxShadow: fever
-              ? '0 0 24px rgba(255,184,0,0.8), inset 0 0 20px rgba(255,255,255,0.5)'
-              : '0 0 16px rgba(255,107,157,0.6), inset 0 0 20px rgba(255,255,255,0.5)',
-            zIndex: 5,
-          }}
-        />
-        <div
-          className="absolute text-[11px] font-black text-oshi-dark/80 pointer-events-none"
-          style={{
-            left: `${HIT_CENTER.x}%`,
-            top: `${HIT_CENTER.y}%`,
-            transform: 'translate(-50%, -50%)',
-            zIndex: 6,
-          }}
-        >
-          HIT!
-        </div>
+        {/* 히트 가이드 라인 (5레인 모두 표시) */}
+        {LANES.map(lane => {
+          const cx = LANE_X[lane];
+          return (
+            <div
+              key={`hit-${lane}`}
+              className="absolute pointer-events-none"
+              style={{
+                left: `${cx}%`,
+                top: `${HIT_LINE_Y}%`,
+                width: 56,
+                height: 56,
+                transform: 'translate(-50%, -50%)',
+                borderRadius: '50%',
+                border: `3px solid ${LANE_INFO[lane].color}`,
+                boxShadow: `0 0 16px ${LANE_INFO[lane].glow}`,
+                background: 'rgba(255,255,255,0.1)',
+                animation: 'ringPulse 1s ease-in-out infinite',
+                zIndex: 5,
+              }}
+            />
+          );
+        })}
 
         {/* 활성 노트들 */}
         {activeNotes.map(n => (
           <FlyingNote key={n.id} note={n} elapsed={elapsed} />
         ))}
 
-        {/* 판정 피드백 + PERFECT 스파클 버스트 */}
+        {/* 판정 피드백 — 가장 최근 판정 한 번에 가운데 표시 */}
         {judgmentFx && (
-          <>
-            {judgmentFx.label === 'PERFECT' && (
-              <img
-                key={`burst-${judgmentFx.id}`}
-                src="/rhythm/sparkle_burst.png"
-                alt=""
-                className="absolute pointer-events-none select-none"
-                style={{
-                  left: `${HIT_CENTER.x}%`,
-                  top: `${HIT_CENTER.y}%`,
-                  width: 200,
-                  height: 'auto',
-                  transform: 'translate(-50%, -50%)',
-                  imageRendering: 'pixelated',
-                  animation: 'sparkleBurst 0.55s ease-out forwards',
-                  zIndex: 7,
-                }}
-                draggable={false}
-              />
-            )}
-            <div
-              key={judgmentFx.id}
-              className="absolute font-black pointer-events-none"
-              style={{
-                left: `${HIT_CENTER.x}%`,
-                top: `${HIT_CENTER.y}%`,
-                fontSize: judgmentFx.label === 'PERFECT' ? 36 : 28,
-                color:
-                  judgmentFx.label === 'PERFECT'
-                    ? RARITY_INFO[judgmentFx.rarity]?.color || '#FF6B9D'
-                    : judgmentFx.label === 'GOOD'
-                      ? '#FFB800'
-                      : '#888',
-                textShadow: '0 2px 6px rgba(0,0,0,0.4), 0 0 12px rgba(255,255,255,0.6)',
-                animation: 'judgmentPop 0.5s ease-out forwards',
-                zIndex: 20,
-              }}
-            >
-              {judgmentFx.label}
-            </div>
-          </>
+          <div
+            key={judgmentFx.id}
+            className="absolute font-black pointer-events-none"
+            style={{
+              left: '50%',
+              top: '60%',
+              fontSize: judgmentFx.label === 'PERFECT' ? 36 : 28,
+              color:
+                judgmentFx.label === 'PERFECT'
+                  ? RARITY_INFO[judgmentFx.rarity]?.color || '#FF6B9D'
+                  : judgmentFx.label === 'GOOD'
+                    ? '#FFB800'
+                    : '#888',
+              textShadow: '0 2px 6px rgba(0,0,0,0.6), 0 0 12px rgba(255,255,255,0.6)',
+              animation: 'judgmentPop 0.5s ease-out forwards',
+              zIndex: 20,
+            }}
+          >
+            {judgmentFx.label}
+          </div>
         )}
 
         {/* 하트 파티클 */}
@@ -844,96 +808,106 @@ function PlayField({
         ))}
       </div>
 
-      <div className="mt-2 text-center text-[10px] text-oshi-dark/50">
-        画面のどこでもタップ — 中央に近づいたノートを判定
+      {/* 하단 5개 레인 버튼 */}
+      <div className="grid grid-cols-5 gap-2 mt-2">
+        {LANES.map(lane => {
+          const info = LANE_INFO[lane];
+          return (
+            <button
+              key={lane}
+              onTouchStart={(e) => { e.preventDefault(); onHit(lane); }}
+              onMouseDown={(e) => { e.preventDefault(); onHit(lane); }}
+              className="relative aspect-square rounded-full flex items-center justify-center font-black text-2xl active:scale-90 transition-transform select-none"
+              style={{
+                background: `radial-gradient(circle, ${info.glow} 0%, rgba(0,0,0,0.4) 80%)`,
+                border: `3px solid ${info.color}`,
+                color: '#fff',
+                boxShadow: `0 0 16px ${info.glow}, inset 0 0 12px rgba(255,255,255,0.2)`,
+                textShadow: `0 0 8px ${info.color}`,
+              }}
+            >
+              {info.label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-// ===== 날아오는 개별 노트 =====
+// ===== 날아오는 개별 노트 (하트 모양, 위→아래) =====
 function FlyingNote({ note, elapsed }) {
-  const t = elapsed - note.spawnTime;          // 스폰 후 경과
+  const t = elapsed - note.spawnTime;
   const progress = Math.max(0, Math.min(1, t / NOTE_TRAVEL_MS));
-  const origin = LANE_ORIGIN[note.direction] || LANE_ORIGIN.top;
-  const x = origin.x + (HIT_CENTER.x - origin.x) * progress;
-  const y = origin.y + (HIT_CENTER.y - origin.y) * progress;
+  const cx = LANE_X[note.lane] ?? 50;
+  // 위(NOTE_START_Y) → 아래(HIT_LINE_Y)
+  const y = NOTE_START_Y + (HIT_LINE_Y - NOTE_START_Y) * progress;
   const info = RARITY_INFO[note.rarity] || RARITY_INFO.N;
-  // 히트 시각에 가까울수록 커지는 느낌
-  const scale = 0.55 + progress * 0.5;
+  const laneInfo = LANE_INFO[note.lane] || LANE_INFO.pink;
 
-  // N/R/SR/SSR 별 말풍선 틴트 (CSS filter로)
-  const tintFilter = {
-    N:   'hue-rotate(0deg)',                                  // 원본 핑크
-    R:   'hue-rotate(190deg) saturate(1.1)',                  // 블루
-    SR:  'hue-rotate(260deg) saturate(1.2)',                  // 퍼플
-    SSR: 'hue-rotate(35deg) saturate(1.5) brightness(1.1)',   // 골드
-  }[note.rarity] || 'none';
+  // 히트 시각에 가까울수록 약간 커짐
+  const scale = 0.7 + progress * 0.4;
 
+  // 하트 SVG 형태 (CSS clip-path) — 노트 색은 레인 컬러
   return (
     <div
       className="absolute pointer-events-none select-none"
       style={{
-        left: `${x}%`,
+        left: `${cx}%`,
         top: `${y}%`,
         transform: `translate(-50%, -50%) scale(${scale})`,
         zIndex: 10,
       }}
     >
-      {/* SSR은 골드 프레임을 말풍선 뒤에 깔기 */}
+      {/* SSR 골드 글로우 */}
       {note.rarity === 'SSR' && (
-        <img
-          src="/rhythm/ssr_note_frame.png"
-          alt=""
-          className="absolute pointer-events-none"
+        <div
+          className="absolute"
           style={{
-            left: '50%',
-            top: '50%',
+            left: '50%', top: '50%',
+            width: 64, height: 64,
             transform: 'translate(-50%, -50%)',
-            width: 150,
-            height: 'auto',
-            imageRendering: 'pixelated',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(255,184,0,0.7) 0%, transparent 70%)',
             animation: 'ringPulse 0.7s ease-in-out infinite',
           }}
-          draggable={false}
         />
       )}
 
-      {/* 말풍선 베이스 + 중앙에 텍스트 오버레이 */}
-      <div className="relative" style={{ width: 112, height: 104 }}>
-        <img
-          src="/rhythm/note_base.png"
-          alt=""
-          className="absolute inset-0 w-full h-full pointer-events-none select-none"
-          style={{
-            imageRendering: 'pixelated',
-            filter: `${tintFilter} drop-shadow(${info.glow !== 'none' ? info.glow : '0 2px 4px rgba(0,0,0,0.25)'})`,
-          }}
-          draggable={false}
-        />
-        <div
-          className="absolute inset-0 flex items-center justify-center px-2"
-          style={{
-            paddingTop: '4px',
-            paddingBottom: '14px',  // 말풍선 꼬리 영역 보정
-          }}
+      {/* 하트 자체 — 큰 이모지 + 컬러 필터 */}
+      <div
+        className="relative"
+        style={{
+          fontSize: 42,
+          filter: `drop-shadow(0 0 8px ${laneInfo.glow}) drop-shadow(0 2px 4px rgba(0,0,0,0.4))`,
+          color: laneInfo.color,
+        }}
+      >
+        {/* 하트 모양 — SVG 로 색깔 적용 */}
+        <svg width="42" height="42" viewBox="0 0 24 24" fill={laneInfo.color}
+          style={{ filter: info.rarity === 'SSR' ? 'drop-shadow(0 0 6px gold)' : undefined }}
         >
-          <span
-            className="font-black text-center leading-tight"
+          <path d="M12 21s-7-4.35-9.3-9.04C1.4 9.5 2.6 6 6 6c2 0 3.5 1 4.5 2.5C12 6 13.5 6 15.5 6c3.4 0 4.6 3.5 3.3 5.96C19 16.65 12 21 12 21z"
+            stroke="#fff" strokeWidth="1.5" strokeLinejoin="round"
+          />
+        </svg>
+
+        {/* SR/SSR 빛줄기 */}
+        {(note.rarity === 'SR' || note.rarity === 'SSR') && (
+          <div
+            className="absolute inset-0 pointer-events-none"
             style={{
-              fontSize: note.phrase.length > 5 ? 11 : 14,
-              color: info.color,
-              textShadow: '0 1px 2px rgba(255,255,255,0.8)',
-              whiteSpace: 'nowrap',
+              borderRadius: '50%',
+              boxShadow: `0 0 12px ${info.color}, 0 0 24px ${info.color}`,
+              animation: 'ringPulse 0.8s ease-in-out infinite',
             }}
-          >
-            {note.phrase}
-          </span>
-        </div>
+          />
+        )}
       </div>
     </div>
   );
 }
+
 
 // ===== 결과 화면 =====
 function ResultScreen({ score, stats, bestScore, isNewBest, onRestart, onHome }) {

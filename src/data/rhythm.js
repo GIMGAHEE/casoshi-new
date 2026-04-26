@@ -24,8 +24,18 @@ export const RARITY_INFO = {
   SSR: { color: '#FFB800', glow: '0 0 20px rgba(255,184,0,0.9)',          scoreMult: 5 },
 };
 
-// 방향 (노트가 어디에서 날아오는지) — 3방향
-export const DIRECTIONS = ['top', 'left', 'right'];
+// 레인 (노트가 어느 컬럼에서 떨어지는지) — 5레인
+// pink / blue / purple / green / orange (이미지 레퍼런스 톤)
+export const LANES = ['pink', 'blue', 'purple', 'green', 'orange'];
+
+// 레인별 시각 정보
+export const LANE_INFO = {
+  pink:   { color: '#FF6BAA', glow: 'rgba(255,107,170,0.6)', label: '↙' },
+  blue:   { color: '#5BB4FF', glow: 'rgba(91,180,255,0.6)',  label: '↖' },
+  purple: { color: '#B07BFF', glow: 'rgba(176,123,255,0.6)', label: '🔄' },
+  green:  { color: '#7DDC6E', glow: 'rgba(125,220,110,0.6)', label: '↗' },
+  orange: { color: '#FFA94D', glow: 'rgba(255,169,77,0.6)',  label: '↘' },
+};
 
 // 판정 윈도우 (ms) — 노트의 이상적 히트 시각과 실제 탭 시각의 차이
 export const JUDGMENT = {
@@ -75,10 +85,13 @@ export function rollPhrase(rarity) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// 방향 뽑기
-export function rollDirection() {
-  return DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+// 레인 뽑기
+export function rollLane() {
+  return LANES[Math.floor(Math.random() * LANES.length)];
 }
+
+// 호환용 alias (옛 코드가 rollDirection 호출시)
+export const rollDirection = rollLane;
 
 // 세션 타임라인 생성 — [{ id, hitTime, rarity, phrase, direction, isSabi }]
 // 3구간 분배: pre(0~SABI_START) · sabi(SABI_START~SABI_END, 밀도↑) · post(SABI_END~)
@@ -103,13 +116,15 @@ export function generateTimeline() {
       const base = rangeStart + (i + 0.5) * step;
       const jitter = (Math.random() - 0.5) * step * jitterRatio;
       const hitTime = Math.max(startBuffer, Math.round(base + jitter));
+      const lane = rollLane();
       notes.push({
         id: `note_${notes.length}`,
         hitTime,
         spawnTime: hitTime - NOTE_TRAVEL_MS,
         rarity: rollNoteRarity(),
         phrase: null,
-        direction: rollDirection(),
+        lane,
+        direction: lane,  // 옛 코드 호환
         isSabi,
       });
     }
