@@ -731,20 +731,26 @@ function PlayField({
           draggable={false}
         />
 
-        {/* 5개 레인 컬러 빔 — 부드럽게, 너무 진하지 않게 */}
+        {/* 5개 레인 컬러 빔 — 픽셀아트 라이트 빔 이미지 */}
         {LANES.map((lane) => {
           const cx = LANE_X[lane];
           return (
-            <div
+            <img
               key={lane}
-              className="absolute top-0 bottom-0 pointer-events-none"
+              src={`/rhythm/lane_${lane}.png`}
+              alt=""
+              className="absolute pointer-events-none select-none"
               style={{
                 left: `${cx}%`,
-                width: '12%',
+                top: 0,
+                height: '100%',
+                width: 'auto',
                 transform: 'translateX(-50%)',
-                background: `linear-gradient(180deg, ${LANE_INFO[lane].color}33 0%, ${LANE_INFO[lane].color}11 50%, transparent 95%)`,
-                opacity: fever ? 1 : sabiActive ? 0.85 : 0.7,
+                imageRendering: 'pixelated',
+                opacity: fever ? 0.85 : sabiActive ? 0.7 : 0.55,
+                zIndex: 1,
               }}
+              draggable={false}
             />
           );
         })}
