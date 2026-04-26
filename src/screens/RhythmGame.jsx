@@ -262,7 +262,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
     rafRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state, fever, feverEndsAt, timeline, sabiActive, paused]);
+  }, [state, fever, feverEndsAt, timeline, sabiActive, paused, GOOD_W]);
 
   const showJudgment = (label, rarity = 'N', lane = null) => {
     clearTimeout(judgmentFxTimerRef.current);
