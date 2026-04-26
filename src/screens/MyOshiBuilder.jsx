@@ -94,7 +94,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
                 : 'text-oshi-dark/60'
             }`}
           >
-            <img src="/icons/girl.png" alt="" className="w-5 h-5" style={{ imageRendering: 'pixelated' }} />
+            <img src="/icons/girl.png" alt="" className="w-8 h-8" style={{ imageRendering: 'pixelated' }} />
             女の子
           </button>
           <button
@@ -106,7 +106,7 @@ export default function MyOshiBuilder({ initialOshi, onSave, onCancel }) {
             }`}
             style={gender === 'boy' ? { backgroundColor: '#5BA4E0' } : {}}
           >
-            <img src="/icons/boy.png" alt="" className="w-5 h-5" style={{ imageRendering: 'pixelated' }} />
+            <img src="/icons/boy.png" alt="" className="w-8 h-8" style={{ imageRendering: 'pixelated' }} />
             男の子
           </button>
         </div>

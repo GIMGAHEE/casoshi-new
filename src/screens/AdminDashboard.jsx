@@ -330,7 +330,7 @@ function RegisterLiverForm({ onCancel, onRegistered }) {
                 <img
                   src={g === 'girl' ? '/icons/girl.png' : '/icons/boy.png'}
                   alt=""
-                  className="w-5 h-5 object-contain"
+                  className="w-8 h-8 object-contain"
                   style={{ imageRendering: 'pixelated' }}
                   draggable={false}
                 />
