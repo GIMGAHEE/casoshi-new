@@ -579,8 +579,8 @@ import { LANES, LANE_INFO } from '../data/rhythm';
 // 5레인의 X 중심 (% — 화면 가로 위치)
 const LANE_X = { pink: 10, blue: 30, purple: 50, green: 70, orange: 90 };
 // 노트가 떨어지는 시작 Y (위쪽) 와 도착 Y (히트라인)
-const NOTE_START_Y = 8;   // %
-const HIT_LINE_Y = 78;    // % — 게임 영역 안에서 히트 가이드 위치
+const NOTE_START_Y = -5;   // % — 화면 위쪽 밖에서 시작
+const HIT_LINE_Y = 88;     // % — 게임 영역 안에서 히트 가이드 위치 (캐릭터 아래)
 
 // ===== PlayField (게임 중) =====
 function PlayField({
@@ -663,22 +663,22 @@ function PlayField({
         className="relative flex-1 rounded-3xl overflow-hidden border-2 border-oshi-sub shadow-inner"
         style={{
           background: fever
-            ? 'linear-gradient(180deg, #2a1444 0%, #4a1f5e 40%, #6b2a78 100%)'
+            ? 'linear-gradient(180deg, #3a1f5c 0%, #5a2d7a 40%, #7a3a90 100%)'
             : sabiActive
-              ? 'linear-gradient(180deg, #2d1640 0%, #3d1f54 50%, #4a2860 100%)'
-              : 'linear-gradient(180deg, #1f1438 0%, #2d1a48 50%, #3a1f5a 100%)',
-          minHeight: '50vh',
+              ? 'linear-gradient(180deg, #2d1f4a 0%, #4a2d68 50%, #5a3578 100%)'
+              : 'linear-gradient(180deg, #251a45 0%, #3a2560 50%, #4a3070 100%)',
+          minHeight: '55vh',
         }}
       >
         {/* 무대 조명 (위에서 아래로) */}
-        <div className="absolute inset-x-0 top-0 h-1/3 pointer-events-none"
+        <div className="absolute inset-x-0 top-0 h-1/2 pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse at top, rgba(255,255,255,0.15) 0%, transparent 60%)',
+            background: 'radial-gradient(ellipse at top, rgba(255,255,255,0.18) 0%, transparent 65%)',
           }}
         />
 
-        {/* 5개 레인 컬러 빔 — 위에서 아래로 내려오는 빛줄기 */}
-        {LANES.map((lane, i) => {
+        {/* 5개 레인 컬러 빔 — 부드럽게, 너무 진하지 않게 */}
+        {LANES.map((lane) => {
           const cx = LANE_X[lane];
           return (
             <div
@@ -686,10 +686,10 @@ function PlayField({
               className="absolute top-0 bottom-0 pointer-events-none"
               style={{
                 left: `${cx}%`,
-                width: '14%',
+                width: '12%',
                 transform: 'translateX(-50%)',
-                background: `linear-gradient(180deg, ${LANE_INFO[lane].glow} 0%, transparent 85%)`,
-                opacity: fever ? 0.8 : sabiActive ? 0.6 : 0.4,
+                background: `linear-gradient(180deg, ${LANE_INFO[lane].color}33 0%, ${LANE_INFO[lane].color}11 50%, transparent 95%)`,
+                opacity: fever ? 1 : sabiActive ? 0.85 : 0.7,
               }}
             />
           );
@@ -703,16 +703,16 @@ function PlayField({
           style={{
             left: '50%',
             // 캐릭터 sprite 는 정사각 캔버스 + 발 위치 92% 통일
-            // top 12% 부터 시작해서 height 65% — 발 끝이 게임영역 76% 부근에 옴
-            top: '12%',
+            // top 18% + height 50% — 발이 게임영역 약 64% 부근, 노트/버튼 영역 안 침범
+            top: '18%',
             transform: `translateX(-50%) scale(${charScale})`,
-            height: '65%',
+            height: '50%',
             width: 'auto',
             imageRendering: 'pixelated',
             zIndex: 4,
             filter: fever
-              ? 'drop-shadow(0 0 20px rgba(255,184,0,0.9)) drop-shadow(0 6px 10px rgba(0,0,0,0.4))'
-              : 'drop-shadow(0 6px 12px rgba(0,0,0,0.4))',
+              ? 'drop-shadow(0 0 16px rgba(255,184,0,0.8)) drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
+              : 'drop-shadow(0 4px 10px rgba(0,0,0,0.3))',
             transition: 'transform 0.15s ease',
           }}
           draggable={false}
@@ -1005,13 +1005,13 @@ function FlyingNote({ note, elapsed }) {
         alt=""
         className="block"
         style={{
-          width: 72,
+          width: 88,
           height: 'auto',
           imageRendering: 'pixelated',
-          filter: `drop-shadow(0 0 10px ${laneInfo.glow}) drop-shadow(0 2px 4px rgba(0,0,0,0.4))${
-            note.rarity === 'SR' ? ` drop-shadow(0 0 8px ${info.color})` : ''
+          filter: `drop-shadow(0 0 12px ${laneInfo.glow}) drop-shadow(0 2px 4px rgba(0,0,0,0.4))${
+            note.rarity === 'SR' ? ` drop-shadow(0 0 10px ${info.color})` : ''
           }${
-            note.rarity === 'SSR' ? ` drop-shadow(0 0 12px gold)` : ''
+            note.rarity === 'SSR' ? ` drop-shadow(0 0 14px gold)` : ''
           }`,
         }}
         draggable={false}
