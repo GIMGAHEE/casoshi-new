@@ -866,21 +866,20 @@ function PlayField({
       {/* HUD 2줄: FEVER 게이지 (CSS, 가로 70% 가운데 정렬) */}
       <div className="w-full mb-2 flex justify-center">
         <div className="flex items-center gap-2" style={{ height: '32px', width: '70%' }}>
-          {/* 좌측 하트 라벨 */}
-          <div
-            className="shrink-0 flex items-center justify-center"
+          {/* 좌측 음표 라벨 — 핑크 동그라미 + 음표 픽셀 아이콘 (페버 시 노란 글로우) */}
+          <img
+            src="/rhythm/fever_note.png"
+            alt=""
+            className="shrink-0"
             style={{
-              width: '40px',
-              height: '32px',
-              background: 'linear-gradient(180deg, #FF7BB8 0%, #FF5599 100%)',
-              border: '2px solid #C73B7E',
-              borderRadius: '999px',
-              boxShadow: '0 2px 0 #A02960, inset 0 2px 0 rgba(255,255,255,0.45)',
-              fontSize: '14px',
+              width: '36px',
+              height: '36px',
+              objectFit: 'contain',
+              imageRendering: 'pixelated',
+              filter: fever ? 'drop-shadow(0 0 6px rgba(255,184,0,0.9))' : undefined,
             }}
-          >
-            <span style={{ filter: fever ? 'drop-shadow(0 0 4px rgba(255,184,0,0.9))' : undefined }}>💖</span>
-          </div>
+            draggable={false}
+          />
 
           {/* 게이지 트랙 */}
           <div
