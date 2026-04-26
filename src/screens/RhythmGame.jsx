@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { sfx } from '../utils/sound';
 import { createBgmEngine } from '../utils/rhythmBgm';
+import { TRACKS, DEFAULT_TRACK_ID, findTrack, getTrackIndex } from '../data/rhythmTracks';
 import {
   generateTimeline,
   RARITY_INFO,
@@ -75,6 +76,13 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
   const bgmRef = useRef(null);                           // BGM 엔진
   const pauseStartRef = useRef(0);                       // 일시정지 시작 시각
 
+  // 선택된 트랙 (localStorage 저장 → 다음 게임에 기억)
+  const [trackId, setTrackId] = useLocalStorage('casoshi:rhythm:track', DEFAULT_TRACK_ID);
+  const selectedTrack = findTrack(trackId);
+  const trackIndex = getTrackIndex(trackId);
+  const prevTrack = () => setTrackId(TRACKS[(trackIndex - 1 + TRACKS.length) % TRACKS.length].id);
+  const nextTrack = () => setTrackId(TRACKS[(trackIndex + 1) % TRACKS.length].id);
+
   // 말풍선 표시 (id 바뀔 때마다 useEffect 가 auto-cleanup)
   const showSpeech = (key) => {
     const text = pickSpeech(key);
@@ -96,13 +104,14 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
     }, durationMs);
   };
 
-  // BGM 엔진 lazy init + unmount cleanup
+  // BGM 엔진 lazy init + 트랙 변경 시 재생성 + unmount cleanup
   useEffect(() => {
-    if (!bgmRef.current) bgmRef.current = createBgmEngine();
+    if (bgmRef.current) bgmRef.current.stop();
+    bgmRef.current = createBgmEngine({ track: selectedTrack });
     return () => {
       if (bgmRef.current) bgmRef.current.stop();
     };
-  }, []);
+  }, [trackId]);
 
   // 콤보에 따라 BGM 레이어 레벨 조절
   useEffect(() => {
@@ -456,9 +465,61 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
               最高スコア: <span className="font-black text-oshi-main">{bestScore}</span>
             </div>
           )}
+
+          {/* 트랙 선택 */}
+          <div className="flex items-center gap-2 mt-1">
+            <button
+              onClick={prevTrack}
+              className="w-8 h-8 rounded-full flex items-center justify-center text-base font-black active:translate-y-0.5 transition"
+              style={{
+                background: '#fffafd',
+                border: `2px solid ${selectedTrack.accentColor}`,
+                color: selectedTrack.accentColor,
+                boxShadow: `0 2px 0 0 ${selectedTrack.accentColor}`,
+              }}
+            >
+              ◀
+            </button>
+            <div
+              className="px-4 py-2.5 text-center"
+              style={{
+                background: '#fffafd',
+                border: `2px solid ${selectedTrack.accentColor}`,
+                borderRadius: '14px',
+                boxShadow: `0 2px 0 0 ${selectedTrack.accentColor}`,
+                minWidth: '180px',
+              }}
+            >
+              <div className="text-[9px] font-bold tracking-wider" style={{ color: selectedTrack.accentColor }}>
+                ♪ {selectedTrack.genre} · {selectedTrack.bpm} BPM
+              </div>
+              <div className="text-sm font-black mt-0.5 text-oshi-dark">
+                {selectedTrack.name}
+              </div>
+              <div className="text-[10px] text-oshi-dark/60">
+                {selectedTrack.subtitle}
+              </div>
+              <div className="text-[8px] text-oshi-dark/40 mt-0.5">
+                {trackIndex + 1} / {TRACKS.length}
+              </div>
+            </div>
+            <button
+              onClick={nextTrack}
+              className="w-8 h-8 rounded-full flex items-center justify-center text-base font-black active:translate-y-0.5 transition"
+              style={{
+                background: '#fffafd',
+                border: `2px solid ${selectedTrack.accentColor}`,
+                color: selectedTrack.accentColor,
+                boxShadow: `0 2px 0 0 ${selectedTrack.accentColor}`,
+              }}
+            >
+              ▶
+            </button>
+          </div>
+
           <button
             onClick={startGame}
-            className="mt-3 px-8 py-3 rounded-full bg-oshi-main text-white font-black text-base shadow-lg active:scale-95 transition-transform"
+            className="mt-2 px-8 py-3 rounded-full bg-oshi-main text-white font-black text-base shadow-lg active:scale-95 transition-transform"
           >
             ▶ START
           </button>
