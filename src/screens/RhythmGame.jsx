@@ -658,7 +658,7 @@ function PlayField({
                 animation: 'feverPulse 1.5s ease infinite',
               }}
             />
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 text-white font-black text-xs shadow-lg z-10">
+            <div className="absolute top-1.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 text-white font-bold text-[10px] shadow z-10">
               ✨ サビ ×1.5
             </div>
           </>
