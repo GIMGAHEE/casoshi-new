@@ -756,11 +756,11 @@ function PlayField({
           className="absolute pointer-events-none select-none"
           style={{
             left: '50%',
-            // 캐릭터 sprite 는 정사각 캔버스 + 발 위치 92% 통일
-            // top 18% + height 50% — 발이 게임영역 약 64% 부근, 노트/버튼 영역 안 침범
-            top: '18%',
+            // 캐릭터 sprite: 정사각 캔버스 + 발 위치 92%
+            // top 12% + height 44% — 발이 게임영역 약 53% 부근, 관객/버튼 영역과 충분한 여유
+            top: '12%',
             transform: `translateX(-50%) scale(${charScale})`,
-            height: '50%',
+            height: '44%',
             width: 'auto',
             imageRendering: 'pixelated',
             zIndex: 4,
