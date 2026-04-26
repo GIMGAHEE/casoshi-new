@@ -606,45 +606,80 @@ function PlayField({
 
   return (
     <div className="flex-1 flex flex-col mt-2">
-      {/* HUD 상단 — SCORE / COMBO / FEVER 게이지 */}
+      {/* HUD 상단 — 핑크 픽셀 박스 톤 */}
       <div className="flex items-stretch gap-2 mb-2">
         {/* SCORE */}
-        <div className="bg-white/80 rounded-2xl border border-oshi-sub px-3 py-1.5 text-center">
-          <div className="text-[8px] text-oshi-dark/60 font-bold tracking-wider">SCORE</div>
-          <div className="text-sm font-black text-oshi-dark tabular-nums">
+        <div
+          className="px-3 py-1.5 text-center"
+          style={{
+            background: 'linear-gradient(180deg, #FF7BB8 0%, #FF5599 100%)',
+            border: '2px solid #C73B7E',
+            borderRadius: '12px',
+            boxShadow: '0 2px 0 #A02960, inset 0 2px 0 rgba(255,255,255,0.4)',
+            minWidth: '4.5rem',
+          }}
+        >
+          <div className="text-[8px] text-white/90 font-black tracking-wider drop-shadow">SCORE</div>
+          <div className="text-sm font-black text-white tabular-nums" style={{ textShadow: '1px 1px 0 #A02960' }}>
             {String(score).padStart(8, '0')}
           </div>
         </div>
         {/* COMBO */}
-        <div className="bg-white/80 rounded-2xl border border-oshi-sub px-3 py-1.5 text-center">
-          <div className="text-[8px] text-oshi-dark/60 font-bold tracking-wider">COMBO</div>
-          <div className={`text-sm font-black tabular-nums ${combo >= 10 ? 'text-oshi-main' : 'text-oshi-dark'}`}>
+        <div
+          className="px-3 py-1.5 text-center"
+          style={{
+            background: 'linear-gradient(180deg, #FF7BB8 0%, #FF5599 100%)',
+            border: '2px solid #C73B7E',
+            borderRadius: '12px',
+            boxShadow: '0 2px 0 #A02960, inset 0 2px 0 rgba(255,255,255,0.4)',
+          }}
+        >
+          <div className="text-[8px] text-white/90 font-black tracking-wider drop-shadow">COMBO</div>
+          <div className="text-sm font-black text-white tabular-nums" style={{ textShadow: '1px 1px 0 #A02960' }}>
             {combo}
           </div>
         </div>
-        {/* FEVER 게이지 */}
-        <div className="flex-1 relative bg-white/80 rounded-2xl border border-oshi-sub overflow-hidden flex items-center px-3">
-          <div className="text-[10px] font-black text-oshi-main mr-2 flex items-center gap-0.5">
+        {/* FEVER 게이지 — 하트 모양 */}
+        <div
+          className="flex-1 relative flex items-center px-3"
+          style={{
+            background: 'linear-gradient(180deg, #FFB5D5 0%, #FF8FB8 100%)',
+            border: '2px solid #C73B7E',
+            borderRadius: '12px',
+            boxShadow: '0 2px 0 #A02960, inset 0 2px 0 rgba(255,255,255,0.4)',
+            overflow: 'hidden',
+          }}
+        >
+          <div className="text-[10px] font-black text-white mr-2 flex items-center gap-0.5" style={{ textShadow: '1px 1px 0 #A02960' }}>
             <span>💖</span>
             <span>FEVER</span>
           </div>
-          <div className="flex-1 h-2 bg-oshi-sub/40 rounded-full overflow-hidden">
+          <div className="flex-1 h-2 bg-white/30 rounded-full overflow-hidden">
             <div
               className="h-full transition-[width] duration-200"
               style={{
                 width: `${(fever ? feverLeft : Math.min(1, combo / FEVER_TRIGGER_COMBO)) * 100}%`,
                 background: fever
                   ? 'linear-gradient(90deg, #FFB800, #FF6B9D, #B77EE0)'
-                  : 'linear-gradient(90deg, #FF6B9D, #FFB800)',
+                  : 'linear-gradient(90deg, #FFFFFF, #FFE4F0)',
                 animation: fever ? 'feverPulse 1s ease infinite' : undefined,
               }}
             />
           </div>
         </div>
         {/* 残り時間 */}
-        <div className="bg-white/80 rounded-2xl border border-oshi-sub px-2 py-1.5 text-center min-w-[3.5rem]">
-          <div className="text-[8px] text-oshi-dark/60 font-bold tracking-wider">残り</div>
-          <div className="text-sm font-black text-oshi-dark tabular-nums">
+        <div
+          className="px-2 py-1.5 text-center"
+          style={{
+            background: 'linear-gradient(180deg, #FF7BB8 0%, #FF5599 100%)',
+            border: '2px solid #C73B7E',
+            borderRadius: '12px',
+            boxShadow: '0 2px 0 #A02960, inset 0 2px 0 rgba(255,255,255,0.4)',
+            minWidth: '3.5rem',
+          }}
+        >
+          <div className="text-[8px] text-white/90 font-black tracking-wider drop-shadow">残り</div>
+          <div className="text-sm font-black text-white tabular-nums" style={{ textShadow: '1px 1px 0 #A02960' }}>
             {(timeLeft / 1000).toFixed(0)}s
           </div>
         </div>
@@ -865,54 +900,27 @@ function PlayField({
           <FlyingNote key={n.id} note={n} elapsed={elapsed} />
         ))}
 
-        {/* 판정 피드백 — 픽셀 텍스트 + 하트 이펙트 */}
-        {judgmentFx && (() => {
-          const labelKey = judgmentFx.label.toLowerCase(); // perfect/good/miss
-          // GREAT 는 PERFECT 와 같은 라벨 사용 (현재 GOOD 로 들어옴)
-          return (
-            <div
-              key={judgmentFx.id}
-              className="absolute pointer-events-none"
-              style={{
-                left: '50%',
-                top: '55%',
-                transform: 'translate(-50%, -50%)',
-                animation: 'judgmentPop 0.5s ease-out forwards',
-                zIndex: 20,
-              }}
-            >
-              {/* 하트 이펙트 (텍스트 뒤에 깔림) */}
-              <img
-                src={`/rhythm/hit_heart_${labelKey}.png`}
-                alt=""
-                className="absolute"
-                style={{
-                  left: '50%',
-                  top: '55%',
-                  width: 140,
-                  height: 'auto',
-                  transform: 'translate(-50%, -50%)',
-                  imageRendering: 'pixelated',
-                  opacity: 0.9,
-                }}
-                draggable={false}
-              />
-              {/* 텍스트 라벨 (위에) */}
-              <img
-                src={`/rhythm/hit_text_${labelKey}.png`}
-                alt={judgmentFx.label}
-                className="relative block"
-                style={{
-                  width: 160,
-                  height: 'auto',
-                  imageRendering: 'pixelated',
-                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.4))',
-                }}
-                draggable={false}
-              />
-            </div>
-          );
-        })()}
+        {/* 판정 피드백 — 통합 픽셀 이미지 (텍스트+하트) */}
+        {judgmentFx && (
+          <img
+            key={judgmentFx.id}
+            src={`/rhythm/hit_${judgmentFx.label.toLowerCase()}.png`}
+            alt={judgmentFx.label}
+            className="absolute pointer-events-none"
+            style={{
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 200,
+              height: 'auto',
+              imageRendering: 'pixelated',
+              filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.4))',
+              animation: 'judgmentPop 0.5s ease-out forwards',
+              zIndex: 20,
+            }}
+            draggable={false}
+          />
+        )}
 
         {/* 하트 파티클 */}
         {hearts.map(h => (
