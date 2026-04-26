@@ -170,12 +170,63 @@ function playClap(ctx, time) {
 
 import { findTrack, DEFAULT_TRACK_ID } from '../data/rhythmTracks';
 
+// === mp3 모드 BGM 엔진 ===
+// 트랙에 audioSrc 가 있으면 절차적 합성 대신 mp3 직접 재생.
+// setLevel(n) 은 볼륨 조절, setFever(f) 는 playbackRate 살짝 빠르게.
+function createAudioBgmEngine({ audioSrc, baseVolume = 0.45 }) {
+  let audio = null;
+  let enabled = true;
+
+  return {
+    start() {
+      if (!enabled) return;
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+        return;
+      }
+      audio = new Audio(audioSrc);
+      audio.loop = true;
+      audio.volume = baseVolume;
+      audio.crossOrigin = 'anonymous';
+      audio.play().catch((e) => console.warn('[rhythmBgm] audio play failed:', e));
+    },
+    stop() {
+      if (!audio) return;
+      audio.pause();
+      audio.currentTime = 0;
+    },
+    setLevel(n) {
+      // mp3 는 합성 레이어 대신 볼륨으로 표현 (콤보 올라갈수록 살짝 커짐)
+      if (audio) {
+        audio.volume = baseVolume * (0.55 + n * 0.15);  // 0=0.55x ~ 3=1.0x
+      }
+    },
+    setFever(f) {
+      if (!audio) return;
+      audio.playbackRate = f ? 1.08 : 1.0;
+    },
+    setEnabled(e) {
+      enabled = !!e;
+      if (!enabled && audio) audio.pause();
+    },
+  };
+}
+
 // === BGM 엔진 ===
 // level: 0 = kick only / 1 = +hat+lead / 2 = +snare+clap / 3 = +bass/chord
 // fever: true 시 bass + crowd cheer + chord stab 추가
-// track: rhythmTracks 의 한 항목 — bpm/리프/베이스/코드/사운드톤 모두 트랙별로 다름
+// track: rhythmTracks 의 한 항목 — bpm/리프/베이스/코드/사운드톤 + audioSrc(옵션)
+// audioSrc 있으면 mp3 재생 모드로 라우팅, 없으면 합성 모드.
 export function createBgmEngine({ track } = {}) {
   const t = track || findTrack(DEFAULT_TRACK_ID);
+
+  // mp3 모드
+  if (t.audioSrc) {
+    return createAudioBgmEngine({ audioSrc: t.audioSrc });
+  }
+
+  // 합성 모드 (절차적)
   let timer = null;
   let subbeatIdx = 0;
   let measureIdx = 0;   // 2마디마다 리프 교체

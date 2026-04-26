@@ -1,5 +1,6 @@
 // 推しリズム 트랙 정의
-// 각 트랙은 BPM, 키, 리드 멜로디(2마디 ABAB), 베이스 패턴, 코드, 사운드 톤을 가짐.
+// 각 트랙은 BPM, 키, 리드 멜로디(2마디 ABAB), 베이스 패턴, 코드, 사운드 톤,
+// 그리고 옵션으로 메인 BGM 으로 쓸 mp3 audioSrc 를 가짐.
 // 게임 시작 전 사용자가 선택. selected track 은 localStorage 에 저장.
 //
 // freq 단위: Hz (오실레이터 직접 주파수)
@@ -8,6 +9,10 @@
 // chord1/chord2: fever 시 마디 시작/중간에 폭발하는 화음 (3음)
 // kickExtraI: level 3 에서 추가 킥 subbeat 위치 (단조로움 방지). null 이면 추가 X
 // leadShape: 'sawtooth'(밝고 풀) / 'square'(8bit) / 'triangle'(부드러움) / 'sine'(맑음)
+// audioSrc: mp3 URL — 있으면 절차적 BGM 대신 그걸 재생. 없으면 합성 BGM 사용.
+//
+// 음원 출처: Eric Matyas — soundimage.org (royalty-free, attribution 필요)
+// "Music by Eric Matyas, www.soundimage.org" — 추후 credits 화면에 표기 예정
 
 export const TRACKS = [
   {
@@ -31,6 +36,7 @@ export const TRACKS = [
     chord2: [277.18, 440, 554.37],  // A major
     bassPattern: { 0: 73.42, 6: 110, 8: 73.42, 14: 138.59 },
     kickExtraI: 10,
+    audioSrc: 'https://soundimage.org/wp-content/uploads/2019/01/Bouncing-Around-in-Pixel-Town.mp3',
   },
   {
     id: 'pixel_heart',
@@ -53,6 +59,7 @@ export const TRACKS = [
     chord2: [196, 246.94, 392],     // G (G B D)
     bassPattern: { 0: 55, 4: 65.41, 8: 55, 12: 65.41 },
     kickExtraI: 6,
+    audioSrc: 'https://soundimage.org/wp-content/uploads/2017/05/Funky-Chiptune.mp3',
   },
   {
     id: 'lavender_sky',
@@ -75,6 +82,7 @@ export const TRACKS = [
     chord2: [146.83, 220, 261.63],  // Dm
     bassPattern: { 0: 87.31, 8: 73.42 },
     kickExtraI: null,
+    audioSrc: 'https://soundimage.org/wp-content/uploads/2019/03/Innocent-Years.mp3',
   },
   {
     id: 'neon_beat',
@@ -97,6 +105,7 @@ export const TRACKS = [
     chord2: [196, 246.94, 293.66],  // G
     bassPattern: { 0: 41.20, 4: 41.20, 6: 49, 8: 41.20, 10: 41.20, 12: 55, 14: 49 },
     kickExtraI: 6,
+    audioSrc: 'https://soundimage.org/wp-content/uploads/2019/05/Of-Summers-Gone-By.mp3',
   },
   {
     id: 'bubblegum',
@@ -119,6 +128,7 @@ export const TRACKS = [
     chord2: [220, 277.18, 329.63],  // A
     bassPattern: { 0: 49, 6: 73.42, 8: 49, 14: 82.41 },
     kickExtraI: 10,
+    audioSrc: 'https://soundimage.org/wp-content/uploads/2019/03/Carefree-Days-in-Groovyville.mp3',
   },
 ];
 
