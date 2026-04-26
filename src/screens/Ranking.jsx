@@ -199,13 +199,7 @@ export default function Ranking({ myOshi, supports, onBack, onSelectCharacter })
               return (
                 <button
                   key={c.id}
-                  onClick={() => {
-                    if (c.isOtherUserOshi) {
-                      alert(`${c.name}\n他のユーザーが作った推しキャラです 👀`);
-                      return;
-                    }
-                    onSelectCharacter(c.id);
-                  }}
+                  onClick={() => onSelectCharacter(c.id)}
                   className="w-full card text-left flex items-center gap-3 active:scale-[0.98] transition-transform"
                   style={{ padding: '12px' }}
                 >
