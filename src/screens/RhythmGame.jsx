@@ -697,19 +697,38 @@ function PlayField({
       <div
         className="relative flex-1 rounded-3xl overflow-hidden border-2 border-oshi-sub shadow-inner"
         style={{
-          background: fever
-            ? 'linear-gradient(180deg, #3a1f5c 0%, #5a2d7a 40%, #7a3a90 100%)'
-            : sabiActive
-              ? 'linear-gradient(180deg, #2d1f4a 0%, #4a2d68 50%, #5a3578 100%)'
-              : 'linear-gradient(180deg, #251a45 0%, #3a2560 50%, #4a3070 100%)',
+          backgroundImage: 'url(/rhythm/stage_bg.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundColor: '#251a45',
           minHeight: '55vh',
         }}
       >
-        {/* 무대 조명 (위에서 아래로) */}
-        <div className="absolute inset-x-0 top-0 h-1/2 pointer-events-none"
+        {/* fever/sabi 컬러 틴트 (배경 이미지 위에 얹음) */}
+        {(fever || sabiActive) && (
+          <div className="absolute inset-0 pointer-events-none mix-blend-overlay"
+            style={{
+              background: fever
+                ? 'linear-gradient(180deg, rgba(255,184,0,0.25) 0%, rgba(255,107,157,0.2) 50%, rgba(183,126,224,0.25) 100%)'
+                : 'linear-gradient(180deg, rgba(255,107,200,0.15) 0%, rgba(120,80,180,0.1) 100%)',
+            }}
+          />
+        )}
+
+        {/* 관객 (3프레임 애니메이션) — 게임 영역 하단 */}
+        <img
+          src={`/rhythm/audience_${['default','left','right'][Math.floor(elapsed / 350) % 3]}.png`}
+          alt=""
+          className="absolute inset-x-0 bottom-0 pointer-events-none select-none"
           style={{
-            background: 'radial-gradient(ellipse at top, rgba(255,255,255,0.18) 0%, transparent 65%)',
+            width: '100%',
+            height: '20%',
+            objectFit: 'cover',
+            objectPosition: 'center top',
+            zIndex: 2,
+            opacity: fever ? 1 : 0.85,
           }}
+          draggable={false}
         />
 
         {/* 5개 레인 컬러 빔 — 부드럽게, 너무 진하지 않게 */}
