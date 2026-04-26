@@ -56,7 +56,9 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
   const [fever, setFever] = useState(false);
   const [feverEndsAt, setFeverEndsAt] = useState(0);
   const [feverCutIn, setFeverCutIn] = useState(false);
-  const [comboBadge, setComboBadge] = useState(null);  // { value, id }
+  const [comboBadge, setComboBadge] = useState(null);
+  // 일시적 리액션 컷인 (SSR 캐치 / MISS 등) — { sprite, id }
+  const [reactionSprite, setReactionSprite] = useState(null);
   const [judgmentFx, setJudgmentFx] = useState(null);    // 최근 판정 이펙트
   const [hearts, setHearts] = useState([]);              // 성공 시 터지는 하트 파티클
   const [sabiActive, setSabiActive] = useState(false);   // 현재 사비 구간인지
@@ -83,6 +85,14 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
     const t = setTimeout(() => setSpeech(null), 1250);
     return () => clearTimeout(t);
   }, [speech?.id]);
+
+  // 캐릭터 리액션 컷인 (cheer / heart / sad 등 sprite 잠깐 표시)
+  const showReaction = (sprite, durationMs = 800) => {
+    setReactionSprite({ sprite, id: Date.now() + Math.random() });
+    setTimeout(() => {
+      setReactionSprite(curr => (curr?.sprite === sprite ? null : curr));
+    }, durationMs);
+  };
 
   // BGM 엔진 lazy init + unmount cleanup
   useEffect(() => {
@@ -202,6 +212,8 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
           return true;
         });
         if (missed.length > 0) {
+          // 콤보가 5+ 였을 때만 sad 컷인 (의미있는 콤보 끊김)
+          const wasComboHigh = combo >= 5;
           missed.forEach(() => {
             setCombo(0);
             setPerfectStreak(0);
@@ -210,6 +222,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
           showJudgment('MISS');
           // 가끔 말풍선 (15% 확률)
           if (Math.random() < 0.15) showSpeech('miss');
+          if (wasComboHigh) showReaction('sad', 600);
         }
         return remain;
       });
@@ -290,9 +303,11 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
           const nc = c + 1;
           if (COMBO_MILESTONES.has(nc)) {
             sfx.comboMilestone();
-            // 콤보 배지 표시 (10/25/50/100 — 단 25 는 시트에 없으니 50 으로 매핑은 아님, 그대로 사용)
+            // 콤보 배지 표시
             setComboBadge({ value: nc, id: Date.now() });
             setTimeout(() => setComboBadge(null), 1400);
+            // cheer 리액션
+            showReaction('cheer', 800);
           }
           return nc;
         });
@@ -310,8 +325,11 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
           }
           return next;
         });
-        // SSR PERFECT 캐치 → 말풍선
-        if (n.rarity === 'SSR') showSpeech('ssrHit');
+        // SSR PERFECT 캐치 → 말풍선 + 하트 컷인
+        if (n.rarity === 'SSR') {
+          showSpeech('ssrHit');
+          showReaction('heart', 1000);
+        }
         // 하트 파티클
         spawnHearts(n.lane, 3);
       } else {
@@ -469,6 +487,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
           charFeverFrames={FEVER_FRAMES}
           feverCutIn={feverCutIn}
           comboBadge={comboBadge}
+          reactionSprite={reactionSprite}
           sabiActive={sabiActive}
           sabiBanner={sabiBanner}
           speech={speech}
@@ -567,7 +586,7 @@ const HIT_LINE_Y = 78;    // % — 게임 영역 안에서 히트 가이드 위�
 function PlayField({
   elapsed, activeNotes, score, combo, fever, feverEndsAt,
   stats, judgmentFx, hearts, onHit, charNormalFrames, charFeverFrames,
-  sabiActive, sabiBanner, speech, feverCutIn, comboBadge,
+  sabiActive, sabiBanner, speech, feverCutIn, comboBadge, reactionSprite,
 }) {
   const timeLeft = Math.max(0, SESSION_DURATION_MS - elapsed);
   const progress = Math.min(1, elapsed / SESSION_DURATION_MS);
@@ -577,11 +596,13 @@ function PlayField({
   const charScale = fever ? 1.18 : sabiActive ? 1.1 : combo >= 30 ? 1.08 : combo >= 10 ? 1.04 : 1;
 
   // ★ 4프레임 댄스 — elapsed (ms) 기준 프레임 인덱스 결정
-  // 프레임당 200ms (총 800ms = 1주기), 페버일 땐 더 빠르게 (150ms)
   const frameDuration = fever ? 150 : sabiActive ? 175 : 200;
   const frames = fever ? charFeverFrames : charNormalFrames;
   const frameIdx = Math.floor((elapsed / frameDuration)) % frames.length;
-  const charImage = frames[frameIdx];
+  // 우선순위: reactionSprite (일시적 sad/heart/cheer) > 페버/일반 댄스 프레임
+  const charImage = reactionSprite
+    ? `/rhythm/${reactionSprite.sprite}.png`
+    : frames[frameIdx];
 
   return (
     <div className="flex-1 flex flex-col mt-2">
