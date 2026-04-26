@@ -229,7 +229,7 @@ export default function Home({
       {/* 등록된 라이버 */}
       <section>
         <div className="flex items-center justify-between mb-3 px-1">
-          <h2 className="text-lg font-black text-oshi-dark inline-flex items-center gap-2 text-thick">
+          <h2 className="text-lg text-oshi-dark inline-flex items-center gap-2 font-display">
             <img src="/icons/mic.png" alt="" className="w-7 h-7 object-contain" style={{ imageRendering: 'pixelated' }} />
             登録ライバー
           </h2>
