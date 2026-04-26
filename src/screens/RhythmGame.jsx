@@ -789,7 +789,7 @@ function PlayField({
               textShadow: '0 1px 0 rgba(255,255,255,0.6)',
             }}
           >
-            {String(score).padStart(8, '0')}
+            {String(score).padStart(6, '0')}
           </div>
         </div>
 

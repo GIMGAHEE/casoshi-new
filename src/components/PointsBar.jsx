@@ -11,18 +11,18 @@ export default function PointsBar({ points, onReset }) {
     <div className="sticky top-0 z-10">
       <div className="max-w-md mx-auto px-3 py-2 flex items-center justify-between">
         {/* 포인트 박스 */}
-        <div className="flex items-center gap-2 px-3 py-1.5" style={pixelStyle}>
+        <div className="flex items-center gap-1.5 px-2 py-1" style={pixelStyle}>
           <img
             src="/icons/heart.png"
             alt=""
-            className="w-7 h-7"
+            className="w-5 h-5"
             style={{ imageRendering: 'pixelated' }}
           />
           <div>
-            <div className="text-[10px] leading-none" style={{ color: '#a888a4' }}>
+            <div className="text-[9px] leading-none" style={{ color: '#a888a4' }}>
               ポイント
             </div>
-            <div className="text-lg font-black leading-tight font-pixel" style={{ color: '#ff5fa2' }}>
+            <div className="text-sm font-black leading-tight font-pixel" style={{ color: '#ff5fa2' }}>
               {points.toLocaleString()}
             </div>
           </div>
@@ -31,10 +31,10 @@ export default function PointsBar({ points, onReset }) {
         {/* 리셋 버튼 */}
         <button
           onClick={onReset}
-          className="flex items-center gap-1 text-[11px] font-bold px-3 py-2 active:translate-y-0.5 transition"
+          className="flex items-center gap-1 text-[10px] font-bold px-2 py-1.5 active:translate-y-0.5 transition"
           style={{ ...pixelStyle, color: '#ff5fa2' }}
         >
-          <span className="text-sm leading-none">↻</span>
+          <span className="text-xs leading-none">↻</span>
           リセット
         </button>
       </div>

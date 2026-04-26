@@ -182,14 +182,19 @@ function createAudioBgmEngine({ audioSrc, baseVolume = 0.45 }) {
       if (!enabled) return;
       if (audio) {
         audio.currentTime = 0;
-        audio.play().catch(() => {});
+        audio.play().catch((e) => console.warn('[rhythmBgm] audio play retry failed:', e));
         return;
       }
       audio = new Audio(audioSrc);
       audio.loop = true;
       audio.volume = baseVolume;
-      audio.crossOrigin = 'anonymous';
-      audio.play().catch((e) => console.warn('[rhythmBgm] audio play failed:', e));
+      audio.preload = 'auto';
+      audio.addEventListener('error', (e) => {
+        console.error('[rhythmBgm] audio error event for', audioSrc, e, audio?.error);
+      });
+      audio.play()
+        .then(() => console.log('[rhythmBgm] audio playing:', audioSrc))
+        .catch((e) => console.error('[rhythmBgm] audio play() rejected:', e?.name, e?.message, '→', audioSrc));
     },
     stop() {
       if (!audio) return;
