@@ -55,6 +55,8 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
   const [bestScore, setBestScore] = useLocalStorage('casoshi:rhythm:best', 0);
   const [fever, setFever] = useState(false);
   const [feverEndsAt, setFeverEndsAt] = useState(0);
+  const [feverCutIn, setFeverCutIn] = useState(false);
+  const [comboBadge, setComboBadge] = useState(null);  // { value, id }
   const [judgmentFx, setJudgmentFx] = useState(null);    // 최근 판정 이펙트
   const [hearts, setHearts] = useState([]);              // 성공 시 터지는 하트 파티클
   const [sabiActive, setSabiActive] = useState(false);   // 현재 사비 구간인지
@@ -286,7 +288,12 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
         setStats(s => ({ ...s, perfect: s.perfect + 1 }));
         setCombo(c => {
           const nc = c + 1;
-          if (COMBO_MILESTONES.has(nc)) sfx.comboMilestone();
+          if (COMBO_MILESTONES.has(nc)) {
+            sfx.comboMilestone();
+            // 콤보 배지 표시 (10/25/50/100 — 단 25 는 시트에 없으니 50 으로 매핑은 아님, 그대로 사용)
+            setComboBadge({ value: nc, id: Date.now() });
+            setTimeout(() => setComboBadge(null), 1400);
+          }
           return nc;
         });
         setPerfectStreak(ps => {
@@ -297,6 +304,9 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
             setFever(true);
             setFeverEndsAt(performance.now() + FEVER_DURATION_MS);
             showSpeech('feverStart');
+            // FEVER! 컷인 컴인
+            setFeverCutIn(true);
+            setTimeout(() => setFeverCutIn(false), 1600);
           }
           return next;
         });
@@ -457,6 +467,8 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
           onHit={handleHit}
           charNormalFrames={DANCE_FRAMES}
           charFeverFrames={FEVER_FRAMES}
+          feverCutIn={feverCutIn}
+          comboBadge={comboBadge}
           sabiActive={sabiActive}
           sabiBanner={sabiBanner}
           speech={speech}
@@ -523,6 +535,20 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
           75%  { transform: scale(1) rotate(0); opacity: 1; }
           100% { transform: scale(0.85) translateY(-12px); opacity: 0; visibility: hidden; }
         }
+        @keyframes feverCutIn {
+          0%   { transform: translate(-50%, -50%) scale(0.3) rotate(-15deg); opacity: 0; }
+          15%  { transform: translate(-50%, -50%) scale(1.2) rotate(5deg); opacity: 1; }
+          25%  { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: 1; }
+          75%  { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: 1; }
+          100% { transform: translate(-50%, -50%) scale(0.85) rotate(0); opacity: 0; }
+        }
+        @keyframes comboBadge {
+          0%   { transform: translate(-50%, -50%) scale(0.4) rotate(-8deg); opacity: 0; }
+          20%  { transform: translate(-50%, -50%) scale(1.15) rotate(3deg); opacity: 1; }
+          35%  { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: 1; }
+          75%  { transform: translate(-50%, -60%) scale(1) rotate(0); opacity: 1; }
+          100% { transform: translate(-50%, -80%) scale(0.9) rotate(0); opacity: 0; }
+        }
       `}</style>
     </div>
   );
@@ -541,7 +567,7 @@ const HIT_LINE_Y = 78;    // % — 게임 영역 안에서 히트 가이드 위�
 function PlayField({
   elapsed, activeNotes, score, combo, fever, feverEndsAt,
   stats, judgmentFx, hearts, onHit, charNormalFrames, charFeverFrames,
-  sabiActive, sabiBanner, speech,
+  sabiActive, sabiBanner, speech, feverCutIn, comboBadge,
 }) {
   const timeLeft = Math.max(0, SESSION_DURATION_MS - elapsed);
   const progress = Math.min(1, elapsed / SESSION_DURATION_MS);
@@ -743,6 +769,52 @@ function PlayField({
           </div>
         )}
 
+        {/* FEVER 컷인 — 페버 진입 순간 큰 배지 */}
+        {feverCutIn && (
+          <img
+            src="/rhythm/fever_badge.png"
+            alt="FEVER"
+            className="absolute left-1/2 top-1/2 pointer-events-none z-40"
+            style={{
+              transform: 'translate(-50%, -50%)',
+              width: '85%',
+              height: 'auto',
+              imageRendering: 'pixelated',
+              animation: 'feverCutIn 1.6s ease-out forwards',
+              filter: 'drop-shadow(0 4px 16px rgba(255,107,157,0.8))',
+            }}
+            draggable={false}
+          />
+        )}
+
+        {/* COMBO 마일스톤 배지 — 10/25/50/100 도달시 */}
+        {comboBadge && (() => {
+          // 시트에 있는 배지: 10/50/100/200 — 가장 가까운 값으로 매핑
+          const target = comboBadge.value >= 100 ? '100'
+                       : comboBadge.value >= 50 ? '50'
+                       : comboBadge.value >= 25 ? '50'   // 25 는 50 배지 빌려쓰기
+                       : '10';
+          return (
+            <img
+              key={comboBadge.id}
+              src={`/rhythm/combo_${target}.png`}
+              alt=""
+              className="absolute pointer-events-none z-40"
+              style={{
+                left: '50%',
+                top: '40%',
+                transform: 'translate(-50%, -50%)',
+                width: 180,
+                height: 'auto',
+                imageRendering: 'pixelated',
+                animation: 'comboBadge 1.4s ease-out forwards',
+                filter: 'drop-shadow(0 4px 12px rgba(255,107,157,0.6))',
+              }}
+              draggable={false}
+            />
+          );
+        })()}
+
         {/* 히트 가이드 라인 (5레인 모두 표시) */}
         {LANES.map(lane => {
           const cx = LANE_X[lane];
@@ -772,29 +844,54 @@ function PlayField({
           <FlyingNote key={n.id} note={n} elapsed={elapsed} />
         ))}
 
-        {/* 판정 피드백 — 가장 최근 판정 한 번에 가운데 표시 */}
-        {judgmentFx && (
-          <div
-            key={judgmentFx.id}
-            className="absolute font-black pointer-events-none"
-            style={{
-              left: '50%',
-              top: '60%',
-              fontSize: judgmentFx.label === 'PERFECT' ? 36 : 28,
-              color:
-                judgmentFx.label === 'PERFECT'
-                  ? RARITY_INFO[judgmentFx.rarity]?.color || '#FF6B9D'
-                  : judgmentFx.label === 'GOOD'
-                    ? '#FFB800'
-                    : '#888',
-              textShadow: '0 2px 6px rgba(0,0,0,0.6), 0 0 12px rgba(255,255,255,0.6)',
-              animation: 'judgmentPop 0.5s ease-out forwards',
-              zIndex: 20,
-            }}
-          >
-            {judgmentFx.label}
-          </div>
-        )}
+        {/* 판정 피드백 — 픽셀 텍스트 + 하트 이펙트 */}
+        {judgmentFx && (() => {
+          const labelKey = judgmentFx.label.toLowerCase(); // perfect/good/miss
+          // GREAT 는 PERFECT 와 같은 라벨 사용 (현재 GOOD 로 들어옴)
+          return (
+            <div
+              key={judgmentFx.id}
+              className="absolute pointer-events-none"
+              style={{
+                left: '50%',
+                top: '55%',
+                transform: 'translate(-50%, -50%)',
+                animation: 'judgmentPop 0.5s ease-out forwards',
+                zIndex: 20,
+              }}
+            >
+              {/* 하트 이펙트 (텍스트 뒤에 깔림) */}
+              <img
+                src={`/rhythm/hit_heart_${labelKey}.png`}
+                alt=""
+                className="absolute"
+                style={{
+                  left: '50%',
+                  top: '55%',
+                  width: 140,
+                  height: 'auto',
+                  transform: 'translate(-50%, -50%)',
+                  imageRendering: 'pixelated',
+                  opacity: 0.9,
+                }}
+                draggable={false}
+              />
+              {/* 텍스트 라벨 (위에) */}
+              <img
+                src={`/rhythm/hit_text_${labelKey}.png`}
+                alt={judgmentFx.label}
+                className="relative block"
+                style={{
+                  width: 160,
+                  height: 'auto',
+                  imageRendering: 'pixelated',
+                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.4))',
+                }}
+                draggable={false}
+              />
+            </div>
+          );
+        })()}
 
         {/* 하트 파티클 */}
         {hearts.map(h => (
@@ -815,7 +912,7 @@ function PlayField({
         ))}
       </div>
 
-      {/* 하단 5개 레인 버튼 */}
+      {/* 하단 5개 레인 버튼 — 픽셀아트 */}
       <div className="grid grid-cols-5 gap-2 mt-2">
         {LANES.map(lane => {
           const info = LANE_INFO[lane];
@@ -824,16 +921,18 @@ function PlayField({
               key={lane}
               onTouchStart={(e) => { e.preventDefault(); onHit(lane); }}
               onMouseDown={(e) => { e.preventDefault(); onHit(lane); }}
-              className="relative aspect-square rounded-full flex items-center justify-center font-black text-2xl active:scale-90 transition-transform select-none"
+              className="relative aspect-square rounded-2xl active:scale-90 transition-transform select-none flex items-center justify-center"
               style={{
-                background: `radial-gradient(circle, ${info.glow} 0%, rgba(0,0,0,0.4) 80%)`,
-                border: `3px solid ${info.color}`,
-                color: '#fff',
-                boxShadow: `0 0 16px ${info.glow}, inset 0 0 12px rgba(255,255,255,0.2)`,
-                textShadow: `0 0 8px ${info.color}`,
+                filter: `drop-shadow(0 0 12px ${info.glow})`,
               }}
             >
-              {info.label}
+              <img
+                src={`/rhythm/btn_${lane}.png`}
+                alt=""
+                className="w-full h-full object-contain pointer-events-none"
+                style={{ imageRendering: 'pixelated' }}
+                draggable={false}
+              />
             </button>
           );
         })}
@@ -842,20 +941,18 @@ function PlayField({
   );
 }
 
-// ===== 날아오는 개별 노트 (하트 모양, 위→아래) =====
+// ===== 날아오는 개별 노트 (픽셀 하트, 위→아래) =====
 function FlyingNote({ note, elapsed }) {
   const t = elapsed - note.spawnTime;
   const progress = Math.max(0, Math.min(1, t / NOTE_TRAVEL_MS));
   const cx = LANE_X[note.lane] ?? 50;
-  // 위(NOTE_START_Y) → 아래(HIT_LINE_Y)
   const y = NOTE_START_Y + (HIT_LINE_Y - NOTE_START_Y) * progress;
   const info = RARITY_INFO[note.rarity] || RARITY_INFO.N;
   const laneInfo = LANE_INFO[note.lane] || LANE_INFO.pink;
 
-  // 히트 시각에 가까울수록 약간 커짐
   const scale = 0.7 + progress * 0.4;
+  const noteImage = `/rhythm/note_${note.lane}.png`;
 
-  // 하트 SVG 형태 (CSS clip-path) — 노트 색은 레인 컬러
   return (
     <div
       className="absolute pointer-events-none select-none"
@@ -866,13 +963,13 @@ function FlyingNote({ note, elapsed }) {
         zIndex: 10,
       }}
     >
-      {/* SSR 골드 글로우 */}
+      {/* SSR 골드 후광 */}
       {note.rarity === 'SSR' && (
         <div
           className="absolute"
           style={{
             left: '50%', top: '50%',
-            width: 64, height: 64,
+            width: 84, height: 84,
             transform: 'translate(-50%, -50%)',
             borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(255,184,0,0.7) 0%, transparent 70%)',
@@ -881,36 +978,23 @@ function FlyingNote({ note, elapsed }) {
         />
       )}
 
-      {/* 하트 자체 — 큰 이모지 + 컬러 필터 */}
-      <div
-        className="relative"
+      {/* 하트 이미지 */}
+      <img
+        src={noteImage}
+        alt=""
+        className="block"
         style={{
-          fontSize: 42,
-          filter: `drop-shadow(0 0 8px ${laneInfo.glow}) drop-shadow(0 2px 4px rgba(0,0,0,0.4))`,
-          color: laneInfo.color,
+          width: 72,
+          height: 'auto',
+          imageRendering: 'pixelated',
+          filter: `drop-shadow(0 0 10px ${laneInfo.glow}) drop-shadow(0 2px 4px rgba(0,0,0,0.4))${
+            note.rarity === 'SR' ? ` drop-shadow(0 0 8px ${info.color})` : ''
+          }${
+            note.rarity === 'SSR' ? ` drop-shadow(0 0 12px gold)` : ''
+          }`,
         }}
-      >
-        {/* 하트 모양 — SVG 로 색깔 적용 */}
-        <svg width="42" height="42" viewBox="0 0 24 24" fill={laneInfo.color}
-          style={{ filter: info.rarity === 'SSR' ? 'drop-shadow(0 0 6px gold)' : undefined }}
-        >
-          <path d="M12 21s-7-4.35-9.3-9.04C1.4 9.5 2.6 6 6 6c2 0 3.5 1 4.5 2.5C12 6 13.5 6 15.5 6c3.4 0 4.6 3.5 3.3 5.96C19 16.65 12 21 12 21z"
-            stroke="#fff" strokeWidth="1.5" strokeLinejoin="round"
-          />
-        </svg>
-
-        {/* SR/SSR 빛줄기 */}
-        {(note.rarity === 'SR' || note.rarity === 'SSR') && (
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              borderRadius: '50%',
-              boxShadow: `0 0 12px ${info.color}, 0 0 24px ${info.color}`,
-              animation: 'ringPulse 0.8s ease-in-out infinite',
-            }}
-          />
-        )}
-      </div>
+        draggable={false}
+      />
     </div>
   );
 }
