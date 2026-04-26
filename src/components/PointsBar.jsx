@@ -1,18 +1,18 @@
 export default function PointsBar({ points, onReset }) {
-  // Home과 동일한 픽셀 산리오 톤
+  // Home과 동일한 픽셀 산리오 톤 (연한 핑크)
   const pixelStyle = {
-    background: '#fff0f6',
-    border: '2px solid #ff7eb6',
-    borderRadius: '12px',
-    boxShadow: '0 3px 0 0 #ff5fa2',
+    background: '#fffafd',
+    border: '2px solid #ffc4dc',
+    borderRadius: '14px',
+    boxShadow: '0 2px 0 0 #ffc4dc',
   };
 
   return (
     <div
       className="sticky top-0 z-10 backdrop-blur-sm"
       style={{
-        background: 'rgba(255, 238, 246, 0.85)',
-        borderBottom: '2px solid #ff7eb6',
+        background: 'rgba(255, 240, 246, 0.85)',
+        borderBottom: '1.5px solid #ffc4dc',
       }}
     >
       <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">

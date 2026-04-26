@@ -30,19 +30,19 @@ export default function Home({
     setLastCheckin(today);
   };
 
-  // 산리오/픽셀 UI 톤 — 단색 BG + 단색 그림자 (blur 0)
+  // 산리오/픽셀 UI 톤 — 흰색 BG + 연한 핑크 보더 + 작은 단색 그림자
   const pixelCard = {
-    background: '#fff0f6',
-    borderColor: '#ff7eb6',
-    borderRadius: '12px',
-    boxShadow: '0 3px 0 0 #ff5fa2',
+    background: '#fffafd',
+    borderColor: '#ffc4dc',
+    borderRadius: '14px',
+    boxShadow: '0 2px 0 0 #ffc4dc',
   };
   // 선택/강조 카드 (랭킹) — 노랑 톤
   const pixelCardSelected = {
     background: '#fff8d8',
     borderColor: '#ffaa2a',
-    borderRadius: '12px',
-    boxShadow: '0 3px 0 0 #d8800a',
+    borderRadius: '14px',
+    boxShadow: '0 2px 0 0 #ffd87a',
   };
 
   return (
@@ -144,11 +144,11 @@ export default function Home({
             <button
               onClick={onOpenBuilder}
               style={{
-                background: '#fff0f6',
-                borderColor: '#ff7eb6',
-                borderRadius: '12px',
+                background: '#fffafd',
+                borderColor: '#ffc4dc',
+                borderRadius: '14px',
                 borderStyle: 'dashed',
-                boxShadow: '0 3px 0 0 #ff5fa2',
+                boxShadow: '0 2px 0 0 #ffc4dc',
               }}
               className="card flex flex-col items-center justify-center py-4 px-2 hover:brightness-105 transition"
             >
@@ -239,10 +239,10 @@ export default function Home({
           <div
             className="p-6 text-center"
             style={{
-              background: '#fff0f6',
-              border: '2px dashed #ff7eb6',
-              borderRadius: '12px',
-              boxShadow: '0 3px 0 0 #ff5fa2',
+              background: '#fffafd',
+              border: '2px dashed #ffc4dc',
+              borderRadius: '14px',
+              boxShadow: '0 2px 0 0 #ffc4dc',
             }}
           >
             <img src="/icons/mic.png" alt="" className="w-10 h-10 object-contain mx-auto mb-2" style={{ imageRendering: 'pixelated' }} />

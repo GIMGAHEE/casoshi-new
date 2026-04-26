@@ -9,7 +9,12 @@ export default function CharacterCard({ character, supportPoints, onClick, highl
   return (
     <button
       onClick={onClick}
-      className={`card w-full text-left active:scale-[0.98] transition-transform relative bg-white ${
+      style={{
+        borderColor: '#ffc4dc',
+        borderRadius: '14px',
+        boxShadow: '0 2px 0 0 #ffc4dc',
+      }}
+      className={`card w-full text-left active:translate-y-0.5 transition relative bg-white ${
         highlight ? 'ring-2 ring-oshi-main' : ''
       }`}
     >

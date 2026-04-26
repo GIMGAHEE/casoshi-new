@@ -17,7 +17,13 @@ const TABS = [
 
 export default function BottomNav({ active, onNavigate }) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t-2 border-oshi-sub z-20 shadow-[0_-4px_12px_rgba(0,0,0,0.04)]">
+    <nav
+      className="fixed bottom-0 left-0 right-0 backdrop-blur-md z-20"
+      style={{
+        background: 'rgba(255, 250, 253, 0.95)',
+        borderTop: '1.5px solid #ffc4dc',
+      }}
+    >
       <div className="max-w-md mx-auto grid grid-cols-4">
         {TABS.map(t => {
           const isActive = active === t.id;
