@@ -161,20 +161,22 @@ export default function MiniHome({
           </div>
         </div>
 
-        {/* 하단 액션 메뉴 (Cyworld 느낌) */}
-        <div className="grid grid-cols-4 divide-x divide-oshi-sub border-t-2 border-oshi-sub bg-oshi-bg/40">
+        {/* 하단 액션 메뉴 (Cyworld 느낌) — 다른 유저 oshi 는 편집 불가 → 3열 */}
+        <div className={`grid ${character.isOtherUserOshi ? 'grid-cols-3' : 'grid-cols-4'} divide-x divide-oshi-sub border-t-2 border-oshi-sub bg-oshi-bg/40`}>
           <MenuButton
             emoji={<img src="/icons/chat.png" alt="" className="w-6 h-6" style={{ imageRendering: 'pixelated' }} />}
             label="ゲストブック"
             onClick={() => alert('ゲストブックは Phase 2 で実装予定！')}
           />
-          <MenuButton
-            emoji={<img src="/icons/sofa.png" alt="" className="w-6 h-6" style={{ imageRendering: 'pixelated' }} />}
-            label={character.isLiver ? '本人のみ' : '家具追加'}
-            onClick={character.isLiver
-              ? () => alert('ライバー本人がマイページから飾ります 🎤')
-              : onEditRoom}
-          />
+          {!character.isOtherUserOshi && (
+            <MenuButton
+              emoji={<img src="/icons/sofa.png" alt="" className="w-6 h-6" style={{ imageRendering: 'pixelated' }} />}
+              label={character.isLiver ? '本人のみ' : '家具追加'}
+              onClick={character.isLiver
+                ? () => alert('ライバー本人がマイページから飾ります 🎤')
+                : onEditRoom}
+            />
+          )}
           {(() => {
             const isOwnMyOshi = character.isMyOshi && !character.isOtherUserOshi;
             return (
