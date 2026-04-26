@@ -179,8 +179,9 @@ export default function Home({
           <button
             onClick={onOpenCraneGame}
             style={pixelCard}
-            className="card !p-2 flex flex-col items-center justify-center py-3 hover:scale-[1.03] transition-transform"
+            className="card !p-2 relative flex flex-col items-center justify-center py-3 hover:scale-[1.03] transition-transform"
           >
+            <span className="absolute top-1 right-1 text-[7px] font-black bg-oshi-main text-white px-1 py-0.5 rounded-full">NEW</span>
             <img
               src="/icons/crane.png"
               alt=""
