@@ -18,7 +18,7 @@ export default {
       fontFamily: {
         sans: ['"DotGothic16"', '"Noto Sans JP"', 'system-ui', 'sans-serif'],
         pixel: ['"Press Start 2P"', '"DotGothic16"', '"Noto Sans JP"', 'monospace'],
-        display: ['"Dela Gothic One"', '"DotGothic16"', '"Noto Sans JP"', 'sans-serif'],
+        display: ['"DotGothic16"', '"Noto Sans JP"', 'sans-serif'],
       },
       animation: {
         'pop': 'pop 0.3s ease-out',

@@ -43,6 +43,12 @@
   .card {
     @apply bg-white rounded-3xl shadow-md p-4 border-2 border-oshi-sub;
   }
+  /* font-display 큰 타이틀 — DotGothic16 픽셀 + 4방향 1px shadow 로 굵음 */
+  .font-display {
+    text-shadow:
+      1px 0 0 currentColor, -1px 0 0 currentColor,
+      0 1px 0 currentColor, 0 -1px 0 currentColor;
+  }
 }
 
 @layer utilities {
