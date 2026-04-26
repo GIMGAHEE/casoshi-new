@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { TAP_REWARD } from '../data/gameRules';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useSoundEnabled } from '../hooks/useSoundEnabled';
+import { sfx } from '../utils/sound';
+import SoundToggle from '../components/SoundToggle';
 
 // ===== 게임 밸런스 =====
 const COMBO_WINDOW_MS = 1500;           // 콤보 유지 시간
@@ -24,6 +27,7 @@ export default function TapGame({ points, setPoints, onBack }) {
   const [combo, setCombo] = useState(0);
   const [bestCombo, setBestCombo] = useLocalStorage('casoshi:bestCombo', 0);
   const [sessionStats, setSessionStats] = useState({ taps: 0, points: 0, maxCombo: 0 });
+  const [soundEnabled, setSoundEnabled] = useSoundEnabled();
 
   const lastTapAtRef = useRef(0);
   const comboTimerRef = useRef(null);
@@ -54,6 +58,16 @@ export default function TapGame({ points, setPoints, onBack }) {
       maxCombo: Math.max(s.maxCombo, newCombo),
     }));
     if (newCombo > bestCombo) setBestCombo(newCombo);
+
+    // ===== 효과음 =====
+    // 크리: 화려 사운드 / 마일스톤(10/25/50): 상승 아르페지오 / 평소: 짧은 click
+    if (isCrit) {
+      sfx.perfect();
+    } else if (newCombo === 10 || newCombo === 25 || newCombo === 50) {
+      sfx.comboMilestone();
+    } else {
+      sfx.click();
+    }
 
     // 플로팅 +pt
     const id = now + Math.random();
@@ -102,12 +116,15 @@ export default function TapGame({ points, setPoints, onBack }) {
         <div className="fixed inset-0 bg-oshi-main/20 pointer-events-none z-40 animate-pulse" />
       )}
 
-      <button
-        onClick={onBack}
-        className="text-sm text-oshi-dark/70 hover:text-oshi-dark self-start"
-      >
-        <img src="/icons/back.png" alt="戻る" className="w-10 h-10 object-contain" style={{ imageRendering: "pixelated" }} draggable={false} />
-      </button>
+      <div className="flex items-center justify-between">
+        <button
+          onClick={onBack}
+          className="text-sm text-oshi-dark/70 hover:text-oshi-dark"
+        >
+          <img src="/icons/back.png" alt="戻る" className="w-10 h-10 object-contain" style={{ imageRendering: "pixelated" }} draggable={false} />
+        </button>
+        <SoundToggle enabled={soundEnabled} onToggle={setSoundEnabled} />
+      </div>
 
       {/* 통계 헤더 */}
       <div className="mt-3 bg-white/60 rounded-2xl p-3 border border-oshi-sub">

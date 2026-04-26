@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import { useGacha } from '../../hooks/useGacha';
+import { useSoundEnabled } from '../../hooks/useSoundEnabled';
 import { GACHA_COST } from '../../data/badges';
 import { sfx } from '../../utils/sound';
+import SoundToggle from '../../components/SoundToggle';
 import GachaAnimation from './GachaAnimation';
 import GachaResult from './GachaResult';
 
 export default function GachaHome({ userId, points, setPoints, onBack }) {
   const { inventory, loading, pulling, canUseFreePull, pullSingle, pullTen } =
     useGacha(userId, points, setPoints);
+
+  const [soundEnabled, setSoundEnabled] = useSoundEnabled();
 
   // 'idle' | 'animating' | 'result'
   const [phase, setPhase] = useState('idle');
@@ -76,7 +80,7 @@ export default function GachaHome({ userId, points, setPoints, onBack }) {
           />
         </button>
         <h1 className="text-3xl text-oshi-main font-display">缶バッジガチャ</h1>
-        <div className="w-10" /> {/* spacer */}
+        <SoundToggle enabled={soundEnabled} onToggle={setSoundEnabled} />
       </div>
 
       {/* 본일의 라인업 (placeholder — 라이버 sprite 가 추가되면 채울 예정) */}

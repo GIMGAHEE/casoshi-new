@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useSoundEnabled } from '../hooks/useSoundEnabled';
 import { sfx } from '../utils/sound';
 import { createBgmEngine } from '../utils/rhythmBgm';
 import { TRACKS, DEFAULT_TRACK_ID, findTrack } from '../data/rhythmTracks';
+import SoundToggle from '../components/SoundToggle';
 import {
   generateTimeline,
   RARITY_INFO,
@@ -84,6 +86,13 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
   // 선택된 난이도
   const [difficultyId, setDifficultyId] = useLocalStorage('casoshi:rhythm:difficulty', DEFAULT_DIFFICULTY_ID);
   const selectedDifficulty = findDifficulty(difficultyId);
+
+  // 사운드 ON/OFF (sfx + BGM 동시)
+  const [soundEnabled, setSoundEnabled] = useSoundEnabled();
+  useEffect(() => {
+    if (bgmRef.current) bgmRef.current.setEnabled(soundEnabled);
+  }, [soundEnabled]);
+
   // 자주 쓰는 alias
   const TRAVEL = selectedDifficulty.noteTravelMs;
   const FEVER_TRIGGER = selectedDifficulty.feverTriggerCombo;
@@ -426,7 +435,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
             <div className="text-[10px] text-oshi-dark/60">リズム合わせてタップ！</div>
           )}
         </div>
-        <div className="w-10" />
+        <SoundToggle enabled={soundEnabled} onToggle={setSoundEnabled} />
       </div>
 
       {/* ===== TITLE ===== */}

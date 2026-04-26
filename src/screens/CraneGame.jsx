@@ -4,7 +4,9 @@ import {
   DOLL_POOL, RARITY_INFO, CRANE_COST, CRANE_FREE_INTERVAL_MS,
   calcSuccessProb, rollRarity, rollDoll,
 } from '../data/crane';
-import { sfx, setSoundEnabled } from '../utils/sound';
+import { sfx } from '../utils/sound';
+import { useSoundEnabled } from '../hooks/useSoundEnabled';
+import SoundToggle from '../components/SoundToggle';
 
 // 기계 이미지 에셋 (public/crane/)
 const MACHINE_IMG = '/crane/machine.png';
@@ -44,10 +46,7 @@ export default function CraneGame({ points, setPoints, onBack }) {
   const [lastResult, setLastResult] = useState(null); // {doll, reward, success}
   const [lastFreeAt, setLastFreeAt] = useLocalStorage('casoshi:craneFreeAt', 0);
   const [history, setHistory] = useLocalStorage('casoshi:craneHistory', []);
-  const [soundOn, setSoundOn] = useLocalStorage('casoshi:craneSound', true);
-
-  // soundOn 변경을 sound util에 동기화
-  useEffect(() => { setSoundEnabled(soundOn); }, [soundOn]);
+  const [soundOn, setSoundOn] = useSoundEnabled();
 
   const animationRef = useRef(null);
   const boardRef = useRef(null);
@@ -341,24 +340,7 @@ export default function CraneGame({ points, setPoints, onBack }) {
         >
           <img src="/icons/back.png" alt="戻る" className="w-10 h-10 object-contain" style={{ imageRendering: "pixelated" }} draggable={false} />
         </button>
-        <button
-          onClick={() => setSoundOn(v => !v)}
-          aria-label={soundOn ? 'サウンドをオフ' : 'サウンドをオン'}
-          className="active:scale-95 transition-transform"
-          title={soundOn ? 'サウンド ON' : 'サウンド OFF'}
-        >
-          <img
-            src="/icons/sound.png"
-            alt=""
-            className="w-10 h-10 object-contain"
-            style={{
-              imageRendering: 'pixelated',
-              filter: soundOn ? 'none' : 'grayscale(1)',
-              opacity: soundOn ? 1 : 0.4,
-            }}
-            draggable={false}
-          />
-        </button>
+        <SoundToggle enabled={soundOn} onToggle={setSoundOn} />
       </div>
 
       <h2 className="text-3xl text-oshi-main text-center mb-2 font-display">
