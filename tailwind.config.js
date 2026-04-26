@@ -16,7 +16,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['"Noto Sans JP"', 'system-ui', 'sans-serif'],
+        sans: ['"DotGothic16"', '"Noto Sans JP"', 'system-ui', 'sans-serif'],
       },
       animation: {
         'pop': 'pop 0.3s ease-out',
