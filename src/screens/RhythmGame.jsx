@@ -20,7 +20,7 @@ const FEVER_TRIGGER_COMBO = 10;       // 10 PERFECT 연쇄 → 페버 진입
 const FEVER_DURATION_MS = 8_000;
 
 // 콤보 마일스톤 (사운드 cue)
-const COMBO_MILESTONES = new Set([10, 25, 50, 100]);
+const COMBO_MILESTONES = new Set([10, 25, 50, 100, 200, 500]);
 
 // ===== 💬 캐릭터 말풍선 멘트 =====
 const SPEECH_MAP = {
@@ -928,8 +928,10 @@ function PlayField({
 
         {/* COMBO 마일스톤 배지 — 10/25/50/100 도달시 */}
         {comboBadge && (() => {
-          // 시트에 있는 배지: 10/50/100/200 — 가장 가까운 값으로 매핑
-          const target = comboBadge.value >= 100 ? '100'
+          // 시트에 있는 배지: 10/50/100/200/500 — 가장 가까운 값으로 매핑
+          const target = comboBadge.value >= 500 ? '500'
+                       : comboBadge.value >= 200 ? '200'
+                       : comboBadge.value >= 100 ? '100'
                        : comboBadge.value >= 50 ? '50'
                        : comboBadge.value >= 25 ? '50'   // 25 는 50 배지 빌려쓰기
                        : '10';
