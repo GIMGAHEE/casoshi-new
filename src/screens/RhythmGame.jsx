@@ -64,6 +64,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
   const [sabiActive, setSabiActive] = useState(false);   // 현재 사비 구간인지
   const [sabiBanner, setSabiBanner] = useState(false);   // 사비 배너 표시 중인지
   const [speech, setSpeech] = useState(null);            // 캐릭터 말풍선
+  const [paused, setPaused] = useState(false);           // 일시정지 상태
 
   const startTimeRef = useRef(0);
   const notesIndexRef = useRef(0);                       // 다음 스폰할 노트 인덱스
@@ -72,6 +73,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
   const sabiBannerFiredRef = useRef(false);              // 배너 중복 트리거 방지
   const prevComboRef = useRef(0);                        // 콤보 마일스톤 말풍선 트리거용
   const bgmRef = useRef(null);                           // BGM 엔진
+  const pauseStartRef = useRef(0);                       // 일시정지 시작 시각
 
   // 말풍선 표시 (id 바뀔 때마다 useEffect 가 auto-cleanup)
   const showSpeech = (key) => {
@@ -169,6 +171,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
   // 메인 게임 루프 (60fps)
   useEffect(() => {
     if (state !== 'playing') return;
+    if (paused) return;
 
     const loop = () => {
       const now = performance.now();
@@ -243,7 +246,7 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
     rafRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state, fever, feverEndsAt, timeline, sabiActive]);
+  }, [state, fever, feverEndsAt, timeline, sabiActive, paused]);
 
   const showJudgment = (label, rarity = 'N') => {
     clearTimeout(judgmentFxTimerRef.current);
@@ -491,6 +494,19 @@ export default function RhythmGame({ points, setPoints, myOshi, onBack }) {
           sabiActive={sabiActive}
           sabiBanner={sabiBanner}
           speech={speech}
+          paused={paused}
+          onTogglePause={() => {
+            setPaused(p => {
+              if (!p) {
+                pauseStartRef.current = performance.now();
+              } else {
+                const dur = performance.now() - pauseStartRef.current;
+                startTimeRef.current += dur;
+                if (fever) setFeverEndsAt(e => e + dur);
+              }
+              return !p;
+            });
+          }}
         />
       )}
 
@@ -587,6 +603,7 @@ function PlayField({
   elapsed, activeNotes, score, combo, fever, feverEndsAt,
   stats, judgmentFx, hearts, onHit, charNormalFrames, charFeverFrames,
   sabiActive, sabiBanner, speech, feverCutIn, comboBadge, reactionSprite,
+  paused, onTogglePause,
 }) {
   const timeLeft = Math.max(0, SESSION_DURATION_MS - elapsed);
   const progress = Math.min(1, elapsed / SESSION_DURATION_MS);
@@ -606,8 +623,8 @@ function PlayField({
 
   return (
     <div className="flex-1 flex flex-col mt-2">
-      {/* HUD 상단 — PNG 배경 + 텍스트 오버레이 */}
-      <div className="flex items-stretch gap-1.5 mb-2" style={{ height: '52px' }}>
+      {/* HUD 1줄: SCORE | COMBO | 残り | PAUSE */}
+      <div className="flex items-stretch gap-1.5 mb-1.5" style={{ height: '52px' }}>
         {/* SCORE — score_box.png */}
         <div className="relative h-full" style={{ aspectRatio: '928/297' }}>
           <img
@@ -632,71 +649,31 @@ function PlayField({
           </div>
         </div>
 
-        {/* COMBO — combo_label.png (PNG 의 "123" 자리에 진짜 콤보 수 오버레이) */}
-        <div className="relative h-full" style={{ aspectRatio: '574/280' }}>
+        {/* COMBO — combo_label.png (잘려서 'COMBO' 라벨만) + 아래 큰 노란 숫자 */}
+        <div className="flex flex-col items-center justify-center h-full px-1" style={{ minWidth: '4.5rem' }}>
           <img
             src="/rhythm/combo_label.png"
             alt=""
-            className="absolute inset-0 w-full h-full pointer-events-none select-none"
-            style={{ objectFit: 'fill' }}
+            className="pointer-events-none select-none"
+            style={{ height: '50%', width: 'auto', objectFit: 'contain' }}
             draggable={false}
           />
           <div
-            className="absolute font-black tabular-nums"
+            className="font-black tabular-nums leading-none"
             style={{
-              left: '50%',
-              top: '72%',
-              transform: 'translate(-50%, -50%)',
-              fontSize: 'clamp(14px, 3.5vw, 20px)',
-              color: '#FFD93D',
-              WebkitTextStroke: '1.2px #C76A00',
-              textShadow: '0 2px 0 #C76A00',
-              minWidth: '40%',
-              textAlign: 'center',
-              background: 'linear-gradient(180deg, #FFE99A 0%, #FFB800 100%)',
+              fontSize: 'clamp(16px, 4vw, 22px)',
+              background: 'linear-gradient(180deg, #FFE99A 0%, #FFB800 60%, #FF8800 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              filter: 'drop-shadow(0 2px 0 #B85C00)',
+              filter: 'drop-shadow(0 2px 0 #B85C00) drop-shadow(0 0 4px rgba(255,184,0,0.4))',
+              marginTop: '2px',
             }}
           >
             {combo}
           </div>
         </div>
 
-        {/* FEVER 게이지 — fever_gauge.png + 트랙 영역 fill */}
-        <div className="relative flex-1 h-full min-w-0">
-          <img
-            src="/rhythm/fever_gauge.png"
-            alt=""
-            className="absolute inset-0 w-full h-full pointer-events-none select-none"
-            style={{ objectFit: 'fill' }}
-            draggable={false}
-          />
-          {/* 트랙 영역 위의 게이지 fill (PNG 의 빈 트랙 위치에 맞춰 좌표 잡음) */}
-          <div
-            className="absolute overflow-hidden"
-            style={{
-              left: '32%',
-              right: '4%',
-              top: '38%',
-              bottom: '34%',
-              borderRadius: '999px',
-            }}
-          >
-            <div
-              className="h-full transition-[width] duration-200"
-              style={{
-                width: `${(fever ? feverLeft : Math.min(1, combo / FEVER_TRIGGER_COMBO)) * 100}%`,
-                background: fever
-                  ? 'linear-gradient(90deg, #FFB800, #FF6B9D, #B77EE0)'
-                  : 'linear-gradient(90deg, #FF6B9D, #FF99CC)',
-                animation: fever ? 'feverPulse 1s ease infinite' : undefined,
-              }}
-            />
-          </div>
-        </div>
-
-        {/* 残り時間 — 기존 CSS div 유지 (PNG 없음, 톤은 score_box 와 비슷하게) */}
+        {/* 잔여 시간 (PNG 없음, score 톤에 맞춰) */}
         <div
           className="px-2 py-1 text-center flex flex-col justify-center"
           style={{
@@ -716,12 +693,12 @@ function PlayField({
           </div>
         </div>
 
-        {/* PAUSE 버튼 */}
+        {/* PAUSE 버튼 (PNG, onClick → onTogglePause) */}
         <button
           type="button"
-          onClick={() => { /* TODO: pause 기능 다음 차시 */ }}
+          onClick={onTogglePause}
           className="relative h-full aspect-square shrink-0 active:scale-90 transition-transform"
-          aria-label="pause"
+          aria-label={paused ? 'resume' : 'pause'}
         >
           <img
             src="/rhythm/pause_btn.png"
@@ -731,6 +708,39 @@ function PlayField({
             draggable={false}
           />
         </button>
+      </div>
+
+      {/* HUD 2줄: FEVER 게이지 (한 줄 가득) */}
+      <div className="relative w-full mb-2" style={{ height: '46px' }}>
+        <img
+          src="/rhythm/fever_gauge.png"
+          alt=""
+          className="absolute inset-0 w-full h-full pointer-events-none select-none"
+          style={{ objectFit: 'fill' }}
+          draggable={false}
+        />
+        {/* 트랙 영역 위의 게이지 fill */}
+        <div
+          className="absolute overflow-hidden"
+          style={{
+            left: '32%',
+            right: '4%',
+            top: '38%',
+            bottom: '34%',
+            borderRadius: '999px',
+          }}
+        >
+          <div
+            className="h-full transition-[width] duration-200"
+            style={{
+              width: `${(fever ? feverLeft : Math.min(1, combo / FEVER_TRIGGER_COMBO)) * 100}%`,
+              background: fever
+                ? 'linear-gradient(90deg, #FFB800, #FF6B9D, #B77EE0)'
+                : 'linear-gradient(90deg, #FF6B9D, #FF99CC)',
+              animation: fever ? 'feverPulse 1s ease infinite' : undefined,
+            }}
+          />
+        </div>
       </div>
 
       {/* 진행 바 */}
@@ -1039,6 +1049,28 @@ function PlayField({
           );
         })}
       </div>
+
+      {/* PAUSED 오버레이 */}
+      {paused && (
+        <div
+          className="fixed inset-0 z-[60] flex flex-col items-center justify-center"
+          style={{ background: 'rgba(15, 8, 30, 0.75)', backdropFilter: 'blur(4px)' }}
+          onClick={onTogglePause}
+        >
+          <div
+            className="font-black tracking-widest mb-3"
+            style={{
+              fontSize: '40px',
+              color: '#FFE99A',
+              textShadow: '0 4px 0 #C76A00, 0 0 24px rgba(255,184,0,0.6)',
+              letterSpacing: '0.2em',
+            }}
+          >
+            PAUSED
+          </div>
+          <div className="text-white/80 text-sm">タップで再開</div>
+        </div>
+      )}
     </div>
   );
 }
