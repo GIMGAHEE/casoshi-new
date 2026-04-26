@@ -655,16 +655,18 @@ function PlayField({
           className="absolute pointer-events-none select-none"
           style={{
             left: '50%',
-            top: '20%',
+            // 캐릭터 sprite 는 정사각 캔버스 + 발 위치 92% 통일
+            // top 12% 부터 시작해서 height 65% — 발 끝이 게임영역 76% 부근에 옴
+            top: '12%',
             transform: `translateX(-50%) scale(${charScale})`,
-            height: '40%',
+            height: '65%',
             width: 'auto',
             imageRendering: 'pixelated',
             zIndex: 4,
             filter: fever
               ? 'drop-shadow(0 0 20px rgba(255,184,0,0.9)) drop-shadow(0 6px 10px rgba(0,0,0,0.4))'
               : 'drop-shadow(0 6px 12px rgba(0,0,0,0.4))',
-            transition: 'transform 0.3s ease, height 0.3s ease',
+            transition: 'transform 0.15s ease',
           }}
           draggable={false}
         />
