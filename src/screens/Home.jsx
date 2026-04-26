@@ -30,11 +30,19 @@ export default function Home({
     setLastCheckin(today);
   };
 
-  // 보라+핑크 톤 카드 스타일 (흰 카드들 톤 통일용)
-  const purpleCard = {
-    borderColor: '#D4B8F0',
-    background: 'linear-gradient(135deg, #FFFFFF 0%, #FAF3FF 55%, #F0E6FA 100%)',
-    boxShadow: '0 4px 14px rgba(155, 123, 217, 0.18)',
+  // 산리오/픽셀 UI 톤 — 단색 BG + 단색 그림자 (blur 0)
+  const pixelCard = {
+    background: '#fff0f6',
+    borderColor: '#ff7eb6',
+    borderRadius: '12px',
+    boxShadow: '0 3px 0 0 #ff5fa2',
+  };
+  // 선택/강조 카드 (랭킹) — 노랑 톤
+  const pixelCardSelected = {
+    background: '#fff8d8',
+    borderColor: '#ffaa2a',
+    borderRadius: '12px',
+    boxShadow: '0 3px 0 0 #d8800a',
   };
 
   return (
@@ -58,7 +66,7 @@ export default function Home({
           <button
             onClick={handleCheckin}
             disabled={!canCheckin}
-            style={purpleCard}
+            style={pixelCard}
             className={`card flex flex-col items-center justify-center py-4 px-2 transition ${
               canCheckin ? 'hover:brightness-105 cursor-pointer' : 'opacity-50 cursor-not-allowed'
             }`}
@@ -78,7 +86,8 @@ export default function Home({
           {/* 랭킹 — 노란색 강조 (핵심 기능) */}
           <button
             onClick={onOpenRanking}
-            className="card flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-br from-yellow-100 via-yellow-50 to-white ring-2 ring-yellow-300 shadow-lg hover:scale-[1.03] transition-transform"
+            style={pixelCardSelected}
+            className="card flex flex-col items-center justify-center py-4 px-2 hover:brightness-105 transition"
           >
             <img
               src="/icons/trophy.png"
@@ -96,7 +105,8 @@ export default function Home({
             return (
               <button
                 onClick={onOpenLiverDashboard}
-                className="card relative flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-br from-pink-100 via-pink-50 to-white ring-2 ring-pink-200 hover:scale-[1.03] transition-transform"
+                style={pixelCard}
+                className="card relative flex flex-col items-center justify-center py-4 px-2 hover:brightness-105 transition"
               >
                 <span className="absolute top-1 right-1 text-[8px] font-black bg-oshi-main text-white px-1.5 py-0.5 rounded-full">
                   LIVER
@@ -116,7 +126,8 @@ export default function Home({
           })() : myOshiChar ? (
             <button
               onClick={() => onSelectCharacter(MY_OSHI_ID)}
-              className="card flex flex-col items-center justify-center py-4 px-2 bg-gradient-to-br from-pink-100 via-pink-50 to-white ring-2 ring-pink-200 hover:scale-[1.03] transition-transform"
+              style={pixelCard}
+              className="card flex flex-col items-center justify-center py-4 px-2 hover:brightness-105 transition"
             >
               <AvatarTile
                 sprite={myOshiChar.sprite}
@@ -132,7 +143,14 @@ export default function Home({
           ) : (
             <button
               onClick={onOpenBuilder}
-              className="card flex flex-col items-center justify-center py-4 px-2 bg-white border-dashed border-2 border-oshi-main/40 hover:scale-[1.03] transition-transform"
+              style={{
+                background: '#fff0f6',
+                borderColor: '#ff7eb6',
+                borderRadius: '12px',
+                borderStyle: 'dashed',
+                boxShadow: '0 3px 0 0 #ff5fa2',
+              }}
+              className="card flex flex-col items-center justify-center py-4 px-2 hover:brightness-105 transition"
             >
               <div className="w-12 h-12 mb-1 flex items-center justify-center text-3xl">➕</div>
               <div className="text-[11px] font-bold text-oshi-main leading-tight text-center">マイ推し</div>
@@ -145,7 +163,7 @@ export default function Home({
         <div className="grid grid-cols-4 gap-2">
           <button
             onClick={onOpenTapGame}
-            style={purpleCard}
+            style={pixelCard}
             className="card !p-2 flex flex-col items-center justify-center py-3 hover:scale-[1.03] transition-transform"
           >
             <img
@@ -160,7 +178,7 @@ export default function Home({
 
           <button
             onClick={onOpenCraneGame}
-            style={purpleCard}
+            style={pixelCard}
             className="card !p-2 flex flex-col items-center justify-center py-3 hover:scale-[1.03] transition-transform"
           >
             <img
@@ -175,7 +193,7 @@ export default function Home({
 
           <button
             onClick={onOpenRhythmGame}
-            style={purpleCard}
+            style={pixelCard}
             className="card !p-2 relative flex flex-col items-center justify-center py-3 hover:scale-[1.03] transition-transform"
           >
             <span className="absolute top-1 right-1 text-[7px] font-black bg-oshi-main text-white px-1 py-0.5 rounded-full">NEW</span>
@@ -191,7 +209,7 @@ export default function Home({
 
           <button
             onClick={onOpenGacha}
-            style={purpleCard}
+            style={pixelCard}
             className="card !p-2 relative flex flex-col items-center justify-center py-3 hover:scale-[1.03] transition-transform"
           >
             <span className="absolute top-1 right-1 text-[7px] font-black bg-oshi-main text-white px-1 py-0.5 rounded-full">NEW</span>
@@ -218,7 +236,15 @@ export default function Home({
           <span className="text-xs text-oshi-dark/60">{registeredLivers.length}人</span>
         </div>
         {registeredLivers.length === 0 ? (
-          <div className="bg-white/60 rounded-2xl border-2 border-dashed p-6 text-center" style={{ borderColor: '#D4B8F0' }}>
+          <div
+            className="p-6 text-center"
+            style={{
+              background: '#fff0f6',
+              border: '2px dashed #ff7eb6',
+              borderRadius: '12px',
+              boxShadow: '0 3px 0 0 #ff5fa2',
+            }}
+          >
             <img src="/icons/mic.png" alt="" className="w-10 h-10 object-contain mx-auto mb-2" style={{ imageRendering: 'pixelated' }} />
             <div className="text-xs text-oshi-dark/60">
               まだ登録されたライバーがいません
