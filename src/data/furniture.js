@@ -484,9 +484,11 @@ export const findFurniture = (id) =>
   FURNITURE_CATALOG.find(f => f.id === id);
 
 // ===== 가구 해금 시스템 =====
-// 카테고리별로 2개씩 단계 해금. Lv.1 = 처음 2개, Lv.2 = 다음 2개, Lv.3 = 다음 2개 ...
-// 예) seat 카테고리에 가구 6개: index 0,1→Lv.1 / 2,3→Lv.2 / 4,5→Lv.3
+// 카테고리별로 2개씩 5레벨 간격으로 해금.
+// Lv.5 = 처음 2개, Lv.10 = 다음 2개, Lv.15 = 다음 2개 ...
+// 예) seat 카테고리 가구 6개: index 0,1→Lv.5 / 2,3→Lv.10 / 4,5→Lv.15
 const PER_LEVEL_PER_CATEGORY = 2;
+const LEVEL_STEP = 5;
 
 // 카테고리별 가구 순서 인덱스를 캐시
 const _categoryIndexCache = (() => {
@@ -503,7 +505,7 @@ const _categoryIndexCache = (() => {
 // 특정 가구의 해금 레벨
 export const getFurnitureUnlockLevel = (furnitureId) => {
   const idx = _categoryIndexCache[furnitureId] ?? 0;
-  return Math.floor(idx / PER_LEVEL_PER_CATEGORY) + 1;
+  return (Math.floor(idx / PER_LEVEL_PER_CATEGORY) + 1) * LEVEL_STEP;
 };
 
 // 현재 레벨에서 사용 가능한지
